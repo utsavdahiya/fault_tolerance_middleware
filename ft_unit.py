@@ -1,7 +1,8 @@
 #this is the base class for ft_units
 # ft_unit is the basic module that implements any and all fault tolerant stratergies 
 #it gives a template for the stratergy that is then realised by replication manager and fault detection manager
-  
+import replication_stratergy
+
 class ft_unit:
     """Base class for ft_unit"""
     def __init__(self):
