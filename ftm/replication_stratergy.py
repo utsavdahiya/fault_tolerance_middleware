@@ -1,3 +1,7 @@
+'''
+    defines the functions required to implement a replication stratergy
+'''
+
 class replication_stratergy:
     """base class for replication stratergy"""
 
