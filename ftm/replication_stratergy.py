@@ -1,6 +1,10 @@
 '''
     defines the functions required to implement a replication stratergy
 '''
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("Exchange")
 
 class Replication_stratergy:
     """base class for replication stratergy"""
@@ -11,4 +15,5 @@ class Replication_stratergy:
         self.backup_config = [] #a list of configurations(YAML file) for backup VMs
     
     def replicationStrat(self):
+        """implements the stratergy named in self.mechanism"""
         raise NotImplementedError()
