@@ -11,31 +11,57 @@ logger = logging.getLogger("Exchange")
 class ReplicationStratergy:
     """base class for replication stratergy"""
 
-    def __init__(self):
-        self.mechanism = "active/passive/semi-active"   #placeholder for actual mechanism implementaion object
-        self.num_of_replica = 0
-        self.backup_config = [] #a list of configurations(YAML file) for backup VMs
+    def __init__(self, mech_name, data):
+        """initialises variables
+        
+            mech_name:str- the name/id of the chosen mechanism
+            data:<key:value>- dict(hashmap) of required paramters for the strat. 
+                        eg- {num_of_replica:5, primary_config:<config>, backup_config:<config>}
+        """
+        self.mech_name = mech_name   #type:str- placeholder for actual mechanism implementaion object
+        self.num_of_replica = data['num_of_replica']
+        self.backup_config = data['backup_config'] #a list of configurations(YAML file) for backup VMs
+        
+        #Qos attributes
+        self.latency = data['latency']
+        self.comp_req = data['comp_req']
     
-    def replicationStrat(self):
+    def replication_strat(self):
         """implements the stratergy named in self.mechanism"""
+
+        raise NotImplementedError()
+
+class FaultDetectionStratergy:
+    """base class for a fault detection stratergy; meant to be inherited"""
+
+    def __init__(self, mech_name, data):
+        self.mech_name = mech_name    #type:str just a name for the mechanism
+        #a few attributes of the chosen stratergy
+        self.latency = data['latency']    #avg time taken bw occrance and detection of a fault
+        self.comp_req = data['comp_req']  #the computaional requirements of the strat
+
+    def detection_strat(self):
+        """"implements the stratergy named in self.mechanism"""
+
         raise NotImplementedError()
 
 class FtUnit:
     """Base class for ft_unit"""
-    def __init__(self, id):
+
+    def __init__(self, id, replication_strat, detection_strat):
         self.id = id
-        self.qos = {"latency" : 0,
+
+        self.replication_strat = replication_strat  #type:ReplicationStratergy instance
+        self.fault_detection_strat = detection_strat    #type:FaultDetectionStratergy instance
+        self.cost_factor = 1
+        self.latency = self.replication_strat.latency + self.fault_detection_strat.latency  #it is a function of all components
+        self.qos = {"latency" : self.latency,
                 "bandwidth" : 0,
                 "availability" : 0}
-        self.cost_factor = 1
-        self.replication_strat = "stratergy_object_placeholder"
-        self.fault_detection_strat = "stratergy_object_placeholder"
-    
-    def get_id(self):
-        raise NotImplementedError
-    
+        
     def value(self):
         """returns the quality values of the ft_unit for ranking it"""
+
         return self.qos
     
     def demo(self):
