@@ -24,5 +24,5 @@ class ServiceDirectory():
                 ft_unit: An object of ft_unit
         """
         id = ft_unit.get_id()
-        ft_units[id] = ft_unit
+        self.ft_units[id] = ft_unit
         logger.info("added " + id + " to directory")
