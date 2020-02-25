@@ -7,7 +7,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Exchange")
 
-class ft_unit:
+class FtUnit:
     """Base class for ft_unit"""
     def __init__(self):
         self.id = 0
@@ -17,6 +17,9 @@ class ft_unit:
         self.cost_factor = 1
         self.replication_strat = "stratergy_object_placeholder"
         self.fault_detection_strat = "stratergy_object_placeholder"
+    
+    def get_id(self):
+        raise NotImplementedError
     
     def value(self):
         """returns the quality values of the ft_unit for ranking it"""
