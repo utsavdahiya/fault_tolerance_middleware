@@ -1,5 +1,5 @@
 import ftm_kernel.service_dir
-import ft_unit
+import ft_units
 
 import logging
 logging.basicConfig(level=logging.INFO)
