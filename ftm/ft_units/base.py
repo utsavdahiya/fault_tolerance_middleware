@@ -9,8 +9,8 @@ logger = logging.getLogger("Exchange")
 
 class FtUnit:
     """Base class for ft_unit"""
-    def __init__(self):
-        self.id = 0
+    def __init__(self, id):
+        self.id = id
         self.qos = {"latency" : 0,
                 "bandwidth" : 0,
                 "availability" : 0}
@@ -25,4 +25,5 @@ class FtUnit:
         """returns the quality values of the ft_unit for ranking it"""
         return self.qos
     
-    
+    def demo(self):
+        print("printing from ft_unit")
