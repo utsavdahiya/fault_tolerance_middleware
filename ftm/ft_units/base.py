@@ -1,11 +1,24 @@
-#this is the base class for ft_units
-# ft_unit is the basic module that implements any and all fault tolerant stratergies 
-#it gives a template for the stratergy that is then realised by replication manager and fault detection manager
-import replication_stratergy
+"""this is the base class for ft_units
+
+ft_unit is the basic module that implements any and all fault tolerant stratergies 
+it gives a template for the stratergy that is then realised by replication manager and fault detection manager
+"""
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Exchange")
+
+class ReplicationStratergy:
+    """base class for replication stratergy"""
+
+    def __init__(self):
+        self.mechanism = "active/passive/semi-active"   #placeholder for actual mechanism implementaion object
+        self.num_of_replica = 0
+        self.backup_config = [] #a list of configurations(YAML file) for backup VMs
+    
+    def replicationStrat(self):
+        """implements the stratergy named in self.mechanism"""
+        raise NotImplementedError()
 
 class FtUnit:
     """Base class for ft_unit"""
