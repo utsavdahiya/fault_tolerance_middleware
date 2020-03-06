@@ -1,5 +1,6 @@
 import ftm_kernel.service_dir
 import ft_units
+import messaging_monitor
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -7,8 +8,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Exchange")
 
 class Application():
-    def __init__(self):
-        pass
+    def __init__(self, msg_monitor):
+        self.msg_monitor = msg_monitor
 
     def on_connect_client(self):
         """callback on establishing contact with client"""
