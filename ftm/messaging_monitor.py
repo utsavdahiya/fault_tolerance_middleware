@@ -15,4 +15,5 @@ class MessagingMonitor():
     def connect(self, destination):
         pass
 
-    def disconnect(self, )
+    def disconnect(self):
+        pass
