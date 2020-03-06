@@ -24,7 +24,7 @@ class Application():
         pass
 
 def main():
-    unit = ft_units.base.FtUnit("007")
+    unit = ft_units.base.FtUnit("007", "replication", "fault_tolerance")
     unit.demo()
 
 if __name__=='__main__':
