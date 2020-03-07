@@ -6,7 +6,7 @@ it gives a template for the stratergy that is then realised by replication manag
 import logging
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("Exchange")
+logger = logging.getLogger("ft_unit_base")
 
 class ReplicationStratergy:
     """base class for replication stratergy"""
