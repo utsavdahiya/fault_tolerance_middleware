@@ -39,19 +39,23 @@ async def main():
 
     #initialising server where you can send requests
     port = "8081"   #set port number to where you want to send requests
-    await app.msg_monitor.server_setup(port)
+    app.msg_monitor.server_setup(port)
     '''my server is now running and can handle your requests at:
         get_req: /
         post_rep: /post
         websocket messages: /ws'''
 
-    await app.msg_monitor.connect_cloud() #sends a simple get req to your server
+    app.msg_monitor.connect_cloud() #sends a simple get req to your server
     msg = {"desc": "hum honge kamiyaaab"}   #msg has to be in json format
     msg = json.dumps(msg)   #converts it to json
     logger.info("sending msg")
-    await app.msg_monitor.send(msg, 'cloud')  #cloud is the destination and is automatically set to cloudsim_url you provide above
+    app.msg_monitor.send(msg, 'cloud')  #cloud is the destination and is automatically set to cloudsim_url you provide above
 
-
+    await asyncio.gather(
+        app.msg_monitor.server_setup(port),
+        app.msg_monitor.connect_cloud(),
+        app.msg_monitor.send(msg, 'cloud')
+    )
 
 if __name__=='__main__':
    asyncio.run(main())
