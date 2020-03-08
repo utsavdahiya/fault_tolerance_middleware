@@ -29,6 +29,7 @@ class MessagingMonitor():
 			self.cloud_session = session
 			async with session.get(self.cloudsim_url, data=b'hentai') as resp:
 				data = resp.text()
+				logger.info("connected succcessfully")
 				logger.info("connection response: " + data)
 
 	def disconnect(self):
@@ -69,11 +70,11 @@ class MessagingMonitor():
 
 		return ws
 
-	async def server_setup(self):
+	async def server_setup(self, port):
 		'''server for cloudsim'''
 		app = web.Application()
 		app.add_routes([web.get('/ws', self.websocket_handler),
                     web.get('/', self.cloud_get_handler),
                     web.post('/post', self.cloud_post_handler)])
 		logger.info("application running")
-		web.run_app(app)
+		web.run_app(app, host='0.0.0.0', port = port)
