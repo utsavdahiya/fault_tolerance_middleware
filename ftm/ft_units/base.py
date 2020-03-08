@@ -54,7 +54,8 @@ class FtUnit:
         self.replication_strat = replication_strat  #type:ReplicationStratergy instance
         self.fault_detection_strat = detection_strat    #type:FaultDetectionStratergy instance
         self.cost_factor = 1
-        self.latency = self.replication_strat.latency + self.fault_detection_strat.latency  #it is a function of all components
+        # self.latency = self.replication_strat.latency + self.fault_detection_strat.latency  #it is a function of all components
+        self.latency = "latency"
         self.qos = {"latency" : self.latency,
                 "bandwidth" : 0,
                 "availability" : 0}
