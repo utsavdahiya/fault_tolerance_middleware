@@ -9,6 +9,8 @@ it performs two functions:
 import asyncio
 import aiohttp
 from aiohttp import web
+import nest_asyncio
+nest_asyncio.apply()
 
 import logging
 logging.basicConfig(level=logging.INFO)
