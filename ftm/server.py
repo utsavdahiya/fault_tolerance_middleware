@@ -48,6 +48,7 @@ async def main():
     await app.msg_monitor.connect_cloud() #sends a simple get req to your server
     msg = {"desc": "hum honge kamiyaaab"}   #msg has to be in json format
     msg = json.dumps(msg)   #converts it to json
+    logger.info("sending msg")
     await app.msg_monitor.send(msg, 'cloud')  #cloud is the destination and is automatically set to cloudsim_url you provide above
 
 
