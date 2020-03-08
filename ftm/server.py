@@ -5,7 +5,7 @@ import messaging_monitor
 import logging
 logging.basicConfig(level=logging.INFO)
 
-logger = logging.getLogger("Exchange")
+logger = logging.getLogger(__name__)
 
 class Application():
     def __init__(self, msg_monitor):

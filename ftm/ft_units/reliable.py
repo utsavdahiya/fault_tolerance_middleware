@@ -5,7 +5,7 @@ from .base import ReplicationStratergy, FaultDetectionStratergy, FtUnit
 import logging
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("Exchange")
+logger = logging.getLogger(__name__)
 
 class Replication(ReplicationStratergy):
     """extends the ReplicationStratergy class inherited from base"""
