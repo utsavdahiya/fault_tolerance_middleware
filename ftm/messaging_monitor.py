@@ -27,6 +27,7 @@ class MessagingMonitor():
 		self.session = {}   #a dictionary of <client_id:client_session>
 
 	async def connect_cloud(self):
+		logger.info("connecting to cloud...")
 		async with aiohttp.ClientSession() as session:
 			self.cloud_session = session
 			async with session.get(self.cloudsim_url, data=b'hentai') as resp:
@@ -38,6 +39,7 @@ class MessagingMonitor():
 		pass
 
 	async def send(self, msg, destination):
+		logger.info("sending msg to " + str(destination))
 		if(destination == 'cloud'):
 			url = self.cloudsim_url
 			async with self.cloud_session as session:
