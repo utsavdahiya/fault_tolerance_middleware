@@ -49,12 +49,12 @@ async def main():
     msg = {"desc": "hum honge kamiyaaab"}   #msg has to be in json format
     msg = json.dumps(msg)   #converts it to json
     logger.info("sending msg")
-    app.msg_monitor.send(msg, 'cloud')  #cloud is the destination and is automatically set to cloudsim_url you provide above
+    app.msg_monitor.send(msg, 'cloud')  #it is a post req, cloud is the destination and is automatically set to cloudsim_url you provide above
 
     await asyncio.gather(
         app.msg_monitor.server_setup(port),
-        app.msg_monitor.connect_cloud(),
-        app.msg_monitor.send(msg, 'cloud')
+        # app.msg_monitor.connect_cloud(),
+        # app.msg_monitor.send(msg, 'cloud')
     )
 
 if __name__=='__main__':

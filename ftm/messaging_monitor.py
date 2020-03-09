@@ -31,7 +31,7 @@ class MessagingMonitor():
 		async with aiohttp.ClientSession() as session:
 			self.cloud_session = session
 			async with session.get(self.cloudsim_url, data=b'hentai') as resp:
-				data = resp.text()
+				data = await resp.text()
 				logger.info("connected succcessfully")
 				logger.info("connection response: " + data)
 
@@ -81,4 +81,4 @@ class MessagingMonitor():
                     web.get('/', self.cloud_get_handler),
                     web.post('/post', self.cloud_post_handler)])
 		logger.info("application running")
-		web.run_app(app, host='0.0.0.0', port = port)
+		web.run_app(app, port = port)
