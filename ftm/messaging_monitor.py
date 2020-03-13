@@ -59,14 +59,14 @@ class MessagingMonitor():
 	async def websocket_handler(self, request):
 		ws = web.WebSocketResponse()
 		await ws.prepare(request)
-
+		await ws.send_str("welcome to websocket server")
 		async for msg in ws:
 			logger.info("msg: " + str(msg.data))
 			if msg.type == aiohttp.WSMsgType.TEXT:
 				if msg.data == 'close':
 					await ws.close()
 				else:
-					await ws.send_str(msg.data + '/answer')
+					await ws.send_str(msg.data + '/server_resp')
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				print('ws connection closed with exception %s' %ws.exception())
 
