@@ -26,15 +26,15 @@ public class Client {
     }
 
     @OnMessage
-    public String onMessage(String message, Session session) {
+    public void onMessage(String message, Session session) {
         BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-        try {
+//        try {
             logger.info("Received ...." + message);
-            String userInput = bufferRead.readLine();
-            return userInput;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//            String userInput = bufferRead.readLine();
+//            return userInput;
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     @OnClose
@@ -48,7 +48,9 @@ public class Client {
         ClientManager client = ClientManager.createClient();
         try {
             Session currSession = client.connectToServer(Client.class, new URI("ws://localhost:8081/ws"));
-            currSession.getBasicRemote().sendText("Chal jaa bhai");
+            currSession.getBasicRemote().sendText("1");
+            currSession.getBasicRemote().sendText("2");
+
             latch.await();
         } catch (DeploymentException | URISyntaxException | InterruptedException | IOException e) {
             throw new RuntimeException(e);
