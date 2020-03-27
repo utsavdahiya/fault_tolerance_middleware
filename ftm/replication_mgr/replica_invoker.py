@@ -7,8 +7,6 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def get_id():
-    pass
 
 class invoker:
     '''class to invole the replicas'''
@@ -28,20 +26,29 @@ class invoker:
                 for name, config in item:
                     self.configs[name] = config     #add config to self.configs
 
-    def instantiate_replicas(self, config_info):
+    def instantiate_replicas(self, config_info, app):
         '''asks resource manager to invoke specified configs
         
+        once the VMs have been invoked it also registers them with the app
         Args:
             config_info: A list of tuples of config names(IDs) to be invoked(instantiated):
-                example: [(config_name, number of VMs to be invoked), (), ...]
+                example: [(config_type, number of VMs to be invoked), (), ...]
+                    config_type is an identifier(str) such as primary config etc
+            app: the instance of app object from within which this function has been called
+        Returns:
+            VMs: a dict of list of VMs according the config names as received in confid_info:
+                example: {config_type: [VMs of type config_type that have been invoked]}
         '''
         VMs = dict()
         for item in config_info:
             vm_list = []
-            for i in range(item[2]):
-                id = get_id()
+            for i in range(item[1]):
                 config_name = item[0]
                 config = self.configs.get(config_name)
                 #create a new VM object
                 vm = VM(id, config)
-                
+                #call resource manager to get resources allocated from the 
+                app.self.VMs[id] = vm
+                vm_list.append(vm)
+            VMs[item[0]] = vm_list
+        return VMs
