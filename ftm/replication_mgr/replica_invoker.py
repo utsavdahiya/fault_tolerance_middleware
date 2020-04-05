@@ -1,7 +1,7 @@
 '''to invoke the required number of replicas(via the resource manager) and return a list of them
     it receives the requirements from composition engine and returns the list to it
 '''
-from .VM import VM
+from VM import VM
 
 import logging
 logging.basicConfig(level=logging.INFO)

@@ -7,7 +7,7 @@
     <output>
         it returns a list of eligible ft_units
 '''
-from ft_units import ft_unit_base
+from ft_units.ft_unit_base import FtUnit
 
 import logging
 
@@ -22,7 +22,7 @@ class ServiceDirectory():
         #adding demo unit
         self.ft_units['demo'] = 'demo ft_unit'
     
-    def add_unit(self, ft_unit: ft_unit_base.FtUnit):
+    def add_unit(self, ft_unit: FtUnit):
         """adds an ft_unit to the service directory
             
             Args:
@@ -32,7 +32,7 @@ class ServiceDirectory():
         self.ft_units[id] = ft_unit
         logger.info("added " + id + " to directory")
 
-    def find_eligible_units(self, requirements: dict) -> list:
+    async def find_eligible_units(self, requirements: dict) -> list:
         '''searches self.ft_units for eligible ft_units
         
             Args:
