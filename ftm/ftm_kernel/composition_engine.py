@@ -7,3 +7,25 @@
     <output>
         >return
 '''
+from ft_units.ft_unit_base import FtUnit
+
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class CompositionEngine():
+    '''creates a ft_unit solution from eligible ft_units'''
+    def __init__(self):
+        pass
+
+    async def compose_solution(self, ft_units: list) -> FtUnit:
+        '''compose a suitable solution from given eligible ft_units
+        
+            Args:
+                ft_units: a list of eligible ft_units(staisfying user requirements)
+            Return:
+                returns an ft_unit that is chosen to be enforced
+        '''
+        #do trivial sort of the ft_units
+        #return the topmost
+        pass
