@@ -7,6 +7,8 @@
     <output>
         it returns a list of eligible ft_units
 '''
+from ft_units import ft_unit_base
+
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +22,7 @@ class ServiceDirectory():
         #adding demo unit
         self.ft_units['demo'] = 'demo ft_unit'
     
-    def add_unit(self, ft_unit):
+    def add_unit(self, ft_unit: ft_unit_base.FtUnit):
         """adds an ft_unit to the service directory
             
             Args:
@@ -30,6 +32,11 @@ class ServiceDirectory():
         self.ft_units[id] = ft_unit
         logger.info("added " + id + " to directory")
 
-    def find_eligible_units(self, requirements: dict):
+    def find_eligible_units(self, requirements: dict) -> list:
+        '''searches self.ft_units for eligible ft_units
+        
+            Args:
+                requirements: a dict of client's requirements
+            '''
         #for each val in req, find all matching ft_units
         pass

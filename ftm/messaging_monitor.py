@@ -6,11 +6,14 @@ it performs two functions:
 	>an interface for communication bw all the composition
 	>it also acts as interface bw the ftm and cloudsim
 '''
+import ftm_middleware
+
 import asyncio
 import aiohttp
 from aiohttp import web
-import nest_asyncio
-nest_asyncio.apply()
+import json
+# import nest_asyncio
+# nest_asyncio.apply()
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -67,7 +70,17 @@ class MessagingMonitor():
 					logger.info("closing the client side server")
 					await ws.close()
 				else:
-					await(ws.send_str(f"{msg.data}/server_resp"))
+					try:
+						req = json.loads(msg.data)
+						#send req to service directory
+						#send VM started reponse
+						pass
+					except:
+						if(msg.data == "new_connection"):
+							#create and send a id to client
+							#start an FTM instance for the client
+							pass
+						await ws.send_str(f"{msg.data}/server_resp")
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				print('ws connection closed with exception %s' %ws.exception())
 		
