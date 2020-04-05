@@ -4,12 +4,14 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-def get_id():
+def get_id(counter):
+    #return a unique id based on counter
     pass
 
 class VM:
+    counter = 1
     def __init__(self, id, config):
-        self.id = get_id()
+        counter += 1
+        self.id = get_id(counter) 
         self.config = config
-        self.status = 'inactive'
+        self.status = 'inactive'    #inactive(not running)/active(running)
