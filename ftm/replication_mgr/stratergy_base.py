@@ -11,6 +11,7 @@ class ReplicationStratergy:
     def __init__(self, mech_name, data):
         """initialises variables
         
+            Args:
             mech_name:str- the name/id of the chosen mechanism
             data:<key:value>- dict(hashmap) of required paramters for the strat. 
                         eg- {num_of_replica:5, primary_config:<config>, backup_config:<config>}
