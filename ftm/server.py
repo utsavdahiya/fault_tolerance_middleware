@@ -31,6 +31,8 @@ class Application():
         pass
 
 async def main():
+    tasks = []  #list of tasks to be run concurrently
+
     # unit = ft_units.base.FtUnit("007", "replication", "fault_tolerance")
     # unit.demo()
     cloudsim_url = 'http://0.0.0.0:8080/'   #set this to the url where your server is running
@@ -39,26 +41,23 @@ async def main():
 
     #initialising server where you can send requests
     port = "8081"   #set port number to where you want to send requests
-    task1 = asyncio.create_task(app.msg_monitor.server_setup(port))
+    tasks.append(asyncio.create_task(app.msg_monitor.server_setup(port)))
     '''my server is now running and can handle your requests at:
         get_req: /
         post_rep: /post
         websocket messages: /ws'''
 
-    task2 = asyncio.create_task(app.msg_monitor.connect_cloud()) #sends a simple get req to your server
+    tasks.append(asyncio.create_task(app.msg_monitor.connect_cloud())) #sends a simple get req to your server
     msg = {"desc": "hum honge kamiyaaab"}   #msg has to be in json format
     msg = json.dumps(msg)   #converts it to json
     logger.info("sending msg")
-    task3 = asyncio.create_task(app.msg_monitor.send(msg, 'cloud'))  #it is a post req, cloud is the destination and is automatically set to cloudsim_url you provide above
+    tasks.append(asyncio.create_task(app.msg_monitor.send(msg, 'cloud'))) #it is a post req, cloud is the destination and is automatically set to cloudsim_url you provide above
 
-    await task1
-    await task2
-    await task3
-    # await asyncio.gather(
-    #     app.msg_monitor.server_setup(port),
-    #     # app.msg_monitor.connect_cloud(),
-    #     # app.msg_monitor.send(msg, 'cloud')
-    # )
+    #starting client websocket server
+    tasks.append(asyncio.create_task(app.msg_monitor.client_setup(8082)))   #starting server where client can connect to
+
+    #gathering all the tasks
+    await asyncio.gather(task for task in tasks)
 
 if __name__=='__main__':
    asyncio.run(main())

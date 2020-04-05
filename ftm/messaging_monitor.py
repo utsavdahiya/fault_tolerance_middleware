@@ -56,6 +56,23 @@ class MessagingMonitor():
 		logger.info("post req received at /post")
 		return web.Response(text="you posted successfully")
 
+	async def client_websocket_handler(self, request):
+		ws = web.WebSocketResponse()
+		await ws.prepare(request)
+		await ws.send_str("Welcome to FTM, send your requirements")
+		async for msg in ws:
+			logger.info(f"client msg: {str(msg.data)}")
+			if msg.type == aiohttp.WSMsgType.TEXT:
+				if msg.data == 'close':
+					logger.info("closing the client side server")
+					await ws.close()
+				else:
+					await(ws.send_str(f"{msg.data}/server_resp"))
+			elif msg.type == aiohttp.WSMsgType.ERROR:
+				print('ws connection closed with exception %s' %ws.exception())
+		
+		print("ws client connection closed")
+
 	async def websocket_handler(self, request):
 		ws = web.WebSocketResponse()
 		await ws.prepare(request)
@@ -75,11 +92,19 @@ class MessagingMonitor():
 
 		return ws
 
-	async def server_setup(self, port):
+	async def server_setup(self, port: int):
 		'''server for cloudsim'''
 		app = web.Application()
 		app.add_routes([web.get('/ws', self.websocket_handler),
                     web.get('/', self.cloud_get_handler),
                     web.post('/post', self.cloud_post_handler)])
-		logger.info("application running")
+		logger.info(f"cloud_server starting at {port}")
+		web.run_app(app, port = port)
+		logger.info("-----------------does this line ever print??------------")
+
+	async def client_setup(self, port: int):
+		'''server for the client to connect to'''
+		app = web.Application()
+		app.add_routes([web.get('/ws', self.client_websocket_handler)])
+		logger.info(f"client_server starting at {port}")
 		web.run_app(app, port = port)
