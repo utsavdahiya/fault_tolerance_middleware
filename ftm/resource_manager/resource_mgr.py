@@ -19,7 +19,7 @@ class ResouceManager:
                 #check vm status with cloudsim
                 pass
 
-    async def instantiate(self, vm: VM) -> (int, int):
+    async def instantiate(self, vm: VM) -> (str, int):
         '''instantiate the given VM 
         
             Args:
@@ -31,3 +31,19 @@ class ResouceManager:
         #add the VM to self.VMs
         #send req to cloudsim to instantiate the required VM config
         pass
+    
+    async def terminate(self, vm: VM) -> (str, int):
+        '''terminate the specified VM 
+
+            Args:
+            vm: an instance of VM()
+            Returns:
+                returns the id of the VM along with a STATUS CODE of the operation
+                    1: SUCCESS
+                    0: FAILURE
+        '''
+        if vm not in self.VMs:
+            raise("invalid VM given to terminate")
+        #send request to cloudsim to terminate the given VM
+        #update the VMs list
+        self.VMs.remove(vm)
