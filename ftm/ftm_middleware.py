@@ -40,7 +40,6 @@ async def start_ftm(self, msg_monitor: MessagingMonitor, requirements):
     chosen_unit = await ftm.composition_engine.compose_solution(eligible_units)
     ftm.ft_unit = chosen_unit
 
-    ftm.ft_unit.
     #invoke the required VMs using predefined replication and fault detection policies
     #or you can include custom replication and fault detection policy here
     # example: chosen_unit.repllication_strat = my_stratergy | derived from replication_mgr
