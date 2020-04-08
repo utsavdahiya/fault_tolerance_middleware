@@ -26,7 +26,7 @@ class invoker:
                 for name, config in item:
                     self.configs[name] = config     #add config to self.configs
 
-    def instantiate_replicas(self, config_info, app):
+    async def instantiate_replicas(self, config_info, app):
         '''asks resource manager to invoke specified configs
         
         once the VMs have been invoked it also registers them with the app

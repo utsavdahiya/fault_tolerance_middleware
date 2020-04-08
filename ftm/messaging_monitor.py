@@ -6,7 +6,6 @@ it performs two functions:
 	>an interface for communication bw all the composition
 	>it also acts as interface bw the ftm and cloudsim
 '''
-import ftm_middleware
 
 import asyncio
 import aiohttp
@@ -22,9 +21,8 @@ logger = logging.getLogger(__name__)
 class MessagingMonitor():
 
 	def __init__(self, cloudsim_url):
-		self.queue = []     #as a buffer for incoming messages
-		self.tasks = []     #a list of functions
-
+		self.callbacks = {}	# a dict of callback functions
+		
 		self.cloudsim_url = cloudsim_url
 		self.cloud_session = "session_obj"
 		self.session = {}   #a dictionary of <client_id:client_session>
@@ -38,7 +36,7 @@ class MessagingMonitor():
 				logger.info("connected succcessfully")
 				logger.info("connection response: " + data)
 
-	def disconnect(self):
+	async def disconnect(self):
 		pass
 
 	async def send(self, msg, destination):
@@ -63,6 +61,12 @@ class MessagingMonitor():
 		ws = web.WebSocketResponse()
 		await ws.prepare(request)
 		await ws.send_str("Welcome to FTM, send your requirements")
+		data = {}
+		data['websocket'] = ws
+		#hitting callback for when a new client connects
+		await self.callbacks['on_client_connected'](data)
+		request.app['client_websockets']
+
 		async for msg in ws:
 			logger.info(f"client msg: {str(msg.data)}")
 			if msg.type == aiohttp.WSMsgType.TEXT:
@@ -76,11 +80,11 @@ class MessagingMonitor():
 						#send VM started reponse
 						pass
 					except:
-						if(msg.data == "new_connection"):
-							#create and send a id to client
-							#start an FTM instance for the client
+						if(msg.data == "requirements_placeholder"):	#parse the requirements json/YAML here
+							await self.callbacks['on_requirements']
 							pass
-						await ws.send_str(f"{msg.data}/server_resp")
+						else:
+							await ws.send_str(f"{msg.data}/server_resp")
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				print('ws connection closed with exception %s' %ws.exception())
 		
