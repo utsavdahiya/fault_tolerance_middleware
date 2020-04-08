@@ -1,7 +1,7 @@
 import asyncio
 import aiohttp
 
-class Client():
+class FtmClient():
     def __init__(self, id: str):
         self.id = id
 
@@ -17,5 +17,5 @@ class Client():
                 elif msg.type == aiohttp.WSMsgType.ERROR:
                     break
 async def main():
-    client = Client("crime master gogo")
+    client = FtmClient("crime master gogo")
     client.connect("http://0.0.0.0:8082")

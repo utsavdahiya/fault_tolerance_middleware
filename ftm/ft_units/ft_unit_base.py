@@ -65,5 +65,8 @@ class FtUnit:
 
         return self.qos
     
+    async def instantiate_unit(self, requirements):
+        pass
+
     def demo(self):
         print("printing from ft_unit")
