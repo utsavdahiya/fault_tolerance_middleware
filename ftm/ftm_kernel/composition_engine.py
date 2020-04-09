@@ -18,11 +18,12 @@ class CompositionEngine():
     def __init__(self):
         pass
 
-    async def compose_solution(self, ft_units: list) -> FtUnit:
+    async def compose_solution(self, ft_units: list, requirements) -> FtUnit:
         '''compose a suitable solution from given eligible ft_units
         
             Args:
                 ft_units: a list of eligible ft_units(staisfying user requirements)
+                requirements: the requirements as given by the user
             Return:
                 returns an ft_unit that is chosen to be enforced
         '''

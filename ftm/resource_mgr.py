@@ -25,22 +25,22 @@ class ResouceManager:
             Args:
                 vm: it is an instance of VM() defined in replication manager package
             Return:
-                returns the VM config id and an SUCCESS/ERROR CODE- (1: success, 0:failure)
+                returns the VM id and an SUCCESS/ERROR CODE- (1: success, 0:failure)
                 #error codes can be made more descriptive in future
         '''
         #add the VM to self.VMs
         #send req to cloudsim to instantiate the required VM config
         pass
     
-    async def terminate(self, vm: VM) -> (str, int):
+    async def terminate(self, vm: VM) -> (str, str):
         '''terminate the specified VM 
 
             Args:
             vm: an instance of VM()
             Returns:
                 returns the id of the VM along with a STATUS CODE of the operation
-                    1: SUCCESS
-                    0: FAILURE
+                    SUCCESS
+                    FAILURE
         '''
         if vm not in self.VMs:
             raise("invalid VM given to terminate")

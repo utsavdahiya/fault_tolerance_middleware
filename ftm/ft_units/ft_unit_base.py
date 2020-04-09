@@ -8,6 +8,13 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ft_unit_base")
 
+class VmPlacementPolicy():
+    def __init__(self):
+        pass
+    def place(self, num_primary: int, num_backup: int) -> list:
+        '''decides how to place VMs according to geographical locations'''
+        pass
+
 class ReplicationStratergy:
     """base class for replication stratergy"""
 
@@ -21,6 +28,7 @@ class ReplicationStratergy:
         self.mech_name = mech_name   #type:str- placeholder for actual mechanism implementaion object
         self.num_of_replica = data['num_of_replica']
         self.backup_config = data['backup_config'] #a list of configurations(YAML file) for backup VMs
+        self.replica_ratio = 2
         
         #Qos attributes
         self.latency = data['latency']

@@ -1,7 +1,7 @@
 '''FTM middleware that will perform the workings of FTM'''
 from ftm_kernel import service_dir, composition_engine, evaluation_unit
 from replication_mgr import replica_invoker
-from resource_manager import resource_mgr
+from resource_mgr import ResouceManager
 from ft_units import *
 
 import asyncio
@@ -16,7 +16,7 @@ class FTM:
     def __init__(self, msg_monitor: MessagingMonitor):
         FTM.counter += 1
         self.id = FTM.counter
-        self.resource_mgr = resource_mgr.ResouceManager(msg_monitor)
+        self.resource_mgr = ResouceManager(msg_monitor)
         self.service_directory = service_dir.ServiceDirectory()
         self.composition_engine = composition_engine.CompositionEngine()
         self.ft_unit = None
@@ -37,9 +37,9 @@ async def start_ftm(self, msg_monitor: MessagingMonitor, requirements):
     ftm = FTM(msg_monitor)
     #the flow of control of FTM:
     eligible_units = await ftm.service_directory.find_eligible_units(requirements)
-    chosen_unit = await ftm.composition_engine.compose_solution(eligible_units)
+    chosen_unit = await ftm.composition_engine.compose_solution(eligible_units, requirements)
     ftm.ft_unit = chosen_unit
-
+    replica_invoker.invoker().instantiate_replicas(ftm.ft_unit, requirements, ftm.resource_mgr)
     #invoke the required VMs using predefined replication and fault detection policies
     #or you can include custom replication and fault detection policy here
     # example: chosen_unit.repllication_strat = my_stratergy | derived from replication_mgr

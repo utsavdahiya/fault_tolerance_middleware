@@ -11,7 +11,7 @@ def get_id(counter):
 #can implement VM using a state mahchine in future, might be easier to keep track of the states of a VM
 class VM:
     counter = 1
-    def __init__(self, id, config):
+    def __init__(self, config):
         VM.counter += 1
         self.id = VM.counter
         self.config = config

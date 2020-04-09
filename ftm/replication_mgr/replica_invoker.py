@@ -1,7 +1,7 @@
 '''to invoke the required number of replicas(via the resource manager) and return a list of them
     it receives the requirements from composition engine and returns the list to it
 '''
-from VM import VM
+from .VM import VM
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -26,29 +26,43 @@ class invoker:
                 for name, config in item:
                     self.configs[name] = config     #add config to self.configs
 
-    async def instantiate_replicas(self, config_info, app):
+    @classmethod
+    async def instantiate_replicas(cls, ft_unit: FtUnit, requirements, resource_mgr: ResourceManager):
         '''asks resource manager to invoke specified configs
         
-        once the VMs have been invoked it also registers them with the app
         Args:
             config_info: A list of tuples of config names(IDs) to be invoked(instantiated):
                 example: [(config_type, number of VMs to be invoked), (), ...]
                     config_type is an identifier(str) such as primary config etc
-            app: the instance of app object from within which this function has been called
-        Returns:
-            VMs: a dict of list of VMs according the config names as received in confid_info:
-                example: {config_type: [VMs of type config_type that have been invoked]}
         '''
-        VMs = dict()
-        for item in config_info:
-            vm_list = []
-            for i in range(item[1]):
-                config_name = item[0]
-                config = self.configs.get(config_name)
-                #create a new VM object
-                vm = VM(id, config)
-                #call resource manager to get resources allocated from the 
-                app.self.VMs[id] = vm
-                vm_list.append(vm)
-            VMs[item[0]] = vm_list
-        return VMs
+        #ft_unit.replication_strat.num_of_replica contains the default num of replicas to be invoked
+        num_primary = requirements['num_primary']
+        num_backup = ft_unit.replication_strat.replica_ratio * num_primary
+        primary_config = requirements['primary_config'] #it is a json
+        backup_config = ft_unit.replication_strat.backup_config #it is a json
+
+        vm_placement = ft_unit.vm_placement_policy.place(num_primary, num_backup)
+        '''vm_placement = [('primary', num of primary to be allocated in one rack(int)),
+                            ('primary', num of primary),
+                            ('backup', num of backups) ...]
+        ''' 
+        
+        #invoke the required VMs and their backups(replicas)
+        for config_group in vm_placement:
+            num_of_vm = config_group[1]
+            for item in range(num_of_vm):   #instantiating 'num_of_vm' number of VMs of type 'config_group[0]
+                #create a VM object
+                if(config_group[0] == 'primary'):
+                    vm = VM(primary_config)
+                elif(config_group[0] == 'backup'):
+                    vm = VM(backup_config)
+                else:
+                    raise(f"{config_group[0]}is not a valid config type, should be primary or backup")
+                #call resource manager to allocate this VM in cloud
+                id, code = await resource_mgr.instantiate(vm)
+                if(code == 'SUCCESS'):
+                    logger.info(f"VM:{vm.id} was instantiated successfully")
+                elif(code == 'FAILURE'):
+                    logger.info(f"VM:{vm.id} could not be instantiated some error occured")
+                else:
+                    raise(f"inavlid error code when trying to instantiate VM:{vm.id}")
