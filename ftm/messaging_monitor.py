@@ -50,6 +50,16 @@ class MessagingMonitor():
 		else:
 			pass
 
+	async def send_ws(self, msg, dest):
+		if(dest == 'cloud'):
+			#send msg to cloud
+			pass
+		if dest not in self.session.keys():
+			raise(f"client: {dest} was not found")
+		else:
+			ws = self.session[dest]
+			await ws.send_json(msg)
+
 	async def cloud_get_handler(self, request):
 		return web.Response(text="Controooool Uday!!")
 
@@ -64,8 +74,8 @@ class MessagingMonitor():
 		data = {}
 		data['websocket'] = ws
 		#hitting callback for when a new client connects
-		await self.callbacks['on_client_connected'](data)
-		request.app['client_websockets']
+		client_id = await self.callbacks['on_connect_client'](data)
+		self.session[client_id] = ws
 
 		async for msg in ws:
 			logger.info(f"client msg: {str(msg.data)}")
@@ -75,16 +85,17 @@ class MessagingMonitor():
 					await ws.close()
 				else:
 					try:
-						req = json.loads(msg.data)
+						data = json.dumps(msg.data)
 						#send req to service directory
 						#send VM started reponse
-						pass
-					except:
 						if(msg.data == "requirements_placeholder"):	#parse the requirements json/YAML here
-							await self.callbacks['on_requirements']
+							await self.callbacks['on_requirements']()
 							pass
 						else:
 							await ws.send_str(f"{msg.data}/server_resp")
+						pass
+					except:
+						pass
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				print('ws connection closed with exception %s' %ws.exception())
 		
@@ -111,17 +122,17 @@ class MessagingMonitor():
 
 	async def server_setup(self, port: int):
 		'''server for cloudsim'''
-		app = web.Application()
-		app.add_routes([web.get('/ws', self.websocket_handler),
+		server_app = web.Application()
+		server_app.add_routes([web.get('/ws', self.websocket_handler),
                     web.get('/', self.cloud_get_handler),
                     web.post('/post', self.cloud_post_handler)])
 		logger.info(f"cloud_server starting at {port}")
-		web.run_app(app, port = port)
+		web.run_app(server_app, port = port)
 		logger.info("-----------------does this line ever print??------------")
 
 	async def client_setup(self, port: int):
 		'''server for the client to connect to'''
-		app = web.Application()
-		app.add_routes([web.get('/ws', self.client_websocket_handler)])
+		client_app = web.Application()
+		client_app.add_routes([web.get('/ws', self.client_websocket_handler)])
 		logger.info(f"client_server starting at {port}")
-		web.run_app(app, port = port)
+		web.run_app(client_app, port = port)
