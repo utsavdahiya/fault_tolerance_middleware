@@ -25,6 +25,7 @@ class Application():
     def __init__(self, msg_monitor):
         self.msg_monitor = msg_monitor
         self.clients = []
+        self.client_dict = {}
 
     def on_connect_client(self, data: dict):
         """callback on establishing contact with client
@@ -41,11 +42,13 @@ class Application():
         client = Client(data['websocket'])
         #register client with app
         self.clients.append(client)
-
+        self.client_dict[data['websocket']] = client
+        return client.id
 
     async def on_requirements(self, data: dict):
         #start an FTM instance for the client
-        # ftm = ftm_middleware.FTM(self)
+        client_id = data['client_id']
+        ftm_middleware.start_ftm(client_id, self.msg_monitor, data['requirements'])
         #register this ftm instance with the application
         #call start_ftm here
         pass
@@ -67,6 +70,9 @@ async def main():
     cloudsim_url = 'http://0.0.0.0:8080/'   #set this to the url where your server is running
     msg_monitor = MessagingMonitor(cloudsim_url)
     app = Application(msg_monitor)
+    #registering callbaks with msg_monitor
+    app.msg_monitor.callbacks['on_connect_client'] = app.on_connect_client
+    app.msg_monitor.callbacks['on_requirements'] = app.on_requirements
 
     #initialising server where you can send requests
     cloud_side_port = "8081"   #set port number to where you want to send requests

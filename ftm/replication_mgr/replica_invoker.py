@@ -27,7 +27,7 @@ class invoker:
                     self.configs[name] = config     #add config to self.configs
 
     @classmethod
-    async def instantiate_replicas(cls, ft_unit: FtUnit, requirements, resource_mgr: ResourceManager):
+    async def instantiate_replicas(cls, ft_unit: FtUnit, requirements, ftm: FTM):
         '''asks resource manager to invoke specified configs
         
         Args:
@@ -59,7 +59,7 @@ class invoker:
                 else:
                     raise(f"{config_group[0]}is not a valid config type, should be primary or backup")
                 #call resource manager to allocate this VM in cloud
-                id, code = await resource_mgr.instantiate(vm)
+                id, code = await ftm.resource_mgr.instantiate(ftm, vm)
                 if(code == 'SUCCESS'):
                     logger.info(f"VM:{vm.id} was instantiated successfully")
                 elif(code == 'FAILURE'):

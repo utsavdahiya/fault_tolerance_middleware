@@ -13,9 +13,10 @@ logger = logging.getLogger(__name__)
 
 class FTM:
     counter = 0 #used for generating a unique id
-    def __init__(self, msg_monitor: MessagingMonitor):
+    def __init__(self, msg_monitor: MessagingMonitor, client_id):
         FTM.counter += 1
         self.id = FTM.counter
+        self.client_id = client_id
         self.resource_mgr = ResouceManager(msg_monitor)
         self.service_directory = service_dir.ServiceDirectory()
         self.composition_engine = composition_engine.CompositionEngine()
@@ -30,16 +31,18 @@ class FTM:
         to_be_deployed = self.composition_engine.compose_solution(eligible_ft_units)
         #send to_be_deployed to resource manager to instantiate
 
-async def start_ftm(self, msg_monitor: MessagingMonitor, requirements):
+async def start_ftm(client_id, msg_monitor: MessagingMonitor, requirements):
     '''To start initialise the ftm middleware: going from client requirments to invoked VMs'''
 
     #create a new ftm object
-    ftm = FTM(msg_monitor)
+    ftm = FTM(msg_monitor, client_id)
     #the flow of control of FTM:
     eligible_units = await ftm.service_directory.find_eligible_units(requirements)
     chosen_unit = await ftm.composition_engine.compose_solution(eligible_units, requirements)
     ftm.ft_unit = chosen_unit
-    replica_invoker.invoker().instantiate_replicas(ftm.ft_unit, requirements, ftm.resource_mgr)
-    #invoke the required VMs using predefined replication and fault detection policies
+
+    #invoke the required VMs using predefined VM placement ploicy, replication and fault detection policies
     #or you can include custom replication and fault detection policy here
     # example: chosen_unit.repllication_strat = my_stratergy | derived from replication_mgr
+    replica_invoker.invoker().instantiate_replicas(ftm.ft_unit, requirements, ftm)
+    return ftm
