@@ -20,37 +20,65 @@ import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.vms.VmSimple;
 import org.cloudsimplus.listeners.EventInfo;
+import org.glassfish.tyrus.client.ClientManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.websocket.*;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.Socket;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.CountDownLatch;
+import java.util.logging.Logger;
 
 /** This class describes an interface which sends any data required by FTM such as the current parameters
     of the VMs and handles all requests such as creating another VM and allocating resources to it.
  */
 public class InterfaceToSendData {
+    private final int HOST_PES = 8; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE.
+    private final int SCHEDULING_INTERVAL = 1; // Random number as of now, TODO: Discuss. DONE.
+    private final int NUMBER_OF_HOSTS = 100; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE
+    private final int TIME_TILL_TERMINATION = 10000; // Random time as of now, very big time as discussed
+    private final int TOTAL_LOCATIONS = 5; //Random number as of now.
+    private JSONArray locations;
+
     private final CloudSim simulation;
+    private final Session currSession;
     private final DatacenterBroker broker;
     private final Datacenter datacenter;
+    final List<Host> hostList = new ArrayList<>(NUMBER_OF_HOSTS);
     private final List<Vm> vmList = new ArrayList<>();
+    private List<Pair> unchangedList = new ArrayList<>();
     private final List<Cloudlet> cloudletList = new ArrayList<>();
-    private final int HOST_PES = 8; /* Random number as of now, TODO: Get this initially from FTM through a socket connection probably */
-    private final int SCHEDULING_INTERVAL = 1; /* Random number as of now, TODO: Discuss */
-    private final int NUMBER_OF_HOSTS = 2; /* Random number as of now, TODO: Get this initially from FTM through a socket connection probably */
-    private final int TIME_TILL_TERMINATION = 10000; /* Random time as of now, very big time as discussed */
-    private final String URL_OF_SERVER_GET = "http://192.168.1.8:8081"; /* URL of server for all GET*/
-    private final String URL_OF_SERVER_POST = "http://192.168.1.8:8000"; /* URL of server for all POST*/
+//    private final String URL_OF_SERVER_GET = "http://192.168.1.8:8081"; // URL of server for all GET
+//    private final String URL_OF_SERVER_POST = "http://192.168.1.8:8000"; // URL of server for all POST
 
     public static void main(String[] args) {
         new InterfaceToSendData();
     }
 
     private InterfaceToSendData(){
+
+        Client.latch = new CountDownLatch(1);
+        ClientManager client = ClientManager.createClient();
+        try {
+            currSession = client.connectToServer(Client.class, new URI("ws://localhost:8081/ws"));
+            //currSession.getBasicRemote().sendText("1");
+            //currSession.getBasicRemote().sendText("2");
+
+            Client.latch.await();
+        } catch (DeploymentException | URISyntaxException | InterruptedException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        locations = new JSONArray();
+        for(int i = 0; i < TOTAL_LOCATIONS; i++){
+            locations.put(i + "");
+        }
+
         simulation = new CloudSim();
         simulation.terminateAt(TIME_TILL_TERMINATION);
 
@@ -58,14 +86,8 @@ public class InterfaceToSendData {
 
         broker = new DatacenterBrokerSimple(simulation);
 
-
-
 //        broker0.submitVmList(vmList);
 //        broker0.submitCloudletList(cloudletList);
-
-        Socket socket = new Socket("192.168.1.8",8888);
-        PrintWriter outToServer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-        outToServer.print(pairs[0].lat + " " + pairs[0].lang);
 
         simulation.addOnClockTickListener(this::onClickTickListener);
 
@@ -77,7 +99,6 @@ public class InterfaceToSendData {
      * @return Datacenter with the given hosts.
      */
     private Datacenter createDatacenter() {
-        final List<Host> hostList = new ArrayList<>(NUMBER_OF_HOSTS);
         for(int i = 0; i < NUMBER_OF_HOSTS; i++) {
             Host host = createHost();
             hostList.add(host);
@@ -99,9 +120,9 @@ public class InterfaceToSendData {
             peList.add(new PeSimple(1000, new PeProvisionerSimple()));
         }
 
-        final long ram = 2048; /* Random number as of now, TODO: Get this initially from FTM through a socket connection probably */
-        final long bw = 10000; /* Random number as of now, TODO: Get this initially from FTM through a socket connection probably */
-        final long storage = 10000; /* Random number as of now, TODO: Get this initially from FTM through a socket connection probably */
+        final long ram = 16384; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE 16GB.
+        final long bw = 40960; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE 40Mbps.
+        final long storage = 51200; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE 50GB.
         Host host = new HostSimple(ram, bw, storage, peList);
         host
                 .setRamProvisioner(new ResourceProvisionerSimple())
@@ -123,12 +144,14 @@ public class InterfaceToSendData {
             int ram = Integer.parseInt(vmConfig.getString("ram"));
             int bandwidth = Integer.parseInt(vmConfig.getString("bandwidth"));
             int size = Integer.parseInt(vmConfig.getString("size"));
+            int location = Integer.parseInt(vmConfig.getString("location"));
 
-            Vm vm = new VmSimple(mips,pes)
+            Vm vm = new VmSimple(mips, pes)
                     .setRam(ram).setBw(bandwidth).setSize(size)
                     .setCloudletScheduler(new CloudletSchedulerTimeShared());
 
             vmList.add(vm);
+            unchangedList.add(new Pair(vm, false));
         }
 
         broker.submitVmList(vmList);
@@ -146,9 +169,27 @@ public class InterfaceToSendData {
         int size = Integer.parseInt(newVmConfig.getString("size"));
 
         int vmID = Integer.parseInt(message.getString("ID"));
-        vmList.get(vmID).setRam(ram).setBw(bandwidth).setSize(size);
 
-        broker.submitVmList(vmList);
+        if(!unchangedList.get(vmID).isRemoved) {
+            Vm currVm = unchangedList.get(vmID).vm;
+            int mips = (int) currVm.getMips();
+            int pes = (int) currVm.getNumberOfPes();
+
+            Host toBeDeletedVmHost = currVm.getHost();
+            toBeDeletedVmHost.destroyVm(currVm);
+
+            vmList.remove(vmID);
+            unchangedList.remove(vmID);
+            broker.submitVmList(vmList);
+
+            Vm vm = new VmSimple(mips, pes)
+                    .setRam(ram).setBw(bandwidth).setSize(size)
+                    .setCloudletScheduler(new CloudletSchedulerTimeShared());
+            toBeDeletedVmHost.createVm(vm);
+            vmList.add(vmID, vm);
+            unchangedList.add(vmID, new Pair(vm, false));
+            broker.submitVmList(vmList);
+        }
     }
 
     /**
@@ -157,9 +198,17 @@ public class InterfaceToSendData {
      */
     private void deleteVm(JSONObject message){
         int vmID = Integer.parseInt(message.getString("ID"));
-        vmList.remove(vmID);
 
-        broker.submitVmList(vmList);
+        if(!unchangedList.get(vmID).isRemoved){
+            Vm currVm = unchangedList.get(vmID).vm;
+            Host toBeDeletedVmHost = currVm.getHost();
+            toBeDeletedVmHost.destroyVm(currVm);
+
+            vmList.remove(vmID);
+            unchangedList.get(vmID).isRemoved = true;
+
+            broker.submitVmList(vmList);
+        }
     }
 
     /**
@@ -191,12 +240,130 @@ public class InterfaceToSendData {
     }
 
     /**
+     * This method returns the 'status' of the given VM.
+     * @param message - Contains a VM ID so we can identify which VM's status is needed.
+     * @return The data asked for.
+     */
+    private JSONObject statusVm(JSONObject message){
+        int vmID = Integer.parseInt(message.getString("id"));
+        JSONObject allDataJSON = null;
+        if(!unchangedList.get(vmID).isRemoved){
+            Vm currVm = unchangedList.get(vmID).vm;
+            String allocatedBw, availableBw, capacityBw, currentRequestedBw, cpuPercentUtilization,
+                    currentRequestedTotalMips, allocatedRam, availableRam, capacityRam, currentRequestedRam,
+                    allocatedStorage, availableStorage, capacityStorage, isWorkingOrFailed;
+            allocatedBw = currVm.getBw().getAllocatedResource() + ""; //TODO: Decide what to return. Everything. DONE.
+            availableBw = currVm.getBw().getAvailableResource() + "";
+            capacityBw = currVm.getBw().getCapacity() + "";
+            currentRequestedBw = currVm.getCurrentRequestedBw() + "";
+            cpuPercentUtilization = currVm.getCpuPercentUtilization() + "";
+            currentRequestedTotalMips = currVm.getCurrentRequestedTotalMips() + "";
+            allocatedRam = currVm.getRam().getAllocatedResource() + "";
+            availableRam = currVm.getRam().getAvailableResource() + "";
+            capacityRam = currVm.getRam().getCapacity() + "";
+            currentRequestedRam = currVm.getCurrentRequestedRam() + "";
+            allocatedStorage = currVm.getStorage().getAllocatedResource() + "";
+            availableStorage = currVm.getStorage().getAvailableResource() + "";
+            capacityStorage = currVm.getStorage().getCapacity() + "";
+
+            if(unchangedList.get(vmID).vm.isWorking()){
+                isWorkingOrFailed = "working";
+            }else{
+                isWorkingOrFailed = "failed";
+            }
+
+            /*String allData = "{\"desc\":\"vm_status_reply\"," +
+                    "\"allocated_bandwidth\": \"" + allocatedBw + "\"," +
+                    "\"available_bandwidth\": \"" + availableBw + "\"," +
+                    "\"capacity_bandwidth\": \"" + capacityBw + "\"," +
+                    "\"current_requested_bandwidth\": \"" + currentRequestedBw + "\"," +
+                    "\"cpu_percent_utilization\": \"" + cpuPercentUtilization + "\"," +
+                    "\"current_requested_total_mips\": \"" + currentRequestedTotalMips + "\"," +
+                    "\"allocated_ram\": \"" + allocatedRam + "\"," +
+                    "\"available_ram\": \"" + availableRam + "\"," +
+                    "\"capacity_ram\": \"" + capacityRam + "\"," +
+                    "\"current_requested_ram\": \"" + currentRequestedRam + "\"," +
+                    "\"allocated_storage\": \"" + allocatedStorage + "\"," +
+                    "\"available_storage\": \"" + availableStorage + "\"," +
+                    "\"capacity_storage\": \"" + capacityStorage + "\"," +
+                    "\"condition\": \"" + isWorkingOrFailed + "\"}";*/
+
+            allDataJSON = new JSONObject();
+            allDataJSON.put("desc", "vm_status_reply");
+            allDataJSON.put("allocated_bandwidth", allocatedBw);
+            allDataJSON.put("available_bandwidth", availableBw);
+            allDataJSON.put("capacity_bandwidth", capacityBw);
+            allDataJSON.put("current_requested_bandwidth", currentRequestedBw);
+            allDataJSON.put("cpu_percent_utilization", cpuPercentUtilization);
+            allDataJSON.put("current_requested_total_mips", currentRequestedTotalMips);
+            allDataJSON.put("allocated_ram", allocatedRam);
+            allDataJSON.put("available_ram", availableRam);
+            allDataJSON.put("capacity_ram", capacityRam);
+            allDataJSON.put("current_requested_ram", currentRequestedRam);
+            allDataJSON.put("allocated_storage", allocatedStorage);
+            allDataJSON.put("available_storage", availableStorage);
+            allDataJSON.put("capacity_storage", capacityStorage);
+            allDataJSON.put("condition", isWorkingOrFailed);
+        }
+
+        return allDataJSON;
+    }
+
+    /**
+     * This method is used to migrate a VM from one host to another.
+     * @param message - Contains the ID of the VM to be migrated.
+     */
+    private void migrateVm(JSONObject message){
+        boolean empty = false;
+        int vmID = Integer.parseInt(message.getString("id"));
+        if(!unchangedList.get(vmID).isRemoved){
+            Vm vm = unchangedList.get(vmID).vm;
+            for(Host host : hostList){
+                if(host.getVmList().isEmpty()){
+                    datacenter.requestVmMigration(vm, host);
+                    empty = true;
+                }
+            }
+
+            if(!empty){
+                int min = Integer.MAX_VALUE;
+                Host vmHost = unchangedList.get(vmID).vm.getHost();
+                Host temp = null;
+                for(Host host : hostList){
+                    if(min >= host.getVmList().size()){
+                        min = host.getVmList().size();
+                        if(host != vmHost){
+                            temp = host;
+                        }
+                    }
+                }
+
+                datacenter.requestVmMigration(vm, temp);
+            }
+        }
+    }
+
+    /**
+     * This function returns an array containing all possible locations.
+     * @return - Array containing all locations.
+     */
+    private JSONArray sendLocations(){
+        return locations;
+    }
+
+    /**
      * This function is called at the passing of every single simulated second.
      * @param evtInfo - Contains the description of the event that triggered this listener. In this case,
      *                the passing of every second (simulated) is the trigger.
      */
     private void onClickTickListener(EventInfo evtInfo) {
-        Runnable communicationRunnable = new Runnable() {
+
+        String receivedMessage = Client.getRecMessage();
+        if(!receivedMessage.isEmpty()){
+            JSONObject obj = new JSONObject(receivedMessage);
+            parseAndRoute(obj);
+        }
+        /*Runnable communicationRunnable = new Runnable() {
             @Override
             public void run() {
                 try {
@@ -270,15 +437,15 @@ public class InterfaceToSendData {
             thread.sleep(1000L);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     /**
-     * This function routes the message received to the appropriate function provided by CloudSim.
+     * This function routes the message received to the appropriate function provided by CloudSim
+     * and sends a reply wherever needed.
      * @param message - Contains the message received from FTM.
-     * @return - returns a JSONObject with the appropriate data.
      */
-    private String parseAndRoute(JSONObject message){
+    private void parseAndRoute(JSONObject message){
         String description = message.getString("desc");
 
         if(description.equalsIgnoreCase("instantiate_vm")){
@@ -290,11 +457,84 @@ public class InterfaceToSendData {
         }else if(description.equalsIgnoreCase("instantiate_cloudlet")){
             createCloudlet(message);
         }else if(description.equalsIgnoreCase("migration")){
-
+            //TODO: Decide how to select destination host. Select random host with least VMs. DONE.
+            migrateVm(message);
         }else if(description.equalsIgnoreCase("status")){
+            JSONObject rv = statusVm(message);
+            try {
+                currSession.getBasicRemote().sendObject(rv);
+            } catch (IOException | EncodeException e) {
+                e.printStackTrace();
+            }
+        }else if(description.equalsIgnoreCase("get_location")){
+            JSONArray rv = sendLocations();
+            try {
+                currSession.getBasicRemote().sendObject(rv);
+            } catch (IOException | EncodeException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Class used to maintain VM IDs even after removal of some VMs.
+     */
+    private class Pair {
+        Vm vm;
+        boolean isRemoved;
+
+        Pair(){
 
         }
 
-        return "yolo";
+        Pair(Vm vm, boolean isRemoved){
+            this.vm = vm;
+            this.isRemoved = isRemoved;
+        }
+
+        public Vm getVm() {
+            return vm;
+        }
+
+        public boolean isRemoved() {
+            return isRemoved;
+        }
+    }
+}
+
+
+/**
+ * This class acts as the Client Endpoint for the websocket connection and handles all communication.
+ */
+@ClientEndpoint
+class Client {
+
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+    public static CountDownLatch latch;
+    private static Queue<String> messageQueue = new LinkedList<>();
+
+    public static String getRecMessage() {
+        String send = "";
+        if(!messageQueue.isEmpty()){
+            send = messageQueue.poll();
+        }
+        return send;
+    }
+
+    @OnOpen
+    public void onOpen(Session session) {
+        logger.info("Connected ... " + session.getId());
+    }
+
+    @OnMessage
+    public void onMessage(String message, Session session) {
+        logger.info("Received ...." + message);
+        messageQueue.add(message);
+    }
+
+    @OnClose
+    public void onClose(Session session, CloseReason closeReason) {
+        logger.info(String.format("Session %s close because of %s", session.getId(), closeReason));
+        latch.countDown();
     }
 }
