@@ -1,0 +1,6 @@
+//All keys and values should be of String data type
+
+{
+	"desc":"instantiate_cloudlet",
+	"cloudlet":[]
+}
