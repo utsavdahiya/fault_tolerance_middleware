@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class ResouceManager:
-    def __init__(self, msg_monitor: MessageMonitor):
+    def __init__(self, msg_monitor):
         self.msg_monitor = msg_monitor  #messaging monitor allows RM to communicate with cloudsim
         self.VMs = {}   #a dict of VMs
         self.timer = 10 #timer for monitoring schelduling
@@ -20,7 +20,7 @@ class ResouceManager:
                 #check vm status with cloudsim
                 pass
 
-    async def instantiate(self, ftm: FTM, vm: VM) -> (str, int):
+    async def instantiate(self, ftm, vm) -> (str, int):
         '''instantiate the given VM 
         
             Args:
@@ -43,7 +43,7 @@ class ResouceManager:
         code = 'SUCCESS'
         return vm.id, code
     
-    async def terminate(self, vm: VM) -> (str, str):
+    async def terminate(self, vm) -> (str, str):
         '''terminate the specified VM 
 
             Args:

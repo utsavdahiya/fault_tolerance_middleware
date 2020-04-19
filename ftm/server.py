@@ -17,7 +17,7 @@ class Client:
     counter = 0
     def  __init__(self, websocket):
         Client.counter += 1
-        self.id = Client.counter
+        self.id = str(Client.counter)
         self.websocket = websocket
         self.ftm_list = []
 
@@ -27,7 +27,7 @@ class Application():
         self.clients = []
         self.client_dict = {}
 
-    def on_connect_client(self, data: dict):
+    async def on_connect_client(self, data: dict):
         """callback on establishing contact with client
 
             Args:
@@ -42,13 +42,35 @@ class Application():
         client = Client(data['websocket'])
         #register client with app
         self.clients.append(client)
+        logger.info("registered client with app")
         self.client_dict[data['websocket']] = client
         return client.id
 
     async def on_requirements(self, data: dict):
+        '''start procedure after receiving requirments
+        
+        Args:
+            data: client related info 
+                    example: {"websocket": websocket_endpoint_of client
+                            "client_id": id_of_client
+                            "client_req":{"vms": [{"num_of_instances": "num",
+                                                    "config": {"mips": "1000",
+                                                            "pes": "4",
+                                                            "ram": "1000",
+                                                            "bandwidth": "1000",
+                                                            "size": "10000",
+                                                            "location": "1"}
+                                                }],
+                                        "latency": "low",
+                                        "availability": "high",
+                                        "bandwidth": "moderate"
+                                    }
+                            }
+        '''
         #start an FTM instance for the client
+        logger.info(f"client requirements received")
         client_id = data['client_id']
-        ftm_middleware.start_ftm(client_id, self.msg_monitor, data['requirements'])
+        await ftm_middleware.start_ftm(client_id, self.msg_monitor, data['client_req'])
         #register this ftm instance with the application
         #call start_ftm here
         pass
@@ -82,19 +104,21 @@ async def main():
         post_rep: /post
         websocket messages: /ws'''
 
-    tasks.append(asyncio.create_task(app.msg_monitor.connect_cloud())) #sends a simple get req to your server
+    # tasks.append(asyncio.create_task(app.msg_monitor.connect_cloud())) #sends a simple get req to your server
     msg = {"desc": "hum honge kamiyaaab"}   #msg has to be in json format
     msg = json.dumps(msg)   #converts it to json
     logger.info("sending msg")
-    tasks.append(asyncio.create_task(app.msg_monitor.send(msg, 'cloud'))) #it is a post req, cloud is the destination and is automatically set to cloudsim_url you provide above
+    # tasks.append(asyncio.create_task(app.msg_monitor.send(msg, 'cloud'))) #it is a post req, cloud is the destination and is automatically set to cloudsim_url you provide above
 
     #starting client websocket server
-    app['client_websockets'] = {}   #dict to store client sessions
+    # app['client_websockets'] = {}   #dict to store client sessions
     client_side_port = '8082'   #port where clients would connect
     tasks.append(asyncio.create_task(app.msg_monitor.client_setup(client_side_port)))   #starting server where client can connect to
 
+    # tasks.append(asyncio.create_task(app.msg_monitor.test_server()))
     #gathering all the tasks
-    await asyncio.gather(task for task in tasks)
+    # await asyncio.gather(task for task in tasks)
+    await asyncio.gather(*tasks)
 
 if __name__=='__main__':
    asyncio.run(main())

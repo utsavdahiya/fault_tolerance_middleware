@@ -51,6 +51,8 @@ class MessagingMonitor():
 			pass
 
 	async def send_ws(self, msg, dest):
+		'''Args:
+			dest: client_id'''
 		if(dest == 'cloud'):
 			#send msg to cloud
 			pass
@@ -61,6 +63,7 @@ class MessagingMonitor():
 			await ws.send_json(msg)
 
 	async def cloud_get_handler(self, request):
+		logger.info("get req received")
 		return web.Response(text="Controooool Uday!!")
 
 	async def cloud_post_handler(self, request):
@@ -76,7 +79,7 @@ class MessagingMonitor():
 		#hitting callback for when a new client connects
 		client_id = await self.callbacks['on_connect_client'](data)
 		self.session[client_id] = ws
-
+		data['client_id'] = client_id
 		async for msg in ws:
 			logger.info(f"client msg: {str(msg.data)}")
 			if msg.type == aiohttp.WSMsgType.TEXT:
@@ -85,21 +88,21 @@ class MessagingMonitor():
 					await ws.close()
 				else:
 					try:
-						data = json.dumps(msg.data)
-						#send req to service directory
+						client_req = json.loads(msg.data)
+						data['client_req'] = client_req
+						logger.info(f"client requirements received: {data}")
+						await self.callbacks['on_requirements'](data)
 						#send VM started reponse
-						if(msg.data == "requirements_placeholder"):	#parse the requirements json/YAML here
-							await self.callbacks['on_requirements']()
-							pass
-						else:
-							await ws.send_str(f"{msg.data}/server_resp")
-						pass
 					except:
-						pass
+							await ws.send_str(f"{msg.data}/server_resp")
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				print('ws connection closed with exception %s' %ws.exception())
 		
 		print("ws client connection closed")
+
+	async def client_get(self, request):
+		logger.info(f"client get req received")
+		return web.Response(text="hello client")
 
 	async def websocket_handler(self, request):
 		ws = web.WebSocketResponse()
@@ -132,7 +135,19 @@ class MessagingMonitor():
 
 	async def client_setup(self, port: int):
 		'''server for the client to connect to'''
+		logger.info(f"req to start client server at {port}")
 		client_app = web.Application()
-		client_app.add_routes([web.get('/ws', self.client_websocket_handler)])
+		client_app.add_routes([web.get('/ws', self.client_websocket_handler),
+							web.get('/', self.client_get)])
 		logger.info(f"client_server starting at {port}")
 		web.run_app(client_app, port = port)
+
+	async def get_handler(self, request):
+		print(f"request received")
+		return web.Response(text="test server landing page")
+
+	async def test_server(self):
+		logger.info(f"inside test_server")
+		app = web.Application()
+		app.add_routes([web.get('/', self.get_handler)])
+		web.run_app(app)
