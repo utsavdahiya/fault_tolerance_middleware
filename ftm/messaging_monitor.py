@@ -121,7 +121,7 @@ class MessagingMonitor():
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				print('ws connection closed with exception %s' %ws.exception())
 		
-		print("ws client connection closed")
+		logger.info(colored("ws client connection closed", 'red'))
 
 	async def client_get(self, request):
 		logger.info(f"client get req received")
@@ -130,7 +130,8 @@ class MessagingMonitor():
 	async def cloud_websocket_handler(self, request):
 		ws = web.WebSocketResponse()
 		await ws.prepare(request)
-		await ws.send_str("welcome to websocket server"+'\n')
+		msg = {"desc": "welcome message"}
+		await ws.send_json(msg)
 		self.cloud_session = ws
 		async for msg in ws:
 			logger.info(colored("recvd msg: " + str(msg.data), 'yellow'))
@@ -149,7 +150,7 @@ class MessagingMonitor():
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				print('ws connection closed with exception %s' %ws.exception())
 
-		print('websocket connection closed')
+		logger.info(colored('cloud websocket connection closed', 'red'))
 
 	async def cloud_setup(self, port: int):
 		'''server for cloudsim'''
