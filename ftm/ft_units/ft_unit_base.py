@@ -6,7 +6,14 @@ it gives a template for the stratergy that is then realised by replication manag
 import logging
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("ft_unit_base")
+logger = logging.getLogger("__name__")
+
+class VmPlacementPolicy():
+    def __init__(self):
+        pass
+    def place(self, locations, num_primary: int, num_backup: int) -> dict:
+        '''decides how to place VMs according to geographical locations'''
+        pass
 
 class ReplicationStratergy:
     """base class for replication stratergy"""
@@ -19,8 +26,11 @@ class ReplicationStratergy:
                         eg- {num_of_replica:5, primary_config:<config>, backup_config:<config>}
         """
         self.mech_name = mech_name   #type:str- placeholder for actual mechanism implementaion object
-        self.num_of_replica = data['num_of_replica']
-        self.backup_config = data['backup_config'] #a list of configurations(YAML file) for backup VMs
+        self.num_of_primary = data.get('num_of_primary', None)
+        self.num_of_replica = data.get('num_of_replica', None)
+        self.primary_config = data.get('primary', None)
+        self.backup_config = data.get('backup_config', None) #a list of configurations(YAML file) for backup VMs
+        self.replica_ratio = 2
         
         #Qos attributes
         self.latency = data['latency']
@@ -37,10 +47,10 @@ class FaultDetectionStratergy:
     def __init__(self, mech_name, data):
         self.mech_name = mech_name    #type:str just a name for the mechanism
         #a few attributes of the chosen stratergy
-        self.latency = data['latency']    #avg time taken bw occrance and detection of a fault
-        self.comp_req = data['comp_req']  #the computaional requirements of the strat
+        self.latency = data.get('latency', None)    #avg time taken bw occrance and detection of a fault
+        self.comp_req = data.get('comp_req', None)  #the computaional requirements of the strat
 
-    def detection_strat(self):
+    async def detection_strat(self):
         """"implements the stratergy named in self.mechanism"""
 
         raise NotImplementedError()
@@ -48,11 +58,12 @@ class FaultDetectionStratergy:
 class FtUnit:
     """Base class for ft_unit"""
 
-    def __init__(self, id, replication_strat, detection_strat):
+    def __init__(self, id, replication_strat, detection_strat, vm_placement_policy):
         self.id = id
 
         self.replication_strat = replication_strat  #type:ReplicationStratergy instance
         self.fault_detection_strat = detection_strat    #type:FaultDetectionStratergy instance
+        self.vm_placement = vm_placement_policy
         self.cost_factor = 1
         # self.latency = self.replication_strat.latency + self.fault_detection_strat.latency  #it is a function of all components
         self.latency = "latency"
@@ -65,5 +76,12 @@ class FtUnit:
 
         return self.qos
     
+    async def instantiate_unit(self, requirements):
+        pass
+
+    def populate(self,  requirements):
+        '''populate the required fields of the stratergies and ft_unit using the requirements'''
+        pass
+
     def demo(self):
         print("printing from ft_unit")
