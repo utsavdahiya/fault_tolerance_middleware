@@ -128,6 +128,7 @@ class MessagingMonitor():
 		return web.Response(text="hello client")
 
 	async def cloud_websocket_handler(self, request):
+		logger.info(colored("cloud handler approached", 'yellow'))
 		ws = web.WebSocketResponse()
 		await ws.prepare(request)
 		msg = {"desc": "welcome message"}
