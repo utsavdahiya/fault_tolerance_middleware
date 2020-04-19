@@ -1,6 +1,7 @@
 import asyncio
 import aiohttp
 import json
+from termcolor import colored
 
 import logging
 
@@ -11,6 +12,7 @@ class FtmClient():
     def __init__(self, id: str):
         self.id = id
         self.ws = None
+        self.basic_config = None
 
     async def connect(self, url:str):
         logger.info(f"connecting to ftm at {url}")
@@ -28,8 +30,10 @@ class FtmClient():
                             logger.info("file loaded:")
                             # print(f)
                             data = json.load(f)
+                            self.basic_config = data
                             logger.info(f"sending client requirements: {data}")
-                        await ws.send_json(json.dumps(data))
+                        await ws.send_json(data)
+                        pause = input("waiting for server ftm instantiaion")
                 elif msg.type == aiohttp.WSMsgType.ERROR:
                     break
             logger.info(f"closed connection to url:{url}")
@@ -45,8 +49,15 @@ class FtmClient():
         ws = self.ws
         ws.send_str(msg)
 
+    async def vm_update(self):
+        for parameter in self.basic_config:
+            self.basic_config[parameter] *= 1.5
+
 async def main():
-    client = FtmClient("crime master gogo")
+    client = FtmClient("Hachiko")
     await client.connect("http://0.0.0.0:8082/ws")
+
+    logger.info(colored("starting a application on the VM", 'green'))
+    await client.vm_update()
     
 asyncio.run(main())

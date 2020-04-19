@@ -11,6 +11,7 @@ import asyncio
 import aiohttp
 from aiohttp import web
 import json
+from termcolor import colored
 # import nest_asyncio
 # nest_asyncio.apply()
 
@@ -50,18 +51,38 @@ class MessagingMonitor():
 		else:
 			pass
 
-	async def send_ws(self, msg, dest):
+	async def send_str(self, msg, dest):
 		'''Args:
 			dest: client_id'''
 		if(dest == 'cloud'):
 			#send msg to cloud
-			pass
+			ws = self.cloud_session
+			await ws.send_str(msg)
 		if dest not in self.session.keys():
-			raise(f"client: {dest} was not found")
+			raise(colored(f"client: {dest} was not found", 'red'))
 		else:
 			ws = self.session[dest]
 			await ws.send_json(msg)
+        #now call replica invoker to invoke at specified loacations
 
+	async def send_json(self, msg, dest):
+		'''Args:
+			dest: client_id'''
+		if(dest == 'cloud'):
+			#send msg to cloud
+			ws = self.cloud_session
+			await ws.send_json(msg)
+			if(msg['desc'] == "get_location"):
+				resp = await ws.receive_json()
+				logger.info(colored("recvd msg: " + str(msg.data), 'yellow'))
+				return resp
+		if dest not in self.session.keys():
+			raise(colored(f"client: {dest} was not found", 'red'))
+		else:
+			ws = self.session[dest]
+			await ws.send_json(msg)
+        #now call replica invoker to invoke at specified loacations
+        
 	async def cloud_get_handler(self, request):
 		logger.info("get req received")
 		return web.Response(text="Controooool Uday!!")
@@ -77,6 +98,8 @@ class MessagingMonitor():
 		data = {}
 		data['websocket'] = ws
 		#hitting callback for when a new client connects
+        #now call replica invoker to invoke at specified loacations
+        
 		client_id = await self.callbacks['on_connect_client'](data)
 		self.session[client_id] = ws
 		data['client_id'] = client_id
@@ -104,32 +127,37 @@ class MessagingMonitor():
 		logger.info(f"client get req received")
 		return web.Response(text="hello client")
 
-	async def websocket_handler(self, request):
+	async def cloud_websocket_handler(self, request):
 		ws = web.WebSocketResponse()
 		await ws.prepare(request)
 		await ws.send_str("welcome to websocket server"+'\n')
+		self.cloud_session = ws
 		async for msg in ws:
-			logger.info("recvd msg: " + str(msg.data))
+			logger.info(colored("recvd msg: " + str(msg.data), 'yellow'))
 			if msg.type == aiohttp.WSMsgType.TEXT:
 				if msg.data == 'close':
 					await ws.close()
 				else:
-					await ws.send_str(msg.data + '/server_resp'+'\n')
-					logger.info("sent reply to ws")
+					try:
+						recvd_msg = json.loads(msg.data)
+						if recvd_msg['desc'] == '':
+							pass
+					except:
+						# await ws.send_str(msg.data + '/server_resp'+'\n')
+						# logger.info("sent reply to ws")
+						logger.info(colored(f"msg recvd: {msg.data}", 'yellow'))
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				print('ws connection closed with exception %s' %ws.exception())
 
 		print('websocket connection closed')
 
-		return ws
-
-	async def server_setup(self, port: int):
+	async def cloud_setup(self, port: int):
 		'''server for cloudsim'''
 		server_app = web.Application()
-		server_app.add_routes([web.get('/ws', self.websocket_handler),
+		server_app.add_routes([web.get('/ws', self.cloud_websocket_handler),
                     web.get('/', self.cloud_get_handler),
                     web.post('/post', self.cloud_post_handler)])
-		logger.info(f"cloud_server starting at {port}")
+		logger.info(colored(f"cloud_server starting at {port}", 'yellow'))
 		web.run_app(server_app, port = port)
 		logger.info("-----------------does this line ever print??------------")
 

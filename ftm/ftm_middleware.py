@@ -3,7 +3,7 @@ from ftm_kernel import service_dir, composition_engine, evaluation_unit
 from replication_mgr import replica_invoker
 from resource_mgr import ResouceManager
 from ft_units import *
-
+from termcolor import colored
 import asyncio
 
 import logging
@@ -17,10 +17,12 @@ class FTM:
         FTM.counter += 1
         self.id = str(FTM.counter)
         self.client_id = client_id
+        self.msg_monitor = msg_monitor
         self.resource_mgr = ResouceManager(msg_monitor)
         self.service_directory = service_dir.ServiceDirectory()
         self.composition_engine = composition_engine.CompositionEngine()
         self.ft_unit = None
+        self.VMs = []
 
     async def create_ft_unit(self, requirements: dict) -> list:
         '''procedure to create ft_unit from given user reqs
@@ -49,18 +51,32 @@ async def start_ftm(client_id, msg_monitor, requirements):
                 "bandwidth": "moderate"
             }
     '''
-    logger.info("starting ftm application for new client")
+    logger.info(colored("starting ftm application for new client", 'blue'))
     #create a new ftm object
     ftm = FTM(msg_monitor, client_id)
     #the flow of control of FTM:
     eligible_units = await ftm.service_directory.find_eligible_units(requirements)
     if len(eligible_units) == 0:
-        raise("No eligible unit found, maybe you would like to create your own")
+        raise(colored("No eligible unit found, maybe you would like to create your own", 'red'))
     chosen_unit = await ftm.composition_engine.compose_solution(eligible_units, requirements)
     ftm.ft_unit = chosen_unit
+    logger.info(colored(f"ft_unit:{chosen_unit.id} has been chosen as appropriate fault tolerance policy", 'blue'))
 
-    #invoke the required VMs using predefined VM placement ploicy, replication and fault detection policies
+    #get locations from the cloud
+    msg = {"desc": "get_location"}
+    locations = ftm.msg_monitor.send_json(msg, 'cloud')
+    locations = [int(i) for i in locations]     #converting from str to int
+    #invoke the required VMs using predefined VM placement policy, replication and fault detection policies
     #or you can include custom replication and fault detection policy here
     # example: chosen_unit.repllication_strat = my_stratergy | derived from replication_mgr
-    replica_invoker.invoker().instantiate_replicas(ftm.ft_unit, requirements, ftm)
+    vm_placement = ftm.ft_unit.repllication_strat.vm_placement.place(locations,
+                    ftm.ft_unit.replication_strat.num_of_primary,
+                    ftm.ft_unit.replication_strat.num_of_replica)
+
+    VMs = replica_invoker.invoker().instantiate_replicas(ftm.ft_unit, ftm, vm_placement)
+    ftm.VMs.append(VMs) #register the VMs with ftm
+
+    #starting the resource manager monitoring for the ftm
+    ftm.resource_mgr.monitor()
+
     return ftm
