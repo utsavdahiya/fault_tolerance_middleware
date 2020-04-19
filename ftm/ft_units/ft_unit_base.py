@@ -6,7 +6,7 @@ it gives a template for the stratergy that is then realised by replication manag
 import logging
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("ft_unit_base")
+logger = logging.getLogger("__name__")
 
 class VmPlacementPolicy():
     def __init__(self):
@@ -74,6 +74,10 @@ class FtUnit:
         return self.qos
     
     async def instantiate_unit(self, requirements):
+        pass
+
+    def populate(self, requirements):
+        '''populate the required fields of the stratergies and ft_unit using the requirements'''
         pass
 
     def demo(self):

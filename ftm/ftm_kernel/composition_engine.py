@@ -28,5 +28,6 @@ class CompositionEngine():
                 returns an ft_unit that is chosen to be enforced
         '''
         #do trivial sort of the ft_units
+        chosen_unit = ft_units[0]
         #return the topmost
-        pass
+        return chosen_unit

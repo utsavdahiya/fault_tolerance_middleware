@@ -1,0 +1,16 @@
+{
+	"vms": [{
+		"num_of_instances": "num",
+		"config": {
+			"mips": "1000",
+			"pes": "4",
+			"ram": "1000",
+			"bandwidth": "1000",
+			"size": "10000",
+			"location": "1"
+		}
+	}],
+	"latency": "low",
+	"availability": "high",
+	"bandwidth": "moderate"
+}

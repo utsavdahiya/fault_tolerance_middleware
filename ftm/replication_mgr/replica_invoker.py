@@ -27,7 +27,7 @@ class invoker:
                     self.configs[name] = config     #add config to self.configs
 
     @classmethod
-    async def instantiate_replicas(cls, ft_unit: FtUnit, requirements, ftm: FTM):
+    async def instantiate_replicas(cls, ft_unit, requirements, ftm):
         '''asks resource manager to invoke specified configs
         
         Args:
