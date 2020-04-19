@@ -27,6 +27,7 @@ class CompositionEngine():
             Return:
                 returns an ft_unit that is chosen to be enforced
         '''
+        logger.info("composing a solution using eligible units")
         #do trivial sort of the ft_units
         chosen_unit = ft_units[0]
         #return the topmost

@@ -13,6 +13,7 @@ class VM:
     counter = 1
     def __init__(self, config):
         VM.counter += 1
-        self.id = VM.counter
+        self.id = str(VM.counter)
         self.config = config
         self.status = 'inactive'    #inactive(not running)/active(running)
+        self.location = None

@@ -52,6 +52,8 @@ class ServiceDirectory():
                 "bandwidth": "moderate"
             }
             '''
+        logger.info(f"service directory is searching for eligible ft_units matching your requirements")
+        
         #for each val in req, find all matching ft_units
         for unit in self.ft_units.keys():
             eligible_units = []

@@ -4,6 +4,7 @@ import ft_units
 from messaging_monitor import MessagingMonitor
 import json
 import asyncio
+from termcolor import colored
 
 import nest_asyncio
 nest_asyncio.apply()
@@ -35,7 +36,7 @@ class Application():
                     example- {'websocket': websocket session for the client} 
         """
 
-        logger.info("client connected: {}".format(data))
+        logger.info(colored("new client connected", 'green'))
         if 'websocket' not in data.keys():
             raise("websocket session object not passed on new client connection")
         #create a new client instance for the newly connected client
@@ -68,14 +69,18 @@ class Application():
                             }
         '''
         #start an FTM instance for the client
-        logger.info(f"client requirements received")
+        logger.info(colored(f"client requirements received", 'green'))
         client_id = data['client_id']
-        await ftm_middleware.start_ftm(client_id, self.msg_monitor, data['client_req'])
+        ftm_instance = await ftm_middleware.start_ftm(client_id, self.msg_monitor, data['client_req'])
         #register this ftm instance with the application
-        #call start_ftm here
-        pass
+        self.ftm_list.append(ftm_instance)
+        logger.info(colored("ftm_created for the client", 'green'))
+        #return list of VMs to the client
+        msg = {'desc': 'VMs',
+                'list': ftm_instance.VMs}
+        await self.msg_monitor.send_json(msg, client_id)
 
-    def on_connect_cloud(self):
+    async def on_connect_cloud(self):
         pass
 
     def on_client_msg(self):
@@ -93,12 +98,13 @@ async def main():
     msg_monitor = MessagingMonitor(cloudsim_url)
     app = Application(msg_monitor)
     #registering callbaks with msg_monitor
+    app.msg_monitor.callbacks['on_connect_cloud'] = app.on_connect_cloud
     app.msg_monitor.callbacks['on_connect_client'] = app.on_connect_client
     app.msg_monitor.callbacks['on_requirements'] = app.on_requirements
 
     #initialising server where you can send requests
     cloud_side_port = "8081"   #set port number to where you want to send requests
-    tasks.append(asyncio.create_task(app.msg_monitor.server_setup(cloud_side_port)))
+    tasks.append(asyncio.create_task(app.msg_monitor.cloud_setup(cloud_side_port)))
     '''my server is now running and can handle your requests at:
         get_req: /
         post_rep: /post

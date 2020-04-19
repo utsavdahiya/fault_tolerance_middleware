@@ -1,3 +1,7 @@
+#####################   DEPRECATED      ###################################
+
+
+
 '''This provides a template for creatiung replication stratergies'''
 
 import logging
