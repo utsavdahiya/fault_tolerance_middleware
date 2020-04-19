@@ -13,6 +13,7 @@ class FtmClient():
         self.id = id
         self.ws = None
         self.basic_config = None
+        self.VMs = None
 
     async def connect(self, url:str):
         logger.info(f"connecting to ftm at {url}")
@@ -33,7 +34,9 @@ class FtmClient():
                             self.basic_config = data
                             logger.info(f"sending client requirements: {data}")
                         await ws.send_json(data)
-                        pause = input("waiting for server ftm instantiaion")
+                        # pause = input("waiting for server ftm instantiaion")
+                        resp = await ws.receive_json()
+                        logger.info(colored(f"received this json: {resp}", 'green'))
                 elif msg.type == aiohttp.WSMsgType.ERROR:
                     break
             logger.info(f"closed connection to url:{url}")
