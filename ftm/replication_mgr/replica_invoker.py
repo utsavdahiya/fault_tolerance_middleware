@@ -7,6 +7,7 @@ from termcolor import colored
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class invoker:
@@ -30,41 +31,44 @@ class invoker:
     @classmethod
     async def instantiate_replicas(cls, ft_unit, ftm, vm_placement):
         '''asks resource manager to invoke specified configs
-        
-        Args:
-            config_info: A list of tuples of config names(IDs) to be invoked(instantiated):
-                example: [(config_type, number of VMs to be invoked), (), ...]
-                    config_type is an identifier(str) such as primary config etc
 
         Returns:
             VMs: a dict containing primary and backup VM ids
         '''
         #ft_unit.replication_strat.num_of_replica contains the default num of replicas to be invoked
-        num_primary = ft_unit.replication_strat.self.num_primary
+        logger.debug(colored("instantiating replicas", 'blue', 'on_white'))
+
+        num_primary = ft_unit.replication_strat.num_of_primary
         num_backup = ft_unit.replication_strat.num_of_replica
         primary_config = ft_unit.replication_strat.primary_config #it is a list of json
         # backup_config = ft_unit.replication_strat.backup_config #it is a json
-        VMs = {'primary': None,
-                'backup': []}
         #invoke the required VMs and their backups(replicas)
-        for config in ft_unit.replication_strat.primary_config:
+        for vm_parameter in ft_unit.replication_strat.primary_config:
+            config = vm_parameter['config']
+            loc = vm_placement['primary']['loc']
+            config['location'] = loc
             vm = VM(config)
-            vm.location = vm_placement['primary'][0]
-            logger.info(colored(f"created a primary VM with id: {vm.id}", 'blue'))
-            VMs['primary'] = vm.id
+            vm.location = loc
+            logger.info(colored(f"created a primary VM id: {vm.id}", 'blue'))
+            VMs = {}
+            VMs[vm.id] = []
+            ftm.all_VMs[vm.id] = vm     #registering VM with ftm
+            # ftm.VMs[vm.id] = []
             #instantiating primary
             id, code = await ftm.resource_mgr.instantiate(ftm, vm)
             logger.info(colored(f"instantiated vm[{vm.id}] at location [{vm.location}]", 'blue'))
-            for location in vm_placement['backup'].keys():
-                backup_vm = VM(config)
-                vm.location = location
-                logger.info(colored(f"created a primary VM with id: {vm.id}", 'blue'))
+            for location in vm_placement['primary']['backup'].keys():
+                for num_replica in range(vm_placement['primary']['backup'][location]):
+                    config['location'] = location
+                    backup_vm = VM(config)
+                    vm.location = location
+                    ftm.all_VMs[backup_vm.id] = backup_vm
+                    logger.info(colored(f"created a primary VM with id: {backup_vm.id}", 'blue'))
 
-                id, code = await ftm.resource_mgr.instantiate(ftm, backup_vm)
-                logger.info(colored(f"instantiated vm[{vm.id}] at location [{vm.location}]", 'blue'))
-                VMs['backup'].append(backup_vm.id)
-
-        return VMs
+                    id, code = await ftm.resource_mgr.instantiate(ftm, backup_vm)
+                    logger.info(colored(f"instantiated vm[{backup_vm.id}] at location [{vm.location}]", 'blue'))
+                    VMs[vm.id].append(backup_vm.id)
+            ftm.VMs.append(VMs)
 
         # for primary_vms in vm_placement['primary']:
         #     config = ft_unit.replication_strat.primary[i]

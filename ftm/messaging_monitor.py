@@ -18,6 +18,7 @@ from termcolor import colored
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 class MessagingMonitor():
 
@@ -69,6 +70,7 @@ class MessagingMonitor():
 		'''Args:
 			dest: client_id'''
 		if(dest == 'cloud'):
+			logger.debug(colored(f"sending msg: {json.dumps(msg, indent=2)} to cloud", 'yellow', 'on_white'))
 			#send msg to cloud
 			ws = self.cloud_session
 			await ws.send_json(msg)
@@ -84,10 +86,12 @@ class MessagingMonitor():
 		elif dest not in self.session.keys():
 			raise(colored(f"client: {dest} was not found", 'red'))
 		else:
-			ws = self.session[dest]
-			await ws.send_json(msg)
-        #now call replica invoker to invoke at specified loacations
-        
+			try:
+				logger.debug(colored(f"sending msg:{json.dumps(msg, indent=2)} to client: {dest}", 'green', 'on_white'))
+				ws = self.session[dest]
+				await ws.send_json(msg)
+			except Exception as e:
+				logger.info(colored(f"msg: {msg} \nerror: {e}", 'red'))
 	async def cloud_get_handler(self, request):
 		logger.info("get req received")
 		return web.Response(text="Controooool Uday!!")

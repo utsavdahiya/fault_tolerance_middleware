@@ -14,6 +14,11 @@ class FtmClient():
         self.ws = None
         self.basic_config = None
         self.VMs = None
+        self.first_time = True
+
+    async def on_vm_creation(self, data):
+        logger.info(colored(f"VMs created successfully", 'green'))
+        logger.info(colored(f"vm details: {json.dumps(data, indent=2)}", 'blue'))
 
     async def connect(self, url:str):
         logger.info(f"connecting to ftm at {url}")
@@ -27,16 +32,25 @@ class FtmClient():
                         break
                     else:
                         logger.info(f"received msg: {msg.data}")
-                        with open('client_req.json') as f:
-                            logger.info("file loaded:")
-                            # print(f)
-                            data = json.load(f)
-                            self.basic_config = data
-                            logger.info(f"sending client requirements: {data}")
-                        await ws.send_json(data)
-                        pause = input("waiting for server ftm instantiaion")
-                        resp = await ws.receive_json()
-                        logger.info(colored(f"received this json: {resp}", 'green'))
+                        if self.first_time: #this will run only once
+                            self.first_time = False
+                            with open('client_req.json') as f:
+                                logger.info("file loaded:")
+                                # print(f)
+                                data = json.load(f)
+                                self.basic_config = data
+                                logger.info(f"sending client requirements: {data}")
+                            await ws.send_json(data)
+                            pause = input("waiting for server ftm instantiaion")
+                        else:
+                            try:
+                                recvd_msg = json.loads(msg.data)
+                                if recvd_msg['desc'] == 'VMs':
+                                    await self.on_vm_creation(recvd_msg)
+                                else:
+                                    logger.info(colored("json received", 'green'))
+                            except:
+                                logger.info(colored("msg format not JSON", 'red'))
                 elif msg.type == aiohttp.WSMsgType.ERROR:
                     break
             logger.info(f"closed connection to url:{url}")
