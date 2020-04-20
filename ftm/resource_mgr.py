@@ -63,6 +63,7 @@ class ResouceManager:
                 returns the VM id and an SUCCESS/ERROR CODE- (1: success, 0:failure)
                 #error codes can be made more descriptive in future
         '''
+        logger.debug(colored(f"invoking replica {vm.id}", 'blue', 'on_white'))
         #register vm with the resource manager
         self.VMs[vm.id] = vm
         #send req to cloudsim to instantiate the required VM config
@@ -70,11 +71,12 @@ class ResouceManager:
         msg = {"desc": "instantiate_vm",
                 "VM": [vm.config],
             }
-        cloud_resp = await self.msg_monitor.send_ws(msg, 'cloud')
-        #check response to see if invocation was successful
+        logger.debug(colored(f"calling cloud to allocate VM", 'blue', 'on_white'))
+        await self.msg_monitor.send_json(msg, 'cloud')
 
         #if successful:
         self.VMs[vm.id].status = 'active'
+        logger.debug(colored(f"vm: {vm.id} activated", 'blue', 'on_white'))
         code = 'SUCCESS'
         return vm.id, code
     

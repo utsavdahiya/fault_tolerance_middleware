@@ -19,13 +19,15 @@ class FTM:
         logger.debug(colored("creating a FTM object", 'blue', 'on_white'))
         FTM.counter += 1
         self.id = str(FTM.counter)
+        self._queue = asyncio.Queue()
         self.client_id = client_id
         self.msg_monitor = msg_monitor
         self.resource_mgr = ResouceManager(msg_monitor)
         self.service_directory = service_dir.ServiceDirectory()
         self.composition_engine = composition_engine.CompositionEngine()
         self.ft_unit = None
-        self.VMs = []
+        self.all_VMs = {}   #a dict of all VMs <vm_id: vm_obj>
+        self.VMs = []   #a list of VMs asked by client [{primary_vm_id: [list of replica VMs]}]
 
     async def create_ft_unit(self, requirements: dict) -> list:
         '''procedure to create ft_unit from given user reqs
@@ -36,27 +38,31 @@ class FTM:
         to_be_deployed = self.composition_engine.compose_solution(eligible_ft_units)
         #send to_be_deployed to resource manager to instantiate
 
-async def start_ftm(application, client_id, msg_monitor, requirements):
+async def start_ftm(application, client_id, msg_monitor, data):
     '''To start initialise the ftm middleware: going from client requirments to
 
     git rm -rf --cached .
 
     git add .
 ion
-        requirements: dict of client requirments
-            example: {"vms": [{"num_of_instances": "num",
-                            "config": {"mips": "1000",
+        data: dict of client requirments and other info
+            example: {'client_req': {"vms": [
+                                    {"num_of_instances": "num",
+                                    "config": {"mips": "1000",
                                     "pes": "4",
                                     "ram": "1000",
                                     "bandwidth": "1000",
                                     "size": "10000",
                                     "location": "1"}
-                        }],
-                "latency": "low",
-                "availability": "high",
-                "bandwidth": "moderate"
+                                    }],
+                            "latency": "low",
+                            "availability": "high",
+                            "bandwidth": "moderate"
+                            }
+                    'locations': [list of locations]
             }
     '''
+    requirements = data['client_req']
     logger.info(colored("starting ftm application for new client", 'blue'))
     #create a new ftm object
     ftm = FTM(msg_monitor, client_id)
@@ -76,28 +82,16 @@ ion
     pretty_print = json.dumps(unit_config, indent=2)
     logger.info(colored(f"ft_unit_config: {pretty_print}", 'blue', 'on_white'))
     
-    return ftm
-    #get locations from the cloud
-    msg = {"desc": "get_location"}
-    locations = await application.get_locations()
-    # locations = await ftm.msg_monitor.send_json(msg, 'cloud')
-    
-
-async def cont_ftm(ftm, locations):
-    # locations = [int(i) for i in locations]     #converting from str to int
-
     #invoke the required VMs using predefined VM placement policy, replication and fault detection policies
     #or you can include custom replication and fault detection policy here
     # example: chosen_unit.repllication_strat = my_stratergy | derived from replication_mgr
-    logger.debug(colored(f"called cont_ftm with the locations: {locations}", 'blue', 'on_white'))
-    vm_placement = ftm.ft_unit.vm_placement.place(locations,
+    locations = data['locations']
+    logger.info(colored(f"chosing locations using vm placement policy", 'blue'))
+    vm_placement = await ftm.ft_unit.vm_placement.place(locations,
                     ftm.ft_unit.replication_strat.num_of_primary,
                     ftm.ft_unit.replication_strat.num_of_replica)
 
-    VMs = replica_invoker.invoker().instantiate_replicas(ftm.ft_unit, ftm, vm_placement)
-    ftm.VMs.append(VMs) #register the VMs with ftm
-
-    #starting the resource manager monitoring for the ftm
-    await ftm.resource_mgr.monitor()
+    logger.info(colored(f"Now invoking the VMs at the chosen locations...", 'blue'))
+    await replica_invoker.invoker().instantiate_replicas(ftm.ft_unit, ftm, vm_placement)
 
     return ftm

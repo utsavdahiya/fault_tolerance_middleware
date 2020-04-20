@@ -16,17 +16,31 @@ class VmPlacement(VmPlacementPolicy):
         logger.debug(colored("creating a VmPlacement object", 'blue', 'on_white'))
         super().__init__(mech_name)
 
-    async def place(self, locations, num_primary, num_backup):
-        logger.info(colored("placing the VMs"), 'blue')
+    async def place(self, locations, num_primary, num_backup) -> dict:
+        '''choses the locations where to place the primary and backup VMs
+        Args:
+            locations: a list of intergers representing locations of hosts
+
+        Returns:
+            placement: a dict of locations of primary and replica VMs
+                example: {'primary': {'loc': location of primary VM,
+                                    'backup': {loc1: num of VMs,
+                                               loc2: num of VMs}
+                                    }
+                        }
+        '''
+        logger.info(colored("placing the VMs", 'blue'))
         #chosing loc 1 for primary and subsequent for backups
-        placement = {}
-        placement['primary'] = [locations[0]]   #this is a list of locations for pimary VMs
+        placement = {'primary': {}}
+        placement['primary']['loc'] = [locations[0]]   #this is a list of locations for pimary VMs
         backup_loc = {}
         for i in range(1, len(locations)):
-            vm_loc = backup_loc.get(locations[i], 0)
-            backup_loc[locations[i]] += 1
+            if i == num_backup+1:
+                break
+            prev_val = backup_loc.get(locations[i], 0)
+            backup_loc[locations[i]] = prev_val + 1
 
-        placement['backup'] = backup_loc
+        placement['primary']['backup'] = backup_loc
         
         return placement
 
@@ -54,10 +68,27 @@ class ActiveReplication(ReplicationStratergy):
         #call synchronizer to continue replication on other nodes
 
     def populate(self, requirements):
+        '''
+        Args:
+            requirements: {"vms": [
+                                    {"num_of_instances": "num",
+                                    "config": {"mips": "1000",
+                                            "pes": "4",
+                                            "ram": "1000",
+                                            "bandwidth": "1000",
+                                            "size": "10000",
+                                            "location": "1"}
+                                            }
+                                    ],
+                            "latency": "low",
+                            "availability": "high",
+                            "bandwidth": "moderate"
+                            }
+        '''
         self.num_of_primary = len(requirements['vms'])
         self.num_of_replica = self.num_of_primary * self.replica_ratio
         self.primary_config = requirements['vms']
-        self.backup_config = requirements['vms'][0]
+        self.backup_config = requirements['vms']
 
 class FaultDetection(FaultDetectionStratergy):
     """extends the FaultDetectionStratergy base class

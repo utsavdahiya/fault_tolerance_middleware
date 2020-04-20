@@ -14,6 +14,15 @@ class VM:
     def __init__(self, config):
         VM.counter += 1
         self.id = str(VM.counter)
-        self.config = config
+        self.config = config    #a dictionary of config
+        '''config = {
+                "mips": "1000",
+                "pes": "4",
+                "ram": "1000",
+                "bandwidth": "1000",
+                "size": "10000",
+                "location": "1"
+            }
+'''
         self.status = 'inactive'    #inactive(not running)/active(running)
         self.location = None

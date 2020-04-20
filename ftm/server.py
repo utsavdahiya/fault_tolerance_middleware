@@ -14,6 +14,8 @@ logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
+NUM_LOCATIONS = 10
+
 class Client:
     counter = 0
     def  __init__(self, websocket):
@@ -27,8 +29,9 @@ class Application():
         self.msg_monitor = msg_monitor
         self.clients = []
         self.client_dict = {}   #dict: <client_websocket, client_obj>
-        self.ftm = {}   #dict: <client_id, ftm>
+        self.ftm_dict = {}   #dict: <client_id, ftm>
         self.ftm_list = []
+        self.locations = [i for i in range(NUM_LOCATIONS)]
 
     async def on_connect_client(self, data: dict):
         """callback on establishing contact with client
@@ -73,20 +76,26 @@ class Application():
         #start an FTM instance for the client
         logger.info(colored(f"client requirements received", 'green'))
         client_id = data['client_id']
-        ftm_instance = await ftm_middleware.start_ftm(self, client_id, self.msg_monitor, data['client_req'])
+        info = {}
+        info['client_req'] = data['client_req']
+        info['locations'] = self.locations
+        ftm_instance = await ftm_middleware.start_ftm(self, client_id, self.msg_monitor, info)
         #register this ftm instance with the application
-        self.ftm[client_id] = ftm_instance
+        self.ftm_dict[client_id] = ftm_instance
         self.ftm_list.append(ftm_instance)
-        
-        #get locations from the cloud
-        msg = {"desc": "get_location"}
-        self.msg_monitor.callbacks['on_location'] = self.on_location
-        await self.msg_monitor.send_json(msg, 'cloud')
-        
+                
         logger.info(colored("ftm_created for the client", 'green'))
         #return list of VMs to the client
+        list_primary = []
+        for vm_obj in ftm_instance.VMs:
+            vm_id = [*vm_obj]
+            vm_id = vm_id[0]
+            list_primary.append(vm_id)
+        # list_primary = [*vm_id for vm_id in ftm_instance.VMs]
+        # list_primary = [ftm_instance.all_VMs[vm_id] for vm_id in list_primary]
         msg = {'desc': 'VMs',
-                'list': ftm_instance.VMs}
+                'list': list_primary}
+        logger.debug(colored(f"sending vm list to client", 'green', 'on_white'))
         await self.msg_monitor.send_json(msg, client_id)
 
     async def on_location(self, data):
