@@ -1,15 +1,17 @@
 """this is the base class for ft_units
-
 ft_unit is the basic module that implements any and all fault tolerant stratergies 
 it gives a template for the stratergy that is then realised by replication manager and fault detection manager
 """
+from termcolor import colored
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("__name__")
+logger.setLevel(logging.DEBUG)
 
 class VmPlacementPolicy():
-    def __init__(self):
+    def __init__(self, mech_name):
+        self.mech_name = mech_name
         pass
     def place(self, locations, num_primary: int, num_backup: int) -> dict:
         '''decides how to place VMs according to geographical locations'''
@@ -18,23 +20,29 @@ class VmPlacementPolicy():
 class ReplicationStratergy:
     """base class for replication stratergy"""
 
-    def __init__(self, mech_name, data):
+    def __init__(self, mech_name: str, data: dict):
         """initialises variables
         
             mech_name:str- the name/id of the chosen mechanism
             data:<key:value>- dict(hashmap) of required paramters for the strat. 
                         eg- {num_of_replica:5, primary_config:<config>, backup_config:<config>}
         """
+        logger.debug(colored("creating ReplicationStratergy object", 'blue', 'on_white'))
+        try:
+            logger.debug(colored(f"data recvd: {data}", 'blue', 'on_white'))
+        except Exception as e:
+            print(f"error: {e}")
         self.mech_name = mech_name   #type:str- placeholder for actual mechanism implementaion object
         self.num_of_primary = data.get('num_of_primary', None)
         self.num_of_replica = data.get('num_of_replica', None)
         self.primary_config = data.get('primary', None)
-        self.backup_config = data.get('backup_config', None) #a list of configurations(YAML file) for backup VMs
+        self.backup_config = data.get('backup_config', None) 
         self.replica_ratio = 2
         
         #Qos attributes
-        self.latency = data['latency']
-        self.comp_req = data['comp_req']
+        self.latency = data.get('latency', None)
+        self.availability = data.get('availability', None)
+        self.comp_req = data.get('comp_req', None)
     
     def replication_strat(self):
         """implements the stratergy named in self.mechanism"""
@@ -67,9 +75,10 @@ class FtUnit:
         self.cost_factor = 1
         # self.latency = self.replication_strat.latency + self.fault_detection_strat.latency  #it is a function of all components
         self.latency = "latency"
-        self.qos = {"latency" : self.latency,
+        self.qos = {"latency" : self.replication_strat.latency,
                 "bandwidth" : 0,
-                "availability" : 0}
+                "availability" : self.replication_strat.availability,
+                "comp_req": self.replication_strat.comp_req}
         
     def value(self):
         """returns the quality values of the ft_unit for ranking it"""

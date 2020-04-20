@@ -6,9 +6,11 @@ from termcolor import colored
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 class ResouceManager:
     def __init__(self, msg_monitor):
+        logger.debug(colored("creating ResourceManger object", 'blue', 'on_white'))
         self.msg_monitor = msg_monitor  #messaging monitor allows RM to communicate with cloudsim
         self.VMs = {}   #a dict of VMs
         self.timer = 2 #timer for monitoring schelduling
@@ -42,7 +44,7 @@ class ResouceManager:
     async def monitor(self):
         #monitor the VMs to check if they are running smoothly
         while True:
-            asyncio.sleep(self.timer)   #check every "timer" seconds
+            await asyncio.sleep(self.timer)   #check every "timer" seconds
             for vm in self.VMs:
                 #check vm status with cloudsim
                 msg = {"desc": "status",

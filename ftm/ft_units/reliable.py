@@ -2,18 +2,22 @@
 
 from .ft_unit_base import ReplicationStratergy, FaultDetectionStratergy, VmPlacementPolicy ,FtUnit
 from replication_mgr import replica_invoker
+from termcolor import colored
 
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 class VmPlacement(VmPlacementPolicy):
     '''atleast one backup not on the same host as the primary'''
-    def __init__(self):
-        super().__init__()
+    def __init__(self, mech_name):
+        logger.debug(colored("creating a VmPlacement object", 'blue', 'on_white'))
+        super().__init__(mech_name)
 
     async def place(self, locations, num_primary, num_backup):
+        logger.info(colored("placing the VMs"), 'blue')
         #chosing loc 1 for primary and subsequent for backups
         placement = {}
         placement['primary'] = [locations[0]]   #this is a list of locations for pimary VMs
@@ -31,13 +35,16 @@ class ActiveReplication(ReplicationStratergy):
     implements active replication stratergy using two backups for each primary
 
     """
-    def __init__(self, mech_name):
+    def __init__(self, mech_name, data):
+        logger.debug(colored(f"passing data: {data} to Base", 'blue', 'on_white'))
+        logging.debug(colored("creating a ActiveReplication object", 'blue', 'on_white'))
         data = {'latency': 'low',
                 'availability': 'high',
+                'bandwidth': 'moderate',
                 'comp_req': 'low'}
-        super().__init__("actve_replication", data)
-
         self.replica_ratio = 2
+
+        super().__init__("actve_replication", data)
 
     async def replication_strat(self, message):
         '''we are using active replication here'''
@@ -57,6 +64,7 @@ class FaultDetection(FaultDetectionStratergy):
     using heartbeat protocol
     """
     def __init__(self, mech_name):
+        logger.debug(colored("creating a FaultDetection object", 'blue', 'on_white'))
         data = {}
         super().__init__(mech_name, data)
         
@@ -66,16 +74,22 @@ class FaultDetection(FaultDetectionStratergy):
 
 class ReliableFtUnit(FtUnit):
     """extends the FtUnit base class"""
-    def __init__(self, id, replication_strat, detection_strat):
-        super().__init__(id, replication_strat, detection_strat)
+    def __init__(self, id, replication_strat, detection_strat, vm_placement):
+        logger.debug(colored("creating a ReliableFtUnit object", 'blue', 'on_white'))
+        super().__init__(id, replication_strat, detection_strat, vm_placement)
     
     def populate(self, requirements):
-        logger.info(f"populating the ft_unit: {self.id}")
+        logger.debug(f"populating the ft_unit: {self.id}")
         self.replication_strat.populate(requirements)
 
 def create_ft_unit():
-    repl_strat = ActiveReplication('active_replication')
+    logging.debug(colored("create_ft_unit called", 'blue', 'on_white'))
+    vm_placement = VmPlacement("backup_host != primary_host")
+    logger.debug(colored("calling ActiveReplication", 'blue', 'on_white'))
+    data = {'test': 'data'}
+    repl_strat = ActiveReplication('active_replication', data)
     fault_det = FaultDetection('heartbeat')
-    ft_unit = ReliableFtUnit("demo_ft_unit", repl_strat, fault_det)
+    ft_unit = ReliableFtUnit("demo_ft_unit", repl_strat, fault_det, vm_placement)
 
+    logger.debug(colored("ft_unit created", 'blue', 'on_white'))
     return ft_unit

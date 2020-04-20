@@ -26,7 +26,9 @@ class Application():
     def __init__(self, msg_monitor):
         self.msg_monitor = msg_monitor
         self.clients = []
-        self.client_dict = {}
+        self.client_dict = {}   #dict: <client_websocket, client_obj>
+        self.ftm = {}   #dict: <client_id, ftm>
+        self.ftm_list = []
 
     async def on_connect_client(self, data: dict):
         """callback on establishing contact with client
@@ -43,7 +45,7 @@ class Application():
         client = Client(data['websocket'])
         #register client with app
         self.clients.append(client)
-        logger.info("registered client with app")
+        logger.info(colored("registered client with app", 'green'))
         self.client_dict[data['websocket']] = client
         return client.id
 
@@ -71,16 +73,34 @@ class Application():
         #start an FTM instance for the client
         logger.info(colored(f"client requirements received", 'green'))
         client_id = data['client_id']
-        ftm_instance = await ftm_middleware.start_ftm(client_id, self.msg_monitor, data['client_req'])
+        ftm_instance = await ftm_middleware.start_ftm(self, client_id, self.msg_monitor, data['client_req'])
         #register this ftm instance with the application
+        self.ftm[client_id] = ftm_instance
         self.ftm_list.append(ftm_instance)
+        
+        #get locations from the cloud
+        msg = {"desc": "get_location"}
+        self.msg_monitor.callbacks['on_location'] = self.on_location
+        await self.msg_monitor.send_json(msg, 'cloud')
+        
         logger.info(colored("ftm_created for the client", 'green'))
         #return list of VMs to the client
         msg = {'desc': 'VMs',
                 'list': ftm_instance.VMs}
         await self.msg_monitor.send_json(msg, client_id)
 
-    async def on_connect_cloud(self):
+    async def on_location(self, data):
+        '''
+            data = {'client_ws': client_ws,
+                    'locations': [locations]}
+        '''
+        logger.debug(colored(f"on_location hit", 'blue', 'on_white'))
+        # client = self.client_dict[data['client_ws']]
+        locations = data['locations']
+        ftm_instance = self.ftm_list[0]
+        await ftm_middleware.cont_ftm(ftm_instance, locations)
+
+    async def on_connect_cloud(self, data):
         pass
 
     def on_client_msg(self):
