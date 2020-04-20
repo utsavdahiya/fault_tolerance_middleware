@@ -72,11 +72,16 @@ class MessagingMonitor():
 			#send msg to cloud
 			ws = self.cloud_session
 			await ws.send_json(msg)
-			if(msg['desc'] == "get_location"):
-				resp = await ws.receive_json()
-				logger.info(colored("recvd msg: " + str(msg.data), 'yellow'))
-				return resp
-		if dest not in self.session.keys():
+			# if(msg['desc'] == "get_location"):
+			# 	try:
+			# 		# resp = await ws.receive_json()
+			# 		async for msg in ws:
+			# 			logger.info(colored("recvd resp: " + str(msg.data), 'yellow'))
+			# 	except Exception as e:
+			# 		logger.info(colored(f"cloud not await for msg error: {e}", 'red'))
+			# 	logger.info(colored("recvd msg: " + str(msg.data), 'yellow'))
+			# 	return resp
+		elif dest not in self.session.keys():
 			raise(colored(f"client: {dest} was not found", 'red'))
 		else:
 			ws = self.session[dest]
@@ -132,19 +137,30 @@ class MessagingMonitor():
 		ws = web.WebSocketResponse()
 		await ws.prepare(request)
 		msg = {"desc": "welcome message"}
+		logger.debug(colored(f"sending msg: {msg} to cloud", 'white', 'on_yellow'))
 		await ws.send_json(msg)
 		self.cloud_session = ws
+		data = {'websocket': ws}
+		# await self.callbacks['on_cloud_connect'](data)
 		async for msg in ws:
+			# await asyncio.sleep(20)
 			logger.info(colored("recvd msg: " + str(msg.data), 'yellow'))
 			if msg.type == aiohttp.WSMsgType.TEXT:
 				if msg.data == 'close':
 					await ws.close()
 				else:
 					try:
+						# msg.data = json.dumps(msg.data)
 						recvd_msg = json.loads(msg.data)
-						if recvd_msg['desc'] == '':
-							pass
-					except:
+						logger.info(type(recvd_msg))
+						# recvd_msg = msg.data
+						if recvd_msg['desc'] == 'locations':
+							logger.debug(colored(f"a locations msg received", 'blue', 'on_white'))
+							data = {'client_ws': ws,
+									'locations': recvd_msg['locations']}
+							await self.callbacks['on_location'](data)
+					except Exception as e:
+						logger.info(colored(f"msg is not a json; error: {e}", 'red'))
 						# await ws.send_str(msg.data + '/server_resp'+'\n')
 						# logger.info("sent reply to ws")
 						logger.info(colored(f"msg recvd: {msg.data}", 'yellow'))
