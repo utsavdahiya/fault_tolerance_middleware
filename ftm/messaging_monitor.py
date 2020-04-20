@@ -159,10 +159,14 @@ class MessagingMonitor():
 						logger.info(type(recvd_msg))
 						# recvd_msg = msg.data
 						if recvd_msg['desc'] == 'locations':
-							logger.debug(colored(f"a locations msg received", 'blue', 'on_white'))
+							logger.debug(colored(f"a locations msg received", 'yellow', 'on_white'))
 							data = {'client_ws': ws,
 									'locations': recvd_msg['locations']}
 							await self.callbacks['on_location'](data)
+						elif recvd_msg['desc'] == 'status':
+							logger.debug(colored(f"a status msg received", 'yellow', 'on_white'))
+							data = msg.data
+							await self.callbacks['on_status'](data)
 					except Exception as e:
 						logger.info(colored(f"msg is not a json; error: {e}", 'red'))
 						# await ws.send_str(msg.data + '/server_resp'+'\n')

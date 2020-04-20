@@ -3,6 +3,8 @@ from ftm_kernel import service_dir, composition_engine, evaluation_unit
 from replication_mgr import replica_invoker
 from resource_mgr import ResouceManager
 from ft_units import *
+from fault_masking_mgr import FaultMasking
+
 from termcolor import colored
 import asyncio
 import json
@@ -25,26 +27,63 @@ class FTM:
         self.resource_mgr = ResouceManager(msg_monitor)
         self.service_directory = service_dir.ServiceDirectory()
         self.composition_engine = composition_engine.CompositionEngine()
+        self.fault_mask_mgr = FaultMasking("migration")
         self.ft_unit = None
         self.all_VMs = {}   #a dict of all VMs <vm_id: vm_obj>
         self.VMs = []   #a list of VMs asked by client [{primary_vm_id: [list of replica VMs]}]
 
-    async def create_ft_unit(self, requirements: dict) -> list:
-        '''procedure to create ft_unit from given user reqs
-        
-           Args:
-            requirements: a dictionary(hashmap) of client requirments'''
-        eligible_ft_units = self.service_directory.find_eligible_units()    #returns a list of ft_units
-        to_be_deployed = self.composition_engine.compose_solution(eligible_ft_units)
-        #send to_be_deployed to resource manager to instantiate
+    async def setup(self):
+        #start queue
+        while True:
+            item = await self._queue.get()
+            if item is None:
+                continue
+            action = item.get('action').upper()
+            data = item.get('data', {})
+            callaback = item.get('callback', None)
+
+            if action == 'STATUS':
+                asyncio.create_task(self.evaluate_status(data))
+            elif action == 'FAULT MASK':
+                asyncio.create_task(self.fault_mask_mgr.handle_fault(data))
+            else:
+                raise Exception(colored(f"no fucntion defined for action: {action}", 'red'))
+
+    async def evaluate_status(self, data, callaback=None):
+        '''
+            {   
+                "client_id": "id of client"
+                "desc": "status",
+                "allocated_bandwidth":"10000", 
+                "available_bandwidth":"10000",
+                "capacity_bandwidth":"20000",
+                "current_requested_bandwidth":"20000",
+                "cpu_percent_utilization":"80",
+                "current_requested_total_mips":"500",
+                "allocated_ram":"4096",
+                "available_ram":"8192",
+                "capacity_ram":"8192",
+                "current_requested_ram":"8192",
+                "allocated_storage":"12800",
+                "available_storage":"25600",
+                "capacity_storage":"25600",
+                "condition":"working"
+            }
+        '''
+        vm_status = data
+        if vm_status['condition'] != "working":
+            logger.info(colored(f"vm [{id}] condition is not working!!", 'red'))
+            self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
+        elif vm_status['cpu_percent_utilization'] > 95:
+            self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
+        elif vm_status['allocated_ram']/vm_status['capacity_ram'] > 90:
+            self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
+        else:
+            logger.info(colored(f"no masking procedure specified", 'red'))
 
 async def start_ftm(application, client_id, msg_monitor, data):
     '''To start initialise the ftm middleware: going from client requirments to
 
-    git rm -rf --cached .
-
-    git add .
-ion
         data: dict of client requirments and other info
             example: {'client_req': {"vms": [
                                     {"num_of_instances": "num",

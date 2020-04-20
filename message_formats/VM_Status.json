@@ -2,5 +2,6 @@
 
 {
 	"desc": "status",
-	"id": "0"
+	"id": "0",
+	"client_id": "id of client"
 }
