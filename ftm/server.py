@@ -97,6 +97,9 @@ class Application():
                 'list': list_primary}
         logger.debug(colored(f"sending vm list to client", 'green', 'on_white'))
         await self.msg_monitor.send_json(msg, client_id)
+        
+        #starting the resource manager monitor
+        await ftm_instance.resource_mgr.monitor()
 
     async def on_location(self, data):
         '''
@@ -108,6 +111,13 @@ class Application():
         locations = data['locations']
         ftm_instance = self.ftm_list[0]
         await ftm_middleware.cont_ftm(ftm_instance, locations)
+        
+    async def on_status(self, data):
+        client_id = data.get('client_id', None)
+        if client_id is None:
+            raise Exception(colored(f"client_id was not present in status message", 'red'))
+        ftm_instance = self.ftm_dict[client_id]
+        ftm_instance._queue.put({'action': 'STATUS', 'data': data})
 
     async def on_connect_cloud(self, data):
         pass

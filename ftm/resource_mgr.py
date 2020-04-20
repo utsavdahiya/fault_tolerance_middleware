@@ -41,17 +41,18 @@ class ResouceManager:
         elif vm_status['allocated_ram']/vm_status['capacity_ram'] > 90:
             pass
     
-    async def monitor(self):
+    async def monitor(self, ftm):
         #monitor the VMs to check if they are running smoothly
+        logger.debug(colored(f"monitoring the VMs for status"))
         while True:
             await asyncio.sleep(self.timer)   #check every "timer" seconds
-            for vm in self.VMs:
+            for vm_id in ftm.all_VMs.keys():
                 #check vm status with cloudsim
                 msg = {"desc": "status",
-                    "id": vm.id
+                    "id": vm_id,
+                    "client_id": ftm.client_id
                 }
-                vm_status = await self.msg_monitor.send_json(msg, 'cloud')
-                await self.evaluate(vm_status)
+                await self.msg_monitor.send_json(msg, 'cloud')
 
     async def instantiate(self, ftm, vm) -> (str, int):
         '''instantiate the given VM 
