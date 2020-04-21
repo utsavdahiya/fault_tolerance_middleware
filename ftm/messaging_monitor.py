@@ -126,8 +126,10 @@ class MessagingMonitor():
 							data['client_req'] = recvd_msg
 							logger.info(f"client requirements received: {data}")
 							await self.callbacks['on_requirements'](data)
-						elif recvd_msg['desc'] == 'cloudlet':
-							pass
+						elif recvd_msg['desc'] == 'instantiate_cloudlet':
+							logger.info(colored("msg to instantiate cloud application recv", 'green'))
+							data['instantiate_cloudlet'] = recvd_msg
+							await self.callbacks['on_cloudlet'](data)
 					except:
 							await ws.send_str(f"{msg.data}/server_resp")
 			elif msg.type == aiohttp.WSMsgType.ERROR:

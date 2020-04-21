@@ -60,12 +60,16 @@ class ActiveReplication(ReplicationStratergy):
 
         super().__init__("actve_replication", data)
 
-    async def replication_strat(self, message):
+    async def synchronizer(self, ftm , message):
         '''we are using active replication here'''
-        logger.info(f"msg received by replication stratergy")
+        logger.debug(colored(f"msg received by replication stratergy", 'blue', 'on_white'))
         #forward msg to all, wait till majority reponse
         #send ack after mjority resp
         #call synchronizer to continue replication on other nodes
+        logger.info(colored(f"using active replication, sending message to all the replicas", 'blue'))
+        for vm_id in ftm.all_VMs.keys():
+            logger.info(colored(f"sending to vm id[{vm_id}]", 'yellow'))
+            await ftm.msg_monitor.send_json(message, 'cloud')
 
     def populate(self, requirements):
         '''
