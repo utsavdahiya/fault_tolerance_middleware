@@ -1,6 +1,7 @@
 //All keys and values should be of String data type, location can be 1, 2, 3 or 4
 
 {
+	"id": "id of VM",
    "mips": "1000",
    "pes": "4",
    "ram": "1000",

@@ -11,8 +11,8 @@ nest_asyncio.apply()
 
 import logging
 logging.basicConfig(level=logging.INFO)
-
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 NUM_LOCATIONS = 10
 
@@ -99,7 +99,7 @@ class Application():
         await self.msg_monitor.send_json(msg, client_id)
         
         #starting the resource manager monitor
-        await ftm_instance.resource_mgr.monitor()
+        await ftm_instance.resource_mgr.monitor(ftm_instance)
 
     async def on_location(self, data):
         '''

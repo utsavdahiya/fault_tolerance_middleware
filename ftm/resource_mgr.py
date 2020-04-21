@@ -72,6 +72,8 @@ class ResouceManager:
         msg = {"desc": "instantiate_vm",
                 "VM": [vm.config],
             }
+        #adding id to vm:
+        msg['VM'][0]['vm_id'] = vm.id
         logger.debug(colored(f"calling cloud to allocate VM", 'blue', 'on_white'))
         await self.msg_monitor.send_json(msg, 'cloud')
 
