@@ -90,6 +90,7 @@ class MessagingMonitor():
 				logger.debug(colored(f"sending msg:{json.dumps(msg, indent=2)} to client: {dest}", 'green', 'on_white'))
 				ws = self.session[dest]
 				await ws.send_json(msg)
+				logger.debug(colored(f"msg sent to client", 'green', 'on_white'))
 			except Exception as e:
 				logger.info(colored(f"msg: {msg} \nerror: {e}", 'red'))
 	async def cloud_get_handler(self, request):
