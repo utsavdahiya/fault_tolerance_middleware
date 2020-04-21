@@ -170,13 +170,13 @@ class MessagingMonitor():
 							await self.callbacks['on_location'](data)
 						elif recvd_msg['desc'] == 'status':
 							logger.debug(colored(f"a status msg received", 'yellow', 'on_white'))
-							data = msg.data
+							data['status'] = recvd_msg
 							await self.callbacks['on_status'](data)
 					except Exception as e:
 						logger.info(colored(f"msg is not a json; error: {e}", 'red'))
 						# await ws.send_str(msg.data + '/server_resp'+'\n')
 						# logger.info("sent reply to ws")
-						logger.info(colored(f"msg recvd: {msg.data}", 'yellow'))
+						logger.info(colored(f"msg recvd: {msg.data}", 'red'))
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				print('ws connection closed with exception %s' %ws.exception())
 
