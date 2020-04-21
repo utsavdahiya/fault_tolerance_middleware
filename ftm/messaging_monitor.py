@@ -70,7 +70,7 @@ class MessagingMonitor():
 		'''Args:
 			dest: client_id'''
 		if(dest == 'cloud'):
-			logger.debug(colored(f"sending msg: {json.dumps(msg, indent=2)} to cloud", 'yellow', 'on_white'))
+			# logger.debug(colored(f"sending msg: {json.dumps(msg, indent=2)} to cloud", 'yellow', 'on_white'))
 			#send msg to cloud
 			ws = self.cloud_session
 			await ws.send_json(msg)
@@ -170,8 +170,8 @@ class MessagingMonitor():
 							await self.callbacks['on_location'](data)
 						elif recvd_msg['desc'] == 'status':
 							logger.debug(colored(f"a status msg received", 'yellow', 'on_white'))
-							data['status'] = recvd_msg
-							await self.callbacks['on_status'](data)
+							# data['status'] = recvd_msg
+							await self.callbacks['on_status'](recvd_msg)
 					except Exception as e:
 						logger.info(colored(f"msg is not a json; error: {e}", 'red'))
 						# await ws.send_str(msg.data + '/server_resp'+'\n')
