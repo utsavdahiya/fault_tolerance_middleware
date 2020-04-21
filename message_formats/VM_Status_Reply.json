@@ -1,9 +1,9 @@
 //All keys and values are of String data type, condition can be working or failed.
 
 {
+    "desc": "status",
     "client_id": "id of client",
     "vm_id": "id of vm",
-    "desc": "status",
 	"allocated_bandwidth":"10000", 
     "available_bandwidth":"10000",
     "capacity_bandwidth":"20000",
