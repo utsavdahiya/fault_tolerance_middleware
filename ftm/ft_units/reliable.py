@@ -32,7 +32,7 @@ class VmPlacement(VmPlacementPolicy):
         logger.info(colored("placing the VMs", 'blue'))
         #chosing loc 1 for primary and subsequent for backups
         placement = {'primary': {}}
-        placement['primary']['loc'] = [locations[0]]   #this is a list of locations for pimary VMs
+        placement['primary']['loc'] = locations[0]   #this is a list of locations for pimary VMs
         backup_loc = {}
         for i in range(1, len(locations)):
             if i == num_backup+1:

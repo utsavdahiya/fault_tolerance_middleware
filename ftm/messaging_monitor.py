@@ -121,11 +121,13 @@ class MessagingMonitor():
 					await ws.close()
 				else:
 					try:
-						client_req = json.loads(msg.data)
-						data['client_req'] = client_req
-						logger.info(f"client requirements received: {data}")
-						await self.callbacks['on_requirements'](data)
-						#send VM started reponse
+						recvd_msg = json.loads(msg.data)
+						if recvd_msg['desc'] == 'requirements':
+							data['client_req'] = recvd_msg
+							logger.info(f"client requirements received: {data}")
+							await self.callbacks['on_requirements'](data)
+						elif recvd_msg['desc'] == 'cloudlet':
+							pass
 					except:
 							await ws.send_str(f"{msg.data}/server_resp")
 			elif msg.type == aiohttp.WSMsgType.ERROR:
