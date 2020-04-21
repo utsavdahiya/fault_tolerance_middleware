@@ -94,7 +94,7 @@ async def main():
 
     logger.info(colored("starting a application on the VM", 'green'))
     msg = messages['instantiate_cloudlet']
-    msg['cloudlet'] = messages['cloudlet']
+    msg['cloudlet'] = [messages['cloudlet']]
     await client.send_json(msg)
 
     cont = input("waiting for ftm")
