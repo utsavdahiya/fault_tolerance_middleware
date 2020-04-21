@@ -52,6 +52,7 @@ class ResouceManager:
                     "id": vm_id,
                     "client_id": ftm.client_id
                 }
+                logger.info(colored("checking status", 'blue'))
                 await self.msg_monitor.send_json(msg, 'cloud')
 
     async def instantiate(self, ftm, vm) -> (str, int):
