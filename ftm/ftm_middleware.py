@@ -32,6 +32,8 @@ class FTM:
         self.all_VMs = {}   #a dict of all VMs <vm_id: vm_obj>
         self.VMs = []   #a list of VMs asked by client [{primary_vm_id: [list of replica VMs]}]
 
+        asyncio.create_task(self.setup())
+
     async def setup(self):
         #start queue
         while True:
@@ -41,6 +43,7 @@ class FTM:
             action = item.get('action').upper()
             data = item.get('data', {})
             callaback = item.get('callback', None)
+            logger.info(colored(f"New action: {action}",'blue', 'on_white'))
 
             if action == 'STATUS':
                 asyncio.create_task(self.evaluate_status(data))
@@ -71,15 +74,19 @@ class FTM:
             }
         '''
         vm_status = data
+        vm_status['ftm'] = self
         if vm_status['condition'] != "working":
-            logger.info(colored(f"vm [{id}] condition is not working!!", 'red'))
-            self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
-        elif vm_status['cpu_percent_utilization'] > 95:
-            self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
-        elif vm_status['allocated_ram']/vm_status['capacity_ram'] > 90:
-            self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
+            logger.info(colored(f"vm [{data['vm_id']}] condition is not working!!", 'red'))
+            if self.all_VMs[data['vm_id']].status == 'active':
+                await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
+        # elif vm_status['cpu_percent_utilization'] > 95:
+        #     await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
+        # elif vm_status['allocated_ram']/vm_status['capacity_ram'] > 90:
+        #     await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
         else:
-            logger.info(colored(f"no masking procedure specified", 'red'))
+            logger.info(colored(f"vm[{data['vm_id']}]STATUS OK", 'green', 'on_white'))
+        # else:
+        #     logger.info(colored(f"no masking procedure specified", 'red'))
 
 async def start_ftm(application, client_id, msg_monitor, data):
     '''To start initialise the ftm middleware: going from client requirments to

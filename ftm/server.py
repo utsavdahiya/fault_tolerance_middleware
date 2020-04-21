@@ -118,7 +118,7 @@ class Application():
         if client_id is None:
             raise Exception(colored(f"client_id was not present in status message", 'red'))
         ftm_instance = self.ftm_dict[client_id]
-        await ftm_instance._queue.put({'action': 'STATUS', 'data': data})
+        asyncio.create_task(ftm_instance._queue.put({'action': 'STATUS', 'data': data}))
 
     async def on_cloudlet(self, data):
         client_id = data['client_id']

@@ -153,7 +153,7 @@ class MessagingMonitor():
 		# await self.callbacks['on_cloud_connect'](data)
 		async for msg in ws:
 			# await asyncio.sleep(20)
-			logger.info(colored("recvd msg: " + str(msg.data), 'yellow'))
+			# logger.info(colored("recvd msg: " + str(msg.data), 'yellow'))
 			if msg.type == aiohttp.WSMsgType.TEXT:
 				if msg.data == 'close':
 					await ws.close()
@@ -161,7 +161,7 @@ class MessagingMonitor():
 					try:
 						# msg.data = json.dumps(msg.data)
 						recvd_msg = json.loads(msg.data)
-						logger.info(type(recvd_msg))
+						# logger.info(type(recvd_msg))
 						# recvd_msg = msg.data
 						if recvd_msg['desc'] == 'locations':
 							logger.debug(colored(f"a locations msg received", 'yellow', 'on_white'))
@@ -170,6 +170,7 @@ class MessagingMonitor():
 							await self.callbacks['on_location'](data)
 						elif recvd_msg['desc'] == 'status':
 							logger.debug(colored(f"a status msg received", 'yellow', 'on_white'))
+							# logger.debug(colored(f"msg: {json.dumps(recvd_msg, indent=2)}"))
 							# data['status'] = recvd_msg
 							await self.callbacks['on_status'](recvd_msg)
 					except Exception as e:
