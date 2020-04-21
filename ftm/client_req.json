@@ -1,4 +1,5 @@
 {
+	"desc": "requirements",
 	"vms": [{
 		"num_of_instances": "num",
 		"config": {

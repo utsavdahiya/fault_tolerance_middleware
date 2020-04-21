@@ -2,5 +2,6 @@
 
 {
 	"desc":"instantiate_cloudlet",
+	"vm_id": "id of vm",
 	"cloudlet":[]
 }

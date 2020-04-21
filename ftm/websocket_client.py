@@ -8,6 +8,20 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("__name__")
 
+messages = {
+    'instantiate_cloudlet': {
+                    "desc":"instantiate_cloudlet",
+                    "vm_id": "id of vm",
+                    "cloudlet":[]
+                },
+    'cloudlet': {
+                    "file_size":"1024",
+                    "output_size":"1024",
+                    "pes":"2",
+                    "length":"10000"
+                }
+}
+
 class FtmClient():
     def __init__(self, id: str):
         self.id = id
@@ -41,7 +55,8 @@ class FtmClient():
                                 self.basic_config = data
                                 logger.info(f"sending client requirements: {data}")
                             await ws.send_json(data)
-                            pause = input("waiting for server ftm instantiaion")
+                            # pause = input("waiting for server ftm instantiaion")
+                            logger.info(colored(f"waiting for ftm instantiation..."))
                         else:
                             try:
                                 recvd_msg = json.loads(msg.data)
@@ -75,6 +90,7 @@ async def main():
     await client.connect("http://0.0.0.0:8082/ws")
 
     logger.info(colored("starting a application on the VM", 'green'))
-    await client.vm_update()
+    msg = messages['instantiate_cloudlet']
+    msg['cloudlet'] = messages['cloudlet']
     
 asyncio.run(main())
