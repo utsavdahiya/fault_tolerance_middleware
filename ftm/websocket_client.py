@@ -73,13 +73,14 @@ class FtmClient():
 
     async def send_json(self, msg):
         '''send message to ftm'''
+        logger.debug(colored(f"sending msg: {json.dumps(msg, indent=2)}", 'green', 'on_white'))
         ws = self.ws
-        ws.send_json(msg)
+        await ws.send_json(msg)
         
     async def send_str(self, msg):
         '''send string message to ftm'''
         ws = self.ws
-        ws.send_str(msg)
+        await ws.send_str(msg)
 
     async def vm_update(self):
         for parameter in self.basic_config:
@@ -87,10 +88,15 @@ class FtmClient():
 
 async def main():
     client = FtmClient("Hachiko")
-    await client.connect("http://0.0.0.0:8082/ws")
+    asyncio.create_task(client.connect("http://0.0.0.0:8082/ws"))
+    await asyncio.sleep(5)
+    cont = input("start an application on the VM?")
 
     logger.info(colored("starting a application on the VM", 'green'))
     msg = messages['instantiate_cloudlet']
     msg['cloudlet'] = messages['cloudlet']
+    await client.send_json(msg)
+
+    cont = input("waiting for ftm")
     
 asyncio.run(main())

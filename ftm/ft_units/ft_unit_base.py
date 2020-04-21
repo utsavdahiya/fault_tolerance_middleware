@@ -44,7 +44,7 @@ class ReplicationStratergy:
         self.availability = data.get('availability', None)
         self.comp_req = data.get('comp_req', None)
     
-    def replication_strat(self):
+    def synchronizer(self, ftm, message):
         """implements the stratergy named in self.mechanism"""
 
         raise NotImplementedError()

@@ -99,7 +99,7 @@ class Application():
         await self.msg_monitor.send_json(msg, client_id)
         
         #starting the resource manager monitor
-        await ftm_instance.resource_mgr.monitor(ftm_instance)
+        asyncio.create_task(ftm_instance.resource_mgr.monitor(ftm_instance))
 
     async def on_location(self, data):
         '''
@@ -113,11 +113,20 @@ class Application():
         await ftm_middleware.cont_ftm(ftm_instance, locations)
         
     async def on_status(self, data):
+        logger.debug(colored(f"on_status hit", 'blue', 'on_white'))
         client_id = data.get('client_id', None)
         if client_id is None:
             raise Exception(colored(f"client_id was not present in status message", 'red'))
         ftm_instance = self.ftm_dict[client_id]
         ftm_instance._queue.put({'action': 'STATUS', 'data': data})
+
+    async def on_cloudlet(self, data):
+        client_id = data['client_id']
+        msg = data['instantiate_cloudlet']
+        #send this message to ftm 
+        ftm = self.ftm_dict[client_id]
+        logger.info(colored(f"calling synchronizer to process the message", 'blue'))
+        await ftm.ft_unit.replication_strat.synchronizer(ftm, msg)
 
     async def on_connect_cloud(self, data):
         pass
@@ -140,6 +149,8 @@ async def main():
     app.msg_monitor.callbacks['on_connect_cloud'] = app.on_connect_cloud
     app.msg_monitor.callbacks['on_connect_client'] = app.on_connect_client
     app.msg_monitor.callbacks['on_requirements'] = app.on_requirements
+    app.msg_monitor.callbacks['on_cloudlet'] = app.on_cloudlet
+    app.msg_monitor.callbacks['on_status'] = app.on_status
 
     #initialising server where you can send requests
     cloud_side_port = "8081"   #set port number to where you want to send requests
