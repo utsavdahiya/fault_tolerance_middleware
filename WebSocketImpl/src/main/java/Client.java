@@ -1,4 +1,5 @@
 import org.glassfish.tyrus.client.ClientManager;
+import org.json.JSONObject;
 
 import javax.websocket.*;
 import java.io.BufferedReader;
@@ -48,8 +49,8 @@ public class Client {
         ClientManager client = ClientManager.createClient();
         try {
             Session currSession = client.connectToServer(Client.class, new URI("ws://localhost:8081/ws"));
-            currSession.getBasicRemote().sendText("1");
-            currSession.getBasicRemote().sendText("2");
+            //currSession.getBasicRemote().sendText("1");
+            //currSession.getBasicRemote().sendText("2");
 
             latch.await();
         } catch (DeploymentException | URISyntaxException | InterruptedException | IOException e) {
