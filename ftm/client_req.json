@@ -4,7 +4,7 @@
 		"num_of_instances": "num",
 		"config": {
 			"mips": "1000",
-			"pes": "4",
+			"pes": "1",
 			"ram": "1000",
 			"bandwidth": "1000",
 			"size": "10000",
