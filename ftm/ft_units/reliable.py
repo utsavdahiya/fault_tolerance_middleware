@@ -16,33 +16,40 @@ class VmPlacement(VmPlacementPolicy):
         logger.debug(colored("creating a VmPlacement object", 'blue', 'on_white'))
         super().__init__(mech_name)
 
-    async def place(self, locations, num_primary, num_backup) -> dict:
+    async def place(self, locations, num_primary, replica_ratio) -> list:
         '''choses the locations where to place the primary and backup VMs
         Args:
             locations: a list of intergers representing locations of hosts
 
         Returns:
-            placement: a dict of locations of primary and replica VMs
-                example: {'primary': {'loc': location of primary VM,
+            final_placement: a list of locations of primary and replica VMs
+                example:[ 
+                            {'primary': {'loc': location of primary VM,
                                     'backup': {loc1: num of VMs,
                                                loc2: num of VMs}
                                     }
-                        }
+                            },
+                            ...
+                        ]
         '''
         logger.info(colored("placing the VMs", 'blue'))
-        #chosing loc 1 for primary and subsequent for backups
-        placement = {'primary': {}}
-        placement['primary']['loc'] = locations[0]   #this is a list of locations for pimary VMs
-        backup_loc = {}
-        for i in range(1, len(locations)):
-            if i == num_backup+1:
-                break
-            prev_val = backup_loc.get(locations[i], 0)
-            backup_loc[locations[i]] = prev_val + 1
+        final_placement = []
+        for primary_vm in range(num_primary):
+            #choosing loc 1 for primary and subsequent for backups
+            placement = {'primary': {}}
+            placement['primary']['loc'] = locations[0]   #this is a list of locations for pimary VMs
+            backup_loc = {}
+            num_backup = replica_ratio
+            for i in range(1, len(locations)):
+                if i == num_backup+1:
+                    break
+                prev_val = backup_loc.get(locations[i], 0)
+                backup_loc[locations[i]] = prev_val + 1
 
-        placement['primary']['backup'] = backup_loc
+            placement['primary']['backup'] = backup_loc
+            final_placement.append(placement)
         
-        return placement
+        return final_placement
 
 class ActiveReplication(ReplicationStratergy):
     """extends the ReplicationStratergy class inherited from base
@@ -56,9 +63,10 @@ class ActiveReplication(ReplicationStratergy):
                 'availability': 'high',
                 'bandwidth': 'moderate',
                 'comp_req': 'low'}
-        self.replica_ratio = 2
 
         super().__init__("actve_replication", data)
+
+        self.replica_ratio = 5
 
     async def synchronizer(self, ftm , message):
         '''we are using active replication here'''
@@ -89,7 +97,13 @@ class ActiveReplication(ReplicationStratergy):
                             "bandwidth": "moderate"
                             }
         '''
-        self.num_of_primary = len(requirements['vms'])
+        count = 0
+        replica_count = 1
+        for vm in requirements['vms']:
+            count += vm['num_of_instances']
+            # replica_count += self.replica_ratio *  
+        self.num_of_primary = count
+        # self.num_of_primary = len(requirements['vms'])
         self.num_of_replica = self.num_of_primary * self.replica_ratio
         self.primary_config = requirements['vms']
         self.backup_config = requirements['vms']

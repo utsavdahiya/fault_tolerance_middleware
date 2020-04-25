@@ -135,7 +135,7 @@ async def start_ftm(application, client_id, msg_monitor, data):
     logger.info(colored(f"chosing locations using vm placement policy", 'blue'))
     vm_placement = await ftm.ft_unit.vm_placement.place(locations,
                     ftm.ft_unit.replication_strat.num_of_primary,
-                    ftm.ft_unit.replication_strat.num_of_replica)
+                    ftm.ft_unit.replication_strat.replica_ratio)
 
     logger.info(colored(f"Now invoking the VMs at the chosen locations...", 'blue'))
     await replica_invoker.invoker().instantiate_replicas(ftm.ft_unit, ftm, vm_placement)
