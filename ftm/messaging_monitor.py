@@ -130,7 +130,8 @@ class MessagingMonitor():
 							logger.info(colored("msg to instantiate cloud application recv", 'green'))
 							data['instantiate_cloudlet'] = recvd_msg
 							await self.callbacks['on_cloudlet'](data)
-					except:
+					except Exception as e:
+							logger.info(colored(f"exception occured: {e}",'red'))
 							await ws.send_str(f"{msg.data}/server_resp")
 			elif msg.type == aiohttp.WSMsgType.ERROR:
 				print('ws connection closed with exception %s' %ws.exception())

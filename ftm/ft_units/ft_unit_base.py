@@ -13,7 +13,7 @@ class VmPlacementPolicy():
     def __init__(self, mech_name):
         self.mech_name = mech_name
         pass
-    def place(self, locations, num_primary: int, num_backup: int) -> dict:
+    def place(self, locations, num_primary: int, replica_ratio: int) -> dict:
         '''decides how to place VMs according to geographical locations'''
         pass
 
