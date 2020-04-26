@@ -1,3 +1,4 @@
+import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicy;
 import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicySimple;
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.brokers.DatacenterBrokerSimple;
@@ -6,6 +7,7 @@ import org.cloudbus.cloudsim.cloudlets.CloudletSimple;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.datacenters.DatacenterSimple;
+import org.cloudbus.cloudsim.distributions.PoissonDistr;
 import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.hosts.HostSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
@@ -20,6 +22,7 @@ import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.vms.VmSimple;
 import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
+import org.cloudsimplus.faultinjection.HostFaultInjection;
 import org.cloudsimplus.listeners.EventInfo;
 import org.cloudsimplus.listeners.EventListener;
 import org.glassfish.tyrus.client.ClientManager;
@@ -31,6 +34,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.BiFunction;
 import java.util.logging.Logger;
 
 /* This class describes an interface which sends any data required by FTM such as the current parameters
@@ -81,6 +85,11 @@ public class Client {
     private static final int TOTAL_LOCATIONS = 5; //Random number as of now.
     private static JSONArray locations;
 
+    private static HostFaultInjection fault;
+    //private static int count = 0;
+    private static PoissonDistr poisson;
+    private static final double MEAN_FAILURE_NUMBER_PER_HOUR = 0.1;
+
     private static/*final*/ CloudSim simulation;
     private static /*final*/ Session currSession;
     private static/*final*/ DatacenterBroker broker;
@@ -90,10 +99,10 @@ public class Client {
     private static List<Vm> unchangedList = new ArrayList<>();
     private static HashMap<Integer, Integer> idMap = new HashMap<>();
     private static final List<Cloudlet> cloudletList = new ArrayList<>();
-//    private final String URL_OF_SERVER_GET = "http://192.168.1.8:8081"; // URL of server for all GET
-//    private final String URL_OF_SERVER_POST = "http://192.168.1.8:8000"; // URL of server for all POST
+    //private final String URL_OF_SERVER_GET = "http://192.168.1.8:8081"; // URL of server for all GET
+    //private final String URL_OF_SERVER_POST = "http://192.168.1.8:8000"; // URL of server for all POST
     private static EventListener<EventInfo> onClockTickListener;
-
+    private static BiFunction<VmAllocationPolicy, Vm, Optional<Host>> findHostForVm;
 
     public static void main(String[] args) {
         //latch = new CountDownLatch(1);
@@ -102,7 +111,7 @@ public class Client {
         }catch (InterruptedException e){
             e.printStackTrace();
         }*/
-        Client clientTest = new Client();
+        //Client clientTest = new Client();
         onClockTickListener = eventInfo -> {
             //System.out.println("yolo4");
             String receivedMessage = getRecMessage();
@@ -112,12 +121,21 @@ public class Client {
                 parseAndRoute(obj);
             }
 
+            /*if((int)(simulation.clockInMinutes() * 60) >= TIME_TILL_TERMINATION){
+                simulation.terminate();
+            }*//*else if((int)(simulation.clockInMinutes()) >= 1
+                    && count == 0){
+                createFaultInjectionForHosts(datacenter);
+                count++;
+            }*/
+
             try{
                 Thread.sleep(1000);
             }catch (InterruptedException e){
                 e.printStackTrace();
             }
         };
+
         ClientManager client = ClientManager.createClient();
         try {
             //System.out.println("yolo1");
@@ -136,14 +154,28 @@ public class Client {
 
             broker = new DatacenterBrokerSimple(simulation);
 
-//        broker0.submitVmList(vmList);
-//        broker0.submitCloudletList(cloudletList);
+            //broker0.submitVmList(vmList);
+            //broker0.submitCloudletList(cloudletList);
 
             //simulation.addOnClockTickListener(this::onClickTickListener);
+
+            //fault = new HostFaultInjection(datacenter);
+            //createFaultInjectionForHosts(datacenter);
 
             simulation.addOnClockTickListener(onClockTickListener);
             //System.out.println("yolo3");
             simulation.start();
+
+            /*System.out.printf(
+                    "%n# Mean Number of Failures per Hour: %.3f (1 failure expected at each %.2f hours).%n",
+                    MEAN_FAILURE_NUMBER_PER_HOUR, poisson.getInterArrivalMeanTime());
+            System.out.printf("# Number of Host faults: %d%n", fault.getNumberOfHostFaults());
+            System.out.printf("# Number of VM faults (VMs destroyed): %d%n", fault.getNumberOfFaults());
+            System.out.printf("# Time the simulations finished: %.4f hours%n", simulation.clockInHours());
+            System.out.printf("# Mean Time To Repair Failures of VMs in minutes (MTTR): %.2f minute%n", fault.meanTimeToRepairVmFaultsInMinutes());
+            System.out.printf("# Mean Time Between Failures (MTBF) affecting all VMs in minutes: %.2f minutes%n", fault.meanTimeBetweenVmFaultsInMinutes());
+            System.out.printf("# Hosts MTBF: %.2f minutes%n", fault.meanTimeBetweenHostFaultsInMinutes());
+            System.out.printf("# Availability: %.2f%%%n%n", fault.availability()*100);*/
             //currSession.getBasicRemote().sendText("1");
             //currSession.getBasicRemote().sendText("2");
 
@@ -172,7 +204,28 @@ public class Client {
             hostList.add(host);
         }
 
-        final Datacenter dc = new DatacenterSimple(simulation, hostList, new VmAllocationPolicySimple());
+        findHostForVm = (vmAllocationPolicy, vm) -> {
+            int factor = NUMBER_OF_HOSTS / TOTAL_LOCATIONS;
+            int id = (int)(vm.getId());
+            int startIdx = factor * id;
+            int min = Integer.MAX_VALUE;
+            List<Host> list = vmAllocationPolicy.getHostList();
+            Host rv = null;
+            for(int i = startIdx; i < startIdx + factor; i++){
+                Host host = list.get(i);
+                if(min > host.getVmList().size()){
+                    min = host.getVmList().size();
+                    rv = host;
+                }
+            }
+
+            return rv != null ? Optional.of(rv) : Optional.empty();
+        };
+
+        VmAllocationPolicySimple vmAllocationPolicy = new VmAllocationPolicySimple();
+        vmAllocationPolicy.setFindHostForVmFunction(findHostForVm);
+
+        final Datacenter dc = new DatacenterSimple(simulation, hostList, vmAllocationPolicy);
         dc.setSchedulingInterval(SCHEDULING_INTERVAL);
         return dc;
     }
@@ -185,7 +238,7 @@ public class Client {
         List<Pe> peList = new ArrayList<>(HOST_PES);
 
         for (int i = 0; i < HOST_PES; i++) {
-            peList.add(new PeSimple(1000, new PeProvisionerSimple()));
+            peList.add(new PeSimple(10000, new PeProvisionerSimple()));
         }
 
         final long ram = 16384; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE 16GB.
@@ -197,6 +250,17 @@ public class Client {
                 .setBwProvisioner(new ResourceProvisionerSimple())
                 .setVmScheduler(new VmSchedulerTimeShared());
         return host;
+    }
+
+    private static void createFaultInjectionForHosts(Datacenter datacenter) {
+        final long seed = 112717613L;
+        poisson = new PoissonDistr(MEAN_FAILURE_NUMBER_PER_HOUR, seed);
+
+        fault = new HostFaultInjection(datacenter);
+        fault.setMaxTimeToFailInHours(8);
+        //fault.generateHostFault(hostList.get(0));
+
+        //fault.addVmCloner(broker, new VmClonerSimple(this::cloneVm, this::cloneCloudlets));
     }
 
     /**
@@ -223,6 +287,7 @@ public class Client {
                     .setRam(ram).setBw(bandwidth).setSize(size)
                     .setCloudletScheduler(new CloudletSchedulerTimeShared());
 
+            vm.setId(location);
             vmList.add(vm);
             idMap.put(vmID, vmList.size() - 1);
             unchangedList.add(vm);
@@ -398,6 +463,7 @@ public class Client {
         allDataJSON = new JSONObject();
         allDataJSON.put("client_id", clientID);
         allDataJSON.put("desc", "status");
+        allDataJSON.put("vm_id", vmID + "");
         allDataJSON.put("allocated_bandwidth", allocatedBw);
         allDataJSON.put("available_bandwidth", availableBw);
         allDataJSON.put("capacity_bandwidth", capacityBw);
@@ -488,7 +554,7 @@ public class Client {
             clientID = message.getString("client_id");
         }
 
-        Vm vm = vmList.get(mappedID);
+        Vm vm = unchangedList.get(mappedID);
         for(Host host : hostList){
             if(host.getVmList().isEmpty()){
                 datacenter.requestVmMigration(vm, host);
@@ -498,7 +564,7 @@ public class Client {
 
         if(!empty){
             int min = Integer.MAX_VALUE;
-            Host vmHost = vmList.get(mappedID).getHost();
+            Host vmHost = unchangedList.get(mappedID).getHost();
             Host temp = null;
             for(Host host : hostList){
                 if(min >= host.getVmList().size()){
