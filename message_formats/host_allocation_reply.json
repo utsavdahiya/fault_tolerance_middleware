@@ -1,5 +1,5 @@
 {
 	"desc": "host_allocation",
-	"client_id": 2,
-	"vm_id": 2
+	"client_id": "2",
+	"vm_id": "2"
 }
