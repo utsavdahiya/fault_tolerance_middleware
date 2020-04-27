@@ -56,6 +56,7 @@ class FTM:
                 raise Exception(colored(f"no fucntion defined for action: {action}", 'red'))
 
     async def activate_vm(self, data):
+        logger.debug(f"activating vm[{data['vm_id']}", "blue", "on_white")
         vm_id = data['vm_id']
         self.all_VMs[vm_id].status = "active"   #acitvate the vm
         #add vm to monitoring list
