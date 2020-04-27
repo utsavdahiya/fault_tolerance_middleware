@@ -177,7 +177,7 @@ class MessagingMonitor():
 						elif recvd_msg['desc'] == 'host_allocation':
 							await self.callbacks['on_host_allocation'](recvd_msg)
 					except Exception as e:
-						logger.info(colored(f"msg is not a json; error: {e}", 'red'))
+						logger.info(colored(f"error: {e}", 'red'))
 						# await ws.send_str(msg.data + '/server_resp'+'\n')
 						# logger.info("sent reply to ws")
 						logger.info(colored(f"msg recvd: {msg.data}", 'red'))
