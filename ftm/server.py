@@ -160,6 +160,7 @@ async def main():
     app.msg_monitor.callbacks['on_requirements'] = app.on_requirements
     app.msg_monitor.callbacks['on_cloudlet'] = app.on_cloudlet
     app.msg_monitor.callbacks['on_status'] = app.on_status
+    app.msg_monitor.callbacks['on_host_allocation'] = app.on_host_allocation
 
     #initialising server where you can send requests
     cloud_side_port = "8081"   #set port number to where you want to send requests
