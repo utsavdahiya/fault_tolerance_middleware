@@ -14,6 +14,7 @@ class ResouceManager:
         self.msg_monitor = msg_monitor  #messaging monitor allows RM to communicate with cloudsim
         self.VMs = {}   #a dict of VMs
         self.timer = 2 #timer for monitoring schelduling
+        self.monitor_list = []
         
     async def evaluate(self, vm_status):
         '''vm_status = {"desc": "vm_status_reply"
@@ -46,7 +47,7 @@ class ResouceManager:
         logger.debug(colored(f"monitoring the VMs for status"))
         while True:
             await asyncio.sleep(self.timer)   #check every "timer" seconds
-            for vm_id in ftm.all_VMs.keys():
+            for vm_id in self.monitor_list:
                 #check vm status with cloudsim
                 msg = {"desc": "status",
                     "id": vm_id,
@@ -79,8 +80,8 @@ class ResouceManager:
         await self.msg_monitor.send_json(msg, 'cloud')
 
         #if successful:
-        self.VMs[vm.id].status = 'active'
-        logger.debug(colored(f"vm: {vm.id} activated", 'blue', 'on_white'))
+        # self.VMs[vm.id].status = 'active'
+        # logger.debug(colored(f"vm: {vm.id} activated", 'blue', 'on_white'))
         code = 'SUCCESS'
         return vm.id, code
     

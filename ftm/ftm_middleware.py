@@ -24,6 +24,7 @@ class FTM:
         self._queue = asyncio.Queue()
         self.client_id = client_id
         self.msg_monitor = msg_monitor
+        # self.monitor_list = []
         self.resource_mgr = ResouceManager(msg_monitor)
         self.service_directory = service_dir.ServiceDirectory()
         self.composition_engine = composition_engine.CompositionEngine()
@@ -49,8 +50,17 @@ class FTM:
                 asyncio.create_task(self.evaluate_status(data))
             elif action == 'FAULT MASK':
                 asyncio.create_task(self.fault_mask_mgr.handle_fault(data))
+            elif action == "HOST ALLOCATION":
+                asyncio.create_task(self.activate_vm(data))
             else:
                 raise Exception(colored(f"no fucntion defined for action: {action}", 'red'))
+
+    async def activate_vm(self, data):
+        vm_id = data['vm_id']
+        self.all_VMs[vm_id].status = "active"   #acitvate the vm
+        #add vm to monitoring list
+        self.msg_monitor.monitor_list.append(vm_id)
+        logger.info(colored(f"vm[{vm_id}] has been activated"))
 
     async def evaluate_status(self, data, callaback=None):
         '''

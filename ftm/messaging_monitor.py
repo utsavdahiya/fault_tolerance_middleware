@@ -174,6 +174,8 @@ class MessagingMonitor():
 							logger.debug(colored(f"msg: {json.dumps(recvd_msg, indent=2)}"))
 							# data['status'] = recvd_msg
 							await self.callbacks['on_status'](recvd_msg)
+						elif recvd_msg['desc'] == 'host_allocation':
+							await self.callbacks['on_host_allocation'](recvd_msg)
 					except Exception as e:
 						logger.info(colored(f"msg is not a json; error: {e}", 'red'))
 						# await ws.send_str(msg.data + '/server_resp'+'\n')
