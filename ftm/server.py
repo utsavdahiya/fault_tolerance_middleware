@@ -128,6 +128,15 @@ class Application():
         logger.info(colored(f"calling synchronizer to process the message", 'blue'))
         await ftm.ft_unit.replication_strat.synchronizer(ftm, msg)
 
+    async def on_host_allocation(self, data):
+        logger.debug(colored(f"on_host_allocation hit", 'blue', 'on_white'))
+        client_id = data['client_id']
+        # msg = data['host_allocation']
+        #send this msg to ftm
+        ftm_instance = self.ftm_dict[client_id]
+        #add task to ftm
+        asyncio.create_task(ftm_instance._queue.put({'action': 'HOST ALLOCATION', 'data': data}))
+
     async def on_connect_cloud(self, data):
         pass
 
