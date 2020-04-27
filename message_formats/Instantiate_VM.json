@@ -2,5 +2,6 @@
 
 {
 	"desc": "instantiate_vm",
+	"client_id": "0",
 	"VM": [],
 }
