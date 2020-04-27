@@ -72,6 +72,7 @@ class ResouceManager:
         #send req to cloudsim to instantiate the required VM config
         # msg = vm.config
         msg = {"desc": "instantiate_vm",
+                "client_id": ftm.client_id,
                 "VM": [vm.config],
             }
         #adding id to vm:
