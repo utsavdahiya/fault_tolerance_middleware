@@ -99,7 +99,7 @@ class Application():
         await self.msg_monitor.send_json(msg, client_id)
         
         #starting the resource manager monitor
-        logger.info(f"starting monitoring task", "blue")
+        logger.info(colored(f"starting monitoring task", "blue"))
         asyncio.create_task(ftm_instance.resource_mgr.monitor(ftm_instance))
 
     async def on_location(self, data):
