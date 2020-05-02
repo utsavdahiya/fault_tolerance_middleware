@@ -52,8 +52,15 @@ class FTM:
                 asyncio.create_task(self.fault_mask_mgr.handle_fault(data))
             elif action == "HOST ALLOCATION":
                 asyncio.create_task(self.activate_vm(data))
+            elif action == 'MIGRATION SUCCESSFUL':
+                asyncio.create_task(self.migration_successful(data))
             else:
                 raise Exception(colored(f"no fucntion defined for action: {action}", 'red'))
+
+    async def migration_successful(self, data):
+        vm_id = data['mv_id']
+        #set condition to working
+        self.all_VMs[vm_id].status = "working"
 
     async def activate_vm(self, data):
         logger.debug(colored(f"activating vm[{data['vm_id']}]", "blue", "on_white"))

@@ -119,7 +119,7 @@ class Application():
         if client_id is None:
             raise Exception(colored(f"client_id was not present in status message", 'red'))
         ftm_instance = self.ftm_dict[client_id]
-        asyncio.create_task(ftm_instance._queue.put({'action': 'STATUS', 'data': data}))
+        await ftm_instance._queue.put({'action': 'STATUS', 'data': data})
 
     async def on_cloudlet(self, data):
         client_id = data['client_id']
@@ -136,8 +136,15 @@ class Application():
         #send this msg to ftm
         ftm_instance = self.ftm_dict[client_id]
         #add task to ftm
-        asyncio.create_task(ftm_instance._queue.put({'action': 'HOST ALLOCATION', 'data': data}))
+        await ftm_instance._queue.put({'action': 'HOST ALLOCATION', 'data': data})
 
+    async def on_migration(self, data):
+        logger.debug(colored(f"on_migration hit", 'blue', 'on_white'))
+        client_id = data['client_id']
+        ftm_instance = self.ftm_dict[client_id]
+        #add task to ftm
+        await ftm_instance._queue.put({'action': 'MIGRATION SUCCESSFUL', 'data': data})
+        
     async def on_connect_cloud(self, data):
         pass
 
@@ -162,6 +169,7 @@ async def main():
     app.msg_monitor.callbacks['on_cloudlet'] = app.on_cloudlet
     app.msg_monitor.callbacks['on_status'] = app.on_status
     app.msg_monitor.callbacks['on_host_allocation'] = app.on_host_allocation
+    app.msg_monitor.callbacks['on_migration'] = app.on_migration
 
     #initialising server where you can send requests
     cloud_side_port = "8081"   #set port number to where you want to send requests

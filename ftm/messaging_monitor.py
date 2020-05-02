@@ -176,6 +176,9 @@ class MessagingMonitor():
 							await self.callbacks['on_status'](recvd_msg)
 						elif recvd_msg['desc'] == 'host_allocation':
 							await self.callbacks['on_host_allocation'](recvd_msg)
+						elif recvd_msg['desc'] == 'migration_successful':
+							logger.debug(colored(f"migration message received", 'yellow', 'on_white'))
+							await self.callbacks['on_migration'](recvd_msg)
 					except Exception as e:
 						logger.info(colored(f"error: {e}", 'red'))
 						# await ws.send_str(msg.data + '/server_resp'+'\n')
