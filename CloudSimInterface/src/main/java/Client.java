@@ -25,6 +25,7 @@ import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
 import org.cloudsimplus.faultinjection.HostFaultInjection;
 import org.cloudsimplus.listeners.EventInfo;
 import org.cloudsimplus.listeners.EventListener;
+import org.cloudsimplus.listeners.VmHostEventInfo;
 import org.glassfish.tyrus.client.ClientManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -78,17 +79,17 @@ public class Client {
     public static CountDownLatch latch;
     private static Queue<String> messageQueue = new LinkedList<>();
 
-    private static final int HOST_PES = 8; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE.
+    private static final int HOST_PES = 2; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE.
     private static final int SCHEDULING_INTERVAL = 1; // Random number as of now, TODO: Discuss. DONE.
-    private static final int NUMBER_OF_HOSTS = 100; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE
-    private static final int TIME_TILL_TERMINATION = 100; // Random time as of now, very big time as discussed
-    private static final int TOTAL_LOCATIONS = 5; //Random number as of now.
+    private static final int NUMBER_OF_HOSTS = 10; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE
+    private static final int TIME_TILL_TERMINATION = 100000; // Random time as of now, very big time as discussed
+    private static final int TOTAL_LOCATIONS = 10; //Random number as of now.
     private static JSONArray locations;
 
     private static HostFaultInjection fault;
     //private static int count = 0;
     private static PoissonDistr poisson;
-    private static final double MEAN_FAILURE_NUMBER_PER_HOUR = 0.1;
+    private static final double MEAN_FAILURE_NUMBER_PER_HOUR = 0;
 
     private static/*final*/ CloudSim simulation;
     private static /*final*/ Session currSession;
@@ -103,6 +104,10 @@ public class Client {
     //private final String URL_OF_SERVER_POST = "http://192.168.1.8:8000"; // URL of server for all POST
     private static EventListener<EventInfo> onClockTickListener;
     private static BiFunction<VmAllocationPolicy, Vm, Optional<Host>> findHostForVm;
+    private static EventListener<VmHostEventInfo> hostAllocationListener;
+
+    //vm.setID() -> For location
+    //vm.setDescription() -> For Client ID
 
     public static void main(String[] args) {
         //latch = new CountDownLatch(1);
@@ -121,9 +126,13 @@ public class Client {
                 parseAndRoute(obj);
             }
 
-            /*if((int)(simulation.clockInMinutes() * 60) >= TIME_TILL_TERMINATION){
+            if((int)eventInfo.getTime() == 15){
+                fault.generateHostFault(hostList.get(0));
+            }
+
+            if((int)(simulation.clockInMinutes() * 60) >= TIME_TILL_TERMINATION){
                 simulation.terminate();
-            }*//*else if((int)(simulation.clockInMinutes()) >= 1
+            }/*else if((int)(simulation.clockInMinutes()) >= 1
                     && count == 0){
                 createFaultInjectionForHosts(datacenter);
                 count++;
@@ -132,6 +141,29 @@ public class Client {
             try{
                 Thread.sleep(1000);
             }catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        };
+
+        hostAllocationListener = vmHostEventInfo -> {
+            JSONObject hostAllocationReply = new JSONObject();
+            hostAllocationReply.put("desc", "host_allocation");
+            hostAllocationReply.put("client_id", vmHostEventInfo.getVm().getDescription());
+
+            int find = unchangedList.size() - 1;
+            int vmID = -1;
+            Set<Map.Entry<Integer, Integer>> entries = idMap.entrySet();
+            for(Map.Entry<Integer, Integer> entry : entries){
+                if(entry.getValue() == find){
+                    vmID = entry.getKey();
+                }
+            }
+
+            hostAllocationReply.put("vm_id", vmID + "");
+
+            try {
+                currSession.getBasicRemote().sendObject(hostAllocationReply);
+            } catch (IOException | EncodeException e) {
                 e.printStackTrace();
             }
         };
@@ -160,7 +192,7 @@ public class Client {
             //simulation.addOnClockTickListener(this::onClickTickListener);
 
             //fault = new HostFaultInjection(datacenter);
-            //createFaultInjectionForHosts(datacenter);
+            createFaultInjectionForHosts(datacenter);
 
             simulation.addOnClockTickListener(onClockTickListener);
             //System.out.println("yolo3");
@@ -256,8 +288,8 @@ public class Client {
         final long seed = 112717613L;
         poisson = new PoissonDistr(MEAN_FAILURE_NUMBER_PER_HOUR, seed);
 
-        fault = new HostFaultInjection(datacenter);
-        fault.setMaxTimeToFailInHours(8);
+        fault = new HostFaultInjection(datacenter, poisson);
+        fault.setMaxTimeToFailInHours(800);
         //fault.generateHostFault(hostList.get(0));
 
         //fault.addVmCloner(broker, new VmClonerSimple(this::cloneVm, this::cloneCloudlets));
@@ -288,9 +320,11 @@ public class Client {
                     .setCloudletScheduler(new CloudletSchedulerTimeShared());
 
             vm.setId(location);
+            vm.setDescription(clientID);
+            vm.addOnHostAllocationListener(hostAllocationListener);
             vmList.add(vm);
-            idMap.put(vmID, vmList.size() - 1);
             unchangedList.add(vm);
+            idMap.put(vmID, unchangedList.size() - 1);
         }
 
         broker.submitVmList(vmList);
@@ -454,7 +488,7 @@ public class Client {
         availableStorage = currVm.getStorage().getAvailableResource() + "";
         capacityStorage = currVm.getStorage().getCapacity() + "";
 
-        if(unchangedList.get(mappedID).isWorking()){
+        if(currVm.isCreated()){
             isWorkingOrFailed = "working";
         }else{
             isWorkingOrFailed = "failed";
@@ -546,7 +580,6 @@ public class Client {
      * @param message - Contains the ID of the VM to be migrated.
      */
     private static void migrateVm(JSONObject message){
-        boolean empty = false;
         int vmID = Integer.parseInt(message.getString("id"));
         int mappedID = idMap.get(vmID);
         String clientID = "";
@@ -556,27 +589,30 @@ public class Client {
 
         Vm vm = unchangedList.get(mappedID);
         for(Host host : hostList){
-            if(host.getVmList().isEmpty()){
+            if(host.getVmList().isEmpty() && host.isSuitableForVm(vm)){
                 datacenter.requestVmMigration(vm, host);
-                empty = true;
+                return;
             }
         }
 
-        if(!empty){
-            int min = Integer.MAX_VALUE;
-            Host vmHost = unchangedList.get(mappedID).getHost();
-            Host temp = null;
-            for(Host host : hostList){
-                if(min >= host.getVmList().size()){
+        int min = Integer.MAX_VALUE;
+        Host vmHost = unchangedList.get(mappedID).getHost();
+        Host temp = null;
+        for(Host host : hostList){
+            if(min >= host.getVmList().size()){
+                if(host != vmHost){
                     min = host.getVmList().size();
-                    if(host != vmHost){
-                        temp = host;
-                    }
+                    temp = host;
                 }
             }
-
-            datacenter.requestVmMigration(vm, temp);
         }
+
+        if(temp == null){
+            return;
+        }
+
+        datacenter.requestVmMigration(vm, temp);
+
 
         /*if(!unchangedList.get(vmID).isRemoved){
             Vm vm = unchangedList.get(vmID).vm;
@@ -728,6 +764,7 @@ public class Client {
             JSONObject rv = statusVm(message);
             try {
                 currSession.getBasicRemote().sendObject(rv);
+                System.out.println(rv);
             } catch (IOException | EncodeException e) {
                 e.printStackTrace();
             }
