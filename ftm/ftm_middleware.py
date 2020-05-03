@@ -134,7 +134,7 @@ class FTM:
             for primary_vm, stat in failures:
                 #primary_vm= primary_vm_d, stat= list of failures
                 for failure in stat[1:]:
-                    duration = stat.end - stat.start
+                    duration = failure.end - failure.start
                     table.add_row([primary_vm, duration])
                     total_duration += duration
         except Exception as e:
