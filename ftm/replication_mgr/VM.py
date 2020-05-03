@@ -14,7 +14,7 @@ class VM:
     def __init__(self, config):
         VM.counter += 1
         self.id = str(VM.counter)
-        self.primary_id = self.id
+        self.primary_vm_id = self.id
         self.config = config    #a dictionary of config
         '''config = {
                 "mips": "1000",
