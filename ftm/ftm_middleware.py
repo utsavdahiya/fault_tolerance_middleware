@@ -139,7 +139,9 @@ class FTM:
                     total_duration += duration
         except Exception as e:
             logger.error(colored(f"failure is of type: {type(failures)}"))
+            logger.error(colored({failures}))
             logger.error(colored(f"error: {e}"))
+
         logger.info(table)
         logger.info(colored(f"Total Failure Duration:\t {total_duration}", "green"))
 
