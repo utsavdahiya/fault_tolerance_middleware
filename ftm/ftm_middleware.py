@@ -6,6 +6,7 @@ from ft_units import *
 from fault_masking_mgr import FaultMasking
 
 from bitarray import bitarray
+from timeit import default_timer
 from prettytable import PrettyTable
 from termcolor import colored
 import asyncio
@@ -133,6 +134,9 @@ class FTM:
         try:
             for primary_vm, stat in failures.items():
                 #primary_vm= primary_vm_d, stat= list of failures
+                if stat[0]["flag"] == True:
+                    #if recovery was pending
+                    stat[-1].end = default_timer()
                 for failure in stat[1:]:
                     duration = failure.end - failure.start
                     table.add_row([primary_vm, duration])
