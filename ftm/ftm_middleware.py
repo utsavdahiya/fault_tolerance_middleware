@@ -73,8 +73,8 @@ class FTM:
             #initailise the bitarray
             self.availability[primary_vm_id] = (self.ft_unit.replication_strat.replica_ratio + 1) * bitarray('0')
         bitset = self.availability[primary_vm_id]
-        offset = primary_vm_id % len(bitset)
-        pos = (vm_id % len(bitset)) - offset
+        offset = int(primary_vm_id) % len(bitset)
+        pos = (int(vm_id) % len(bitset)) - offset
         #setting the bit corressponding to vm_id
         bitset[pos] = True
         #add vm to monitoring list
