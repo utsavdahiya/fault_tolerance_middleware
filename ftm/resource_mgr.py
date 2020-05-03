@@ -2,19 +2,26 @@
 import json
 import asyncio
 from termcolor import colored
+from timeit import default_timer
 
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+class Duration:
+    def __init__(self, start):
+        self.start = start
+        self.end = start
+
 class ResouceManager:
     def __init__(self, msg_monitor):
         logger.debug(colored("creating ResourceManger object", 'blue', 'on_white'))
         self.msg_monitor = msg_monitor  #messaging monitor allows RM to communicate with cloudsim
         self.VMs = {}   #a dict of VMs
-        self.timer = 2 #timer for monitoring schelduling
+        self.timer = 1 #timer for monitoring schelduling
         self.monitor_list = []
+        self.failures = {}  #a dict of failure times <primary_vm_id: [{"flag": False}, [start, end], ..., [start, end]]
         
     async def evaluate(self, vm_status):
         '''vm_status = {"desc": "vm_status_reply"
@@ -53,6 +60,25 @@ class ResouceManager:
                     "id": vm_id,
                     "client_id": ftm.client_id
                 }
+                primary_vm_id = ftm.all_VMs[vm_id].primary_vm_id
+                if primary_vm_id not in self.failures:
+                    self.failures[primary_vm_id] = []
+                    self.failures[primary_vm_id].append({"flag": False})
+                    
+                #checking current status of the VMs
+                bitset = ftm.availability[primary_vm_id]
+                if bitset.any():
+                    #atleast one VM is up and running
+                    if self.failures[primary_vm_id][0]["flag"] == True:
+                        #if failure recovery is pending
+                        self.failures[primary_vm_id][-1].end = default_timer()
+                        #again setting the flag
+                        self.failures[primary_vm_id][0]["flag"] = False
+                else:
+                    #if all VMs are down
+                    self.failures[primary_vm_id][0]["flag"] = True
+                    duration = Duration(default_timer())
+                    self.failures[primary_vm_id].append(duration)
                 logger.info(colored("checking status", 'blue'))
                 await self.msg_monitor.send_json(msg, 'cloud')
 

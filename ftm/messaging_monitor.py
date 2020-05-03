@@ -179,6 +179,9 @@ class MessagingMonitor():
 						elif recvd_msg['desc'] == 'migration_successful':
 							logger.debug(colored(f"migration message received", 'yellow', 'on_white'))
 							await self.callbacks['on_migration'](recvd_msg)
+						elif recvd_msg['desc'] == "finish":
+							logger.info(colored(f"------------SIMULATION FINISHED---------", "magenta", "on_white"))
+							await self.callbacks["on_finish"](recvd_msg)
 					except Exception as e:
 						logger.info(colored(f"error: {e}", 'red'))
 						# await ws.send_str(msg.data + '/server_resp'+'\n')

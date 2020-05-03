@@ -88,6 +88,7 @@ class invoker:
                         config['location'] = location
                         backup_vm = VM(config)
                         backup_vm.location = location
+                        backup_vm.primary_id = vm.id
                         ftm.all_VMs[backup_vm.id] = backup_vm
                         logger.info(colored(f"created a backup VM with id: {backup_vm.id}", 'blue'))
 
