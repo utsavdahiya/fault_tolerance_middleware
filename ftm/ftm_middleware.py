@@ -6,6 +6,7 @@ from ft_units import *
 from fault_masking_mgr import FaultMasking
 
 from bitarray import bitarray
+from prettytable import PrettyTable
 from termcolor import colored
 import asyncio
 import json
@@ -127,10 +128,15 @@ class FTM:
         #printing failure durations
         failures = self.resource_mgr.failures
         total_duration = 0
-        for item in failures[1:]:
-            duration = item.end - item.start
-            total_duration += duration
-
+        table = PrettyTable()
+        table.field_names = ["VM ID", "Failure Duration"]
+        for primary_vm, stat in failures:
+            #primary_vm= primary_vm_d, stat= list of failures
+            for failure in stat[1:]:
+                duration = stat.end - stat.start
+                table.add_row([primary_vm, duration])
+                total_duration += duration
+        logger.info(table)
         logger.info(colored(f"Total Failure Duration:\t {total_duration}", "green"))
 
 async def start_ftm(application, client_id, msg_monitor, data):
