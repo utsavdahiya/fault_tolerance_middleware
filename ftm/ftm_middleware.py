@@ -122,6 +122,8 @@ class FTM:
         #     logger.info(colored(f"no masking procedure specified", 'red'))
 
     async def finish(self):
+        #stopping the resource manager monitor
+        self.resource_mgr.monitor_flag = False
         #printing failure durations
         failures = self.resource_mgr.failures
         total_duration = 0
