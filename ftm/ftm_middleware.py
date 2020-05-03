@@ -5,6 +5,7 @@ from resource_mgr import ResouceManager
 from ft_units import *
 from fault_masking_mgr import FaultMasking
 
+from bitarray import bitarray
 from termcolor import colored
 import asyncio
 import json
@@ -32,6 +33,7 @@ class FTM:
         self.ft_unit = None
         self.all_VMs = {}   #a dict of all VMs <vm_id: vm_obj>
         self.VMs = []   #a list of VMs asked by client [{primary_vm_id: [list of replica VMs]}]
+        self.availability = {}  #dict to calc availability <primary_vm_id: bitarray>
 
         asyncio.create_task(self.setup())
 
@@ -66,6 +68,15 @@ class FTM:
         logger.debug(colored(f"activating vm[{data['vm_id']}]", "blue", "on_white"))
         vm_id = data['vm_id']
         self.all_VMs[vm_id].status = "active"   #acitvate the vm
+        primary_vm_id = self.all_VMs[vm_id].primary_vm_id
+        if primary_vm_id not in self.availability:
+            #initailise the bitarray
+            self.availability[primary_vm_id] = (self.ft_unit.replication_strat.replica_ratio + 1) * bitarray('0')
+        bitset = self.availability[primary_vm_id]
+        offset = primary_vm_id % len(bitset)
+        pos = (vm_id % len(bitset)) - offset
+        #setting the bit corressponding to vm_id
+        bitset[pos] = True
         #add vm to monitoring list
         self.resource_mgr.monitor_list.append(vm_id)
         logger.info(colored(f"vm[{vm_id}] has been activated"))
@@ -96,7 +107,11 @@ class FTM:
         if vm_status['condition'] != "working":
             logger.info(colored(f"vm [{data['vm_id']}] condition is not working!!", 'red'))
             if self.all_VMs[data['vm_id']].status == 'active':
+                #if the VM was active until now, then try to mask fault
                 await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
+            else:
+                #this is duplicate status message, fault handling for this VM has already been initiated above
+                pass
         # elif vm_status['cpu_percent_utilization'] > 95:
         #     await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
         # elif vm_status['allocated_ram']/vm_status['capacity_ram'] > 90:
@@ -105,6 +120,16 @@ class FTM:
             logger.info(colored(f"vm[{data['vm_id']}]STATUS OK", 'green', 'on_white'))
         # else:
         #     logger.info(colored(f"no masking procedure specified", 'red'))
+
+    async def finish(self):
+        #printing failure durations
+        failures = self.resource_mgr.failures
+        total_duration = 0
+        for item in failures[1:]:
+            duration = item.end - item.start
+            total_duration += duration
+
+        logger.info(colored(f"Total Failure Duration:\t {total_duration}", "green"))
 
 async def start_ftm(application, client_id, msg_monitor, data):
     '''To start initialise the ftm middleware: going from client requirments to

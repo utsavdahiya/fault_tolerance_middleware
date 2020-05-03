@@ -148,11 +148,11 @@ class Application():
     async def on_connect_cloud(self, data):
         pass
 
-    def on_client_msg(self):
-        pass
-
-    def on_cloud_msg(self):
-        pass
+    async def on_finish(self, data):
+        #wrapping up and printing results
+        logger.debug(colored(f"on finish hit", "blue", "on_white"))
+        ftm_instance = data['client_id']
+        await ftm_instance.finish()
 
 async def main():
     tasks = []  #list of tasks to be run concurrently
@@ -170,6 +170,7 @@ async def main():
     app.msg_monitor.callbacks['on_status'] = app.on_status
     app.msg_monitor.callbacks['on_host_allocation'] = app.on_host_allocation
     app.msg_monitor.callbacks['on_migration'] = app.on_migration
+    app.msg_monitor.callbacks['on_finish'] = app.on_finish
 
     #initialising server where you can send requests
     cloud_side_port = "8081"   #set port number to where you want to send requests

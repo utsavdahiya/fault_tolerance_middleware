@@ -17,6 +17,11 @@ class FaultMasking:
         vm_id = data['vm_id']
         #change vm status to inactive
         ftm.all_VMs[vm_id].status = 'inactive'
+        primary_vm_id = ftm.all_VMs[vm_id].primary_vm_id
+        bitset = ftm.availability[primary_vm_id]
+        offset = primary_vm_id % len(bitset)
+        pos = (vm_id % len(bitset)) - offset
+        bitset[pos] = False
         #migrating the vm
         msg = {
                 "desc": "migration",
