@@ -73,13 +73,19 @@ class ResouceManager:
                     if self.failures[primary_vm_id][0]["flag"] == True:
                         #if failure recovery is pending
                         self.failures[primary_vm_id][-1].end = default_timer()
-                        #again setting the flag
+                        #again unsetting the flag
                         self.failures[primary_vm_id][0]["flag"] = False
                 else:
                     #if all VMs are down
-                    self.failures[primary_vm_id][0]["flag"] = True
-                    duration = Duration(default_timer())
-                    self.failures[primary_vm_id].append(duration)
+                    if self.failures[primary_vm_id][0]["flag"] == False:
+                        #if the flag is not set for failure
+                        self.failures[primary_vm_id][0]["flag"] = True
+                        duration = Duration(default_timer())
+                        self.failures[primary_vm_id].append(duration)
+                    else:
+                        #if all VMs are down and flag is also set for failure
+                        pass
+                    
                 logger.info(colored("checking status", 'blue'))
                 await self.msg_monitor.send_json(msg, 'cloud')
 
