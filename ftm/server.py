@@ -151,7 +151,8 @@ class Application():
     async def on_finish(self, data):
         #wrapping up and printing results
         logger.debug(colored(f"on finish hit", "blue", "on_white"))
-        ftm_instance = data['client_id']
+        client_id = data['client_id']
+        ftm_instance = self.ftm_dict[client_id]
         await ftm_instance.finish()
 
 async def main():
