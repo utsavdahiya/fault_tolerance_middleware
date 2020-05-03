@@ -21,6 +21,7 @@ class ResouceManager:
         self.VMs = {}   #a dict of VMs
         self.timer = 1 #timer for monitoring schelduling
         self.monitor_list = []
+        self.monitor_flag = True
         self.failures = {}  #a dict of failure times <primary_vm_id: [{"flag": False}, [start, end], ..., [start, end]]
         
     async def evaluate(self, vm_status):
@@ -52,7 +53,7 @@ class ResouceManager:
     async def monitor(self, ftm):
         #monitor the VMs to check if they are running smoothly
         logger.debug(colored(f"monitoring the VMs for status"))
-        while True:
+        while self.monitor_flag:
             await asyncio.sleep(self.timer)   #check every "timer" seconds
             for vm_id in self.monitor_list:
                 #check vm status with cloudsim
