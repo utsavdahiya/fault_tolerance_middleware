@@ -147,8 +147,8 @@ class FTM:
             print(failures)
             logger.error(colored(f"error: {e}"))
 
-        logger.info(table)
-        logger.info(colored(f"Total Failure Duration:\t {total_duration}", "green"))
+        print(table)
+        print(colored(f"Total Failure Duration:\t {total_duration}", "green"))
 
 async def start_ftm(application, client_id, msg_monitor, data):
     '''To start initialise the ftm middleware: going from client requirments to
