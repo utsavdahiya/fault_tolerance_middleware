@@ -130,12 +130,16 @@ class FTM:
         total_duration = 0
         table = PrettyTable()
         table.field_names = ["VM ID", "Failure Duration"]
-        for primary_vm, stat in failures:
-            #primary_vm= primary_vm_d, stat= list of failures
-            for failure in stat[1:]:
-                duration = stat.end - stat.start
-                table.add_row([primary_vm, duration])
-                total_duration += duration
+        try:
+            for primary_vm, stat in failures:
+                #primary_vm= primary_vm_d, stat= list of failures
+                for failure in stat[1:]:
+                    duration = stat.end - stat.start
+                    table.add_row([primary_vm, duration])
+                    total_duration += duration
+        except Exception as e:
+            logger.error(colored(f"failure is of type: {type(failures)}"))
+            logger.error(colored(f"error: {e}"))
         logger.info(table)
         logger.info(colored(f"Total Failure Duration:\t {total_duration}", "green"))
 
