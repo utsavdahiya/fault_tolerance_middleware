@@ -27,3 +27,4 @@ class VM:
 '''
         self.status = 'inactive'    #inactive(not running)/active(running)
         self.location = None
+        self.fail_counter = 0

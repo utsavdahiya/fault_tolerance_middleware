@@ -113,7 +113,10 @@ class FTM:
                 await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
             else:
                 #this is duplicate status message, fault handling for this VM has already been initiated above
-                pass
+                #incrementing the failure count of the VM
+                self.all_VMs[data['vm_id']].fail_counter += 1
+                if self.all_VMs[data['vm_id']].fail_counter > self.fault_mask_mgr.MIGRATION_FAILURE_THRESHOLD:
+                    await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
         # elif vm_status['cpu_percent_utilization'] > 95:
         #     await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
         # elif vm_status['allocated_ram']/vm_status['capacity_ram'] > 90:
