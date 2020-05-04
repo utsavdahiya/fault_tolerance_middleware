@@ -57,6 +57,41 @@ class VmPlacement(VmPlacementPolicy):
         
         return final_placement
 
+    async def place_random(self, locations, num_primary, replica_ratio) -> list:
+        '''choses the locations where to place the primary and backup VMs
+        Args:
+            locations: a list of intergers representing locations of hosts
+
+        Returns:
+            final_placement: a list of locations of primary and replica VMs
+                example:[ 
+                            {'primary': {'loc': location of primary VM,
+                                    'backup': {loc1: num of VMs,
+                                               loc2: num of VMs}
+                                    }
+                            },
+                            ...
+                        ]
+        '''
+        
+        logger.info(colored("placing the VMs", 'blue'))
+        final_placement = []
+        for primary_vm in range(num_primary):
+            placement = {'primary': {}}
+            loc = choices(locations)
+            placement['primary']['loc'] = loc   #this is a list of locations for pimary VMs
+            backup_loc = {}
+            num_backup = replica_ratio
+            for i in range(num_backup):
+                loc = choices(locations)
+                prev_val = backup_loc.get(loc, 0)
+                backup_loc[loc] = prev_val + 1
+
+            placement['primary']['backup'] = backup_loc
+            final_placement.append(placement)
+        
+        return final_placement
+
 class ActiveReplication(ReplicationStratergy):
     """extends the ReplicationStratergy class inherited from base
     implements active replication stratergy using two backups for each primary
