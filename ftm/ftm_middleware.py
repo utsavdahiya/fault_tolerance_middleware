@@ -116,6 +116,8 @@ class FTM:
                 #incrementing the failure count of the VM
                 self.all_VMs[data['vm_id']].fail_counter += 1
                 if self.all_VMs[data['vm_id']].fail_counter > self.fault_mask_mgr.MIGRATION_FAILURE_THRESHOLD:
+                    #reset the counter again after sending migration req
+                    self.all_VMs[data['vm_id']].fail_counter = 0
                     await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
         # elif vm_status['cpu_percent_utilization'] > 95:
         #     await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
