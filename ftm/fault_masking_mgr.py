@@ -11,17 +11,20 @@ class FaultMasking:
     def __init__(self, mech_name):
         logger.debug(colored("creating a FaultMasking object", 'blue', 'on_white'))
         self.mech_name = mech_name
+        self.MIGRATION_FAILURE_THRESHOLD = 5    #time in seconds
 
     async def handle_fault(self, data):
         ftm = data['ftm']
         vm_id = data['vm_id']
         #change vm status to inactive
-        ftm.all_VMs[vm_id].status = 'inactive'
-        primary_vm_id = ftm.all_VMs[vm_id].primary_vm_id
-        bitset = ftm.availability[primary_vm_id]
-        offset = int(primary_vm_id) % len(bitset)
-        pos = (int(vm_id) % len(bitset)) - offset
-        bitset[pos] = False
+        if ftm.all_VMs[vm_id].status == "active":
+            #if the VM was active earlier then mark it as failed now
+            ftm.all_VMs[vm_id].status = 'inactive'
+            primary_vm_id = ftm.all_VMs[vm_id].primary_vm_id
+            bitset = ftm.availability[primary_vm_id]
+            offset = int(primary_vm_id) % len(bitset)
+            pos = (int(vm_id) % len(bitset)) - offset
+            bitset[pos] = False
         #migrating the vm
         msg = {
                 "desc": "migration",
