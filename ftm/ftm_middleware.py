@@ -123,6 +123,8 @@ class FTM:
         #     await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
         else:
             logger.info(colored(f"vm[{data['vm_id']}]STATUS OK", 'green', 'on_white'))
+            #rest the failure counter once the VM is working
+            self.all_VMs[data['vm_id']].fail_counter = 0
         # else:
         #     logger.info(colored(f"no masking procedure specified", 'red'))
 
