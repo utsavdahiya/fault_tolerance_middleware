@@ -41,7 +41,7 @@ class VmPlacement(VmPlacementPolicy):
             placement = {'primary': {}}
             loc = choices(locations)
             chosen.add(loc[0])
-            placement['primary']['loc'] = loc   #this is a list of locations for pimary VMs
+            placement['primary']['loc'] = loc[0]   #this is a list of locations for pimary VMs
             backup_loc = {}
             num_backup = replica_ratio
             for i in range(num_backup):
