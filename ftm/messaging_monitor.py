@@ -170,8 +170,8 @@ class MessagingMonitor():
 									'locations': recvd_msg['locations']}
 							await self.callbacks['on_location'](data)
 						elif recvd_msg['desc'] == 'status':
-							logger.debug(colored(f"a status msg received", 'yellow', 'on_white'))
-							logger.debug(colored(f"msg: {json.dumps(recvd_msg, indent=2)}"))
+							# logger.debug(colored(f"a status msg received", 'yellow', 'on_white'))
+							# logger.debug(colored(f"msg: {json.dumps(recvd_msg, indent=2)}"))
 							# data['status'] = recvd_msg
 							await self.callbacks['on_status'](recvd_msg)
 						elif recvd_msg['desc'] == 'host_allocation':
