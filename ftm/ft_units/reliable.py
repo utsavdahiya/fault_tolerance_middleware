@@ -3,6 +3,7 @@
 from .ft_unit_base import ReplicationStratergy, FaultDetectionStratergy, VmPlacementPolicy ,FtUnit
 from replication_mgr import replica_invoker
 from termcolor import colored
+from random import choices
 
 import logging
 
@@ -32,19 +33,24 @@ class VmPlacement(VmPlacementPolicy):
                             ...
                         ]
         '''
+        
         logger.info(colored("placing the VMs", 'blue'))
         final_placement = []
         for primary_vm in range(num_primary):
-            #choosing loc 1 for primary and subsequent for backups
+            chosen = set()
             placement = {'primary': {}}
-            placement['primary']['loc'] = locations[0]   #this is a list of locations for pimary VMs
+            loc = choices(locations)
+            chosen.add(loc)
+            placement['primary']['loc'] = loc   #this is a list of locations for pimary VMs
             backup_loc = {}
             num_backup = replica_ratio
-            for i in range(1, len(locations)):
-                if i == num_backup+1:
-                    break
-                prev_val = backup_loc.get(locations[i], 0)
-                backup_loc[locations[i]] = prev_val + 1
+            for i in range(num_backup):
+                loc = choices(locations)
+                while loc in chosen:
+                    loc = choices(locations)
+                chosen.add(loc)
+                prev_val = backup_loc.get(loc, 0)
+                backup_loc[loc] = prev_val + 1
 
             placement['primary']['backup'] = backup_loc
             final_placement.append(placement)
