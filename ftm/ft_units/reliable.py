@@ -79,13 +79,13 @@ class VmPlacement(VmPlacementPolicy):
         for primary_vm in range(num_primary):
             placement = {'primary': {}}
             loc = choices(locations)
-            placement['primary']['loc'] = loc   #this is a list of locations for pimary VMs
+            placement['primary']['loc'] = loc[0]   #this is a list of locations for pimary VMs
             backup_loc = {}
             num_backup = replica_ratio
             for i in range(num_backup):
                 loc = choices(locations)
-                prev_val = backup_loc.get(loc, 0)
-                backup_loc[loc] = prev_val + 1
+                prev_val = backup_loc.get(loc[0], 0)
+                backup_loc[loc[0]] = prev_val + 1
 
             placement['primary']['backup'] = backup_loc
             final_placement.append(placement)
