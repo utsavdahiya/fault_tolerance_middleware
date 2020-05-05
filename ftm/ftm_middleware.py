@@ -40,7 +40,7 @@ class FTM:
         self.all_VMs = {}   #a dict of all VMs <vm_id: vm_obj>
         self.VMs = []   #a list of VMs asked by client [{primary_vm_id: [list of replica VMs]}]
         self.availability = {}  #dict to calc availability <primary_vm_id: bitarray>
-        self.SIMULATION_TIME = 20
+        self.SIMULATION_TIME = 40
 
         asyncio.create_task(self.setup())
 
@@ -171,23 +171,23 @@ class FTM:
         num_primary = self.ft_unit.replication_strat.num_of_primary
         mean_failure_duration = np.sum(failure_durations)/num_primary
         availability = mean_failure_duration / self.SIMULATION_TIME
+        print(colored(f"Availability: {availability}"))
+        # with open('./results/failure_durations.pkl', 'r+b') as handle:
+        #     availability_result = pickle.load(handle)
+        #     availability_result[CONFIG_NUMBER].append(availability)
+        #     pickle.dump(availability_result, handle)
 
-        with open('./results/failure_durations.pkl', 'r+b') as handle:
-            availability_result = pickle.load(handle)
-            availability_result[CONFIG_NUMBER].append(availability)
-            pickle.dump(availability_result, handle)
-
-        #processing the failure times
-        with open('/resutls/failure_times.pkl', 'r+b') as handle:
-            failure_result = pickle.load(handle)
+        # #processing the failure times
+        # with open('/resutls/failure_times.pkl', 'r+b') as handle:
+        #     failure_result = pickle.load(handle)
         
-            store = failure_result[FAULT_CONFIG]
-            for time in range(self.SIMULATION_TIME):
-                arr =np.array(failure_times)
-                store[time] = (arr < time).sum()
+        #     store = failure_result[FAULT_CONFIG]
+        #     for time in range(self.SIMULATION_TIME):
+        #         arr =np.array(failure_times)
+        #         store[time] = (arr < time).sum()
             
-            failure_result[FAULT_CONFIG] = store
-            pickle.dump(failure_result, handle)
+        #     failure_result[FAULT_CONFIG] = store
+        #     pickle.dump(failure_result, handle)
 
 async def start_ftm(application, client_id, msg_monitor, data):
     '''To start initialise the ftm middleware: going from client requirments to

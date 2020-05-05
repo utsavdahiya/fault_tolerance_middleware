@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 NUM_LOCATIONS = 10
+CONFIG_NUMBER = 1
+FAULT_CONFIG = 1
 
 class Client:
     counter = 0
