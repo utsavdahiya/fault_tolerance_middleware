@@ -64,7 +64,7 @@ class ResouceManager:
                 primary_vm_id = ftm.all_VMs[vm_id].primary_vm_id
                 if primary_vm_id not in self.failures:
                     self.failures[primary_vm_id] = []
-                    self.failures[primary_vm_id].append({"flag": False})
+                    self.failures[primary_vm_id].append({"flag": False})    #a flag=True means that failure has occured
                     
                 #checking current status of the VMs
                 bitset = ftm.availability[primary_vm_id]

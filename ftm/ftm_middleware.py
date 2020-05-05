@@ -5,6 +5,10 @@ from resource_mgr import ResouceManager
 from ft_units import *
 from fault_masking_mgr import FaultMasking
 
+from server import CONFIG_NUMBER, FAULT_CONFIG
+
+import pickle
+import numpy as np
 from bitarray import bitarray
 from timeit import default_timer
 from prettytable import PrettyTable
@@ -36,6 +40,7 @@ class FTM:
         self.all_VMs = {}   #a dict of all VMs <vm_id: vm_obj>
         self.VMs = []   #a list of VMs asked by client [{primary_vm_id: [list of replica VMs]}]
         self.availability = {}  #dict to calc availability <primary_vm_id: bitarray>
+        self.SIMULATION_TIME = 20
 
         asyncio.create_task(self.setup())
 
@@ -138,6 +143,8 @@ class FTM:
         total_duration = 0
         table = PrettyTable()
         table.field_names = ["VM ID", "Failure Duration"]
+        failure_times = []  #times of occurance of all failures
+        failure_durations = []
         try:
             for primary_vm, stat in failures.items():
                 #primary_vm= primary_vm_d, stat= list of failures
@@ -146,6 +153,8 @@ class FTM:
                     stat[-1].end = default_timer()
                 for failure in stat[1:]:
                     duration = failure.end - failure.start
+                    failure_durations.append(duration)
+                    failure_times.append(failure.start)
                     table.add_row([primary_vm, duration])
                     total_duration += duration
         except Exception as e:
@@ -156,6 +165,29 @@ class FTM:
 
         print(table)
         print(colored(f"Total Failure Duration:\t {total_duration}", "green"))
+
+        #post processing of data for storage
+        #processing failure_durations
+        num_primary = self.ft_unit.replication_strat.num_of_primary
+        mean_failure_duration = np.sum(failure_durations)/num_primary
+        availability = mean_failure_duration / self.SIMULATION_TIME
+
+        with open('./results/failure_durations.pkl', 'r+b') as handle:
+            availability_result = pickle.load(handle)
+            availability_result[CONFIG_NUMBER].append(availability)
+            pickle.dump(availability_result, handle)
+
+        #processing the failure times
+        with open('/resutls/failure_times.pkl', 'r+b') as handle:
+            failure_result = pickle.load(handle)
+        
+            store = failure_result[FAULT_CONFIG]
+            for time in range(self.SIMULATION_TIME):
+                arr =np.array(failure_times)
+                store[time] = (arr < time).sum()
+            
+            failure_result[FAULT_CONFIG] = store
+            pickle.dump(failure_result, handle)
 
 async def start_ftm(application, client_id, msg_monitor, data):
     '''To start initialise the ftm middleware: going from client requirments to
