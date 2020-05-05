@@ -172,21 +172,26 @@ class FTM:
         mean_failure_duration = np.sum(failure_durations)/num_primary
         availability = mean_failure_duration / self.SIMULATION_TIME
         print(colored(f"Availability: {availability}"))
-        # with open('./results/failure_durations.pkl', 'r+b') as handle:
+        # with open('./results/failure_durations.pkl', 'rb') as handle:
         #     availability_result = pickle.load(handle)
-        #     availability_result[CONFIG_NUMBER].append(availability)
+
+        # availability_result[CONFIG_NUMBER].append(availability)
+        # with open('./results/failure_durations.pkl', 'wb') as handle:
         #     pickle.dump(availability_result, handle)
 
         # #processing the failure times
-        # with open('/resutls/failure_times.pkl', 'r+b') as handle:
+        # with open('/resutls/failure_times.pkl', 'rb') as handle:
         #     failure_result = pickle.load(handle)
         
-        #     store = failure_result[FAULT_CONFIG]
-        #     for time in range(self.SIMULATION_TIME):
-        #         arr =np.array(failure_times)
-        #         store[time] = (arr < time).sum()
-            
-        #     failure_result[FAULT_CONFIG] = store
+        # store = failure_result[FAULT_CONFIG]
+        # for time in range(self.SIMULATION_TIME):
+        #     if time not in store[FAULT_CONFIG]:
+        #         store[FAULT_CONFIG][time] = []
+        #     arr = np.array(failure_times)
+        #     store[time] = (arr < time).sum()
+        
+        # failure_result[FAULT_CONFIG] = store
+        # with open('./results/failure_times.pkl', 'wb') as handle:
         #     pickle.dump(failure_result, handle)
 
 async def start_ftm(application, client_id, msg_monitor, data):
