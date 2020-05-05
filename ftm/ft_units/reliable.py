@@ -3,13 +3,17 @@
 from .ft_unit_base import ReplicationStratergy, FaultDetectionStratergy, VmPlacementPolicy ,FtUnit
 from replication_mgr import replica_invoker
 from termcolor import colored
-from random import choices
+# from random import choices
+import random
 
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+SEED = 42
+random.seed(SEED)
 
 class VmPlacement(VmPlacementPolicy):
     '''atleast one backup not on the same host as the primary'''
@@ -39,15 +43,15 @@ class VmPlacement(VmPlacementPolicy):
         for primary_vm in range(num_primary):
             chosen = set()
             placement = {'primary': {}}
-            loc = choices(locations)
+            loc = random.choices(locations)
             chosen.add(loc[0])
             placement['primary']['loc'] = loc[0]   #this is a list of locations for pimary VMs
             backup_loc = {}
             num_backup = replica_ratio
             for i in range(num_backup):
-                loc = choices(locations)
+                loc = random.choices(locations)
                 while loc[0] in chosen:
-                    loc = choices(locations)
+                    loc = random.choices(locations)
                 chosen.add(loc[0])
                 prev_val = backup_loc.get(loc[0], 0)
                 backup_loc[loc[0]] = prev_val + 1
@@ -78,12 +82,12 @@ class VmPlacement(VmPlacementPolicy):
         final_placement = []
         for primary_vm in range(num_primary):
             placement = {'primary': {}}
-            loc = choices(locations)
+            loc = random.choices(locations)
             placement['primary']['loc'] = loc[0]   #this is a list of locations for pimary VMs
             backup_loc = {}
             num_backup = replica_ratio
             for i in range(num_backup):
-                loc = choices(locations)
+                loc = random.choices(locations)
                 prev_val = backup_loc.get(loc[0], 0)
                 backup_loc[loc[0]] = prev_val + 1
 
