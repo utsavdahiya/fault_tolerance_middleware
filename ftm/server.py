@@ -6,6 +6,7 @@ import json
 import asyncio
 from termcolor import colored
 
+import sys
 import nest_asyncio
 nest_asyncio.apply()
 
@@ -158,6 +159,10 @@ class Application():
         await ftm_instance.finish()
 
 async def main():
+    print("starting application")
+    logger.info("starting app")
+    logger.info("number of args: ", len(sys.argv))
+    logger.info(colored(f"arguments: {sys.argv}", 'green'))
     tasks = []  #list of tasks to be run concurrently
 
     # unit = ft_units.base.FtUnit("007", "replication", "fault_tolerance")
