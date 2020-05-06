@@ -40,7 +40,7 @@ def main():
 
     print(f"result: {result}")
     #printing one simulation durations
-    for fault_rate, record in result:
+    for fault_rate, record in result.items():
         #displaying fault rate
         print("displaying")
         print_duration(fault_rate, record['duration'])
