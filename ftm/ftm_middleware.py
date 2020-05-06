@@ -159,7 +159,7 @@ class FTM:
                 table.add_row([primary_vm, duration])
                 total_duration += duration
 
-        logger.info("\n", table)
+        logger.info(f"\n{table}")
         logger.info(colored(f"Total Failure Duration:\t {total_duration}", "green"))
 
         #post processing of data for storage
@@ -196,7 +196,7 @@ class FTM:
         # store = failure_result[FAULT_CONFIG]
         for time in range(globals.SIMULATION_TIME):
             if time not in result[globals.FAULT_RATE]['timing']:
-                result[globals.FAULT_CONFIG]['timing'][time] = []
+                result[globals.FAULT_RATE]['timing'][time] = []
             arr = np.array(failure_times)
             result[globals.FAULT_RATE]['timing'][time].append((arr < time).sum())
         
