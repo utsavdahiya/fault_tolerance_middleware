@@ -5,7 +5,7 @@ from .resource_mgr import ResouceManager
 from .ft_units import *
 from .fault_masking_mgr import FaultMasking
 
-from ftm.server import CONFIG_NUMBER, FAULT_CONFIG, NUM_LOCATIONS, CONFIG_NUMBER, FAULT_CONFIG, ITERATION, EPOCH, OUTPUT
+# from ftm.server import CONFIG_NUMBER, FAULT_CONFIG, NUM_LOCATIONS, CONFIG_NUMBER, FAULT_CONFIG, ITERATION, EPOCH, OUTPUT
 
 import pickle
 import numpy as np
