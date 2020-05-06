@@ -53,7 +53,7 @@ def procedure():
 
 def run_main():
     NUM_SIMULATION = 4
-    EPOCH = 2
+    EPOCH = 3
     NUM_LOCATIONS = 10
     OUTPUT = "./results/default_output.pkl"
     SIMULATION_TIME = 38
