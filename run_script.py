@@ -5,6 +5,7 @@ from ftm.websocket_client import run_main as client_main
 import subprocess, shlex
 import multiprocessing
 import time
+import json
 
 command = "python test.py"
 def subprocess_cmd(command, cwd=None, **kwargs):
@@ -37,6 +38,7 @@ def procedure():
     p1 = multiprocessing.Process(target=server_main)
     # p2 = multiprocessing.Process(target=cloud_main)
     p3 = multiprocessing.Process(target=client_main, args=(queue,))
+    
     p1.start()  #starting server
     time.sleep(2)
     p2.start()  #starting cloud
@@ -47,7 +49,46 @@ def procedure():
     print("p1 finished")
 
 def run_main():
-    procedure()
+    NUM_SIMULATION = 1
+    EPOCH = 50
+    NUM_LOCATIONS = 10
+    output = "./results/default_output.pkl"
+
+    THRESHOLD1 = 0.5
+    THRESHOLD2 = 0.8
+    SEED1 = 42
+    SEED2 = 42
+    SEED3 = 42
+
+    fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * NUM_LOCATIONS
+
+    for iteration in range(NUM_SIMULATION):
+        SEED2 = 42
+        for epoch in range(EPOCH):
+            print(f"Iteration: {iteration} | epoch: {epoch}")
+            with open("ftm.conf") as handle:
+                settings = json.load(handle)
+            
+            fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * NUM_LOCATIONS
+            settings['FAULT_RATE'] = fault_rate
+            settings['EPOCH'] = epoch
+            with open("ftm.conf") as handle:
+                print(f"updating ftm.conf: {settings}")
+                json.dump(settings)
+
+            cloud_args = f"{THRESHOLD1} {THRESHOLD2} {SEED1} {SEED2} {SEED3}"
+            with open("CloudSim_Conf", 'w+t') as handle:
+                print(f"updating CloudSim_Conf: {cloud_args}")
+                handle.write(cloud_args)
+
+            procedure()
+
+            SEED1 += 1
+            SEED2 += 1
+            SEED3 += 1
+
+        #updating the parameters
+        THRESHOLD2 -= 0.05
 
 if __name__ == '__main__':
     run_main()
