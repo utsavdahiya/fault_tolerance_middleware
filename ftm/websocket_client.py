@@ -50,12 +50,15 @@ class FtmClient():
                         logger.info(f"received msg: {msg.data}")
                         if self.first_time: #this will run only once
                             self.first_time = False
-                            with open('client_req.json') as f:
-                                logger.info("file loaded:")
-                                # print(f)
-                                data = json.load(f)
-                                self.basic_config = data
-                                logger.info(f"sending client requirements: {data}")
+                            try:
+                                with open("ftm/client_req.json") as f:
+                                    logger.info(colored("file loaded:", on_color='on_green'))
+                                    # print(f)
+                                    data = json.load(f)
+                            except Exception as e:
+                                logger.info(colored(f"error: {e}", 'red'))
+                            self.basic_config = data
+                            logger.info(f"sending client requirements: {data}")
                             await ws.send_json(data)
                             # pause = input("waiting for server ftm instantiaion")
                             logger.info(colored(f"waiting for ftm instantiation..."))
