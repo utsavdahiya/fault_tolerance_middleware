@@ -2,16 +2,17 @@ import json
 
 NUM_LOCATIONS = 10
 CONFIG_NUMBER = 1
-FAULT_RATE = 1
+FAULT_RATE = 5
 ITERATION = 1
 EPOCH = 1
 SIMULATION_TIME = 40
 OUTPUT = "./results/default_output.pkl"
 
 def initialize_globals(args):
+    print("---INITTIALIZING GLOBAL VARS---")
     print(f"Arguements passed: {args}")
 
-    fname = f"../run/{args[1]}"
+    fname = f"../{args}"
     with open(fname) as handle:
         args = json.load(handle)
 

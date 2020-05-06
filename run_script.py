@@ -1,5 +1,6 @@
 from ftm.server import run_main as server_main
 from ftm.websocket_client import run_main as client_main
+from ftm import globals
 # from ftm.test_cloud import run_main as cloud_main
 
 import subprocess, shlex
@@ -63,7 +64,7 @@ def run_main():
     SEED2 = 42
     SEED3 = 42
 
-    fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * NUM_LOCATIONS
+    fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
 
     for iteration in range(NUM_SIMULATION):
         SEED2 = 42
@@ -76,9 +77,11 @@ def run_main():
             settings['FAULT_RATE'] = fault_rate
             settings['EPOCH'] = epoch
             settings['SIMULATION_TIME'] = SIMULATION_TIME
+
             with open("ftm.conf", 'w') as handle:
                 print(f"updating ftm.conf: {settings}")
                 json.dump(settings, handle)
+            globals.initialize_globals("ftm.conf")            
 
             cloud_args = f"{THRESHOLD1} {THRESHOLD2} {SEED1} {SEED2} {SEED3}"
             with open("CloudSim_Conf", 'w+t') as handle:
