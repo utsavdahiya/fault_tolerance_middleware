@@ -99,10 +99,10 @@ async def main(queue):
     # msg['cloudlet'] = [messages['cloudlet']]
     # await client.send_json(msg)
 
-    # cont = input("waiting for ftm")
-    print("waiting for ftm")
-    resp = queue.get()
-    print(f"received: {resp} | Now quitting")
+    cont = input("waiting for ftm")
+    # print("waiting for ftm")
+    # resp = queue.get()
+    # print(f"received: {resp} | Now quitting")
     sys.exit()
 
 def run_main(queue):
