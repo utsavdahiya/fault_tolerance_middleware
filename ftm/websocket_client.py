@@ -94,7 +94,7 @@ class FtmClient():
 async def main(queue):
     client = FtmClient("Hachiko")
     asyncio.create_task(client.connect("http://0.0.0.0:8082/ws"))
-    await asyncio.sleep(10)
+    await asyncio.sleep(5)
     # cont = input("start an application on the VM?")
 
     # logger.info(colored("starting a application on the VM", 'green'))
