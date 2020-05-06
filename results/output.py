@@ -23,13 +23,13 @@ def print_all_durations(data):
     duration_max = []
 
     for fault_rate, record in data.items():
-        duration_mean.append(np.mean(data[fault_rate]['duration']))
-        duration_max.append(np.max(data[fault_rate]['duration']))
-        duration_min.append(np.min(data[fault_rate]['duration']))
+        duration_mean.append(np.mean(record['duration']))
+        duration_max.append(np.max(record['duration']))
+        duration_min.append(np.min(record['duration']))
 
-    # duration_mean = np.array(duration_mean)
-    # duration_max = np.array(duration_max)
-    # duration_min = np.array(duration_min)
+    duration_mean = np.array(duration_mean)
+    duration_max = np.array(duration_max)
+    duration_min = np.array(duration_min)
 
     plt.plot(data.keys(), duration_mean, 'k-')
     plt.fill_between(data.keys(), duration_min, duration_max, color='blue', alpha=0.2)
