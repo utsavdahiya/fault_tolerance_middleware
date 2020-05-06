@@ -40,7 +40,7 @@ def procedure():
     p1.start()  #starting server
     time.sleep(2)
     p2.start()  #starting cloud
-    time.sleep(3)
+    time.sleep(4)
     p3.start()  #starting client
     p1.join()
     queue.put("quit")

@@ -1,26 +1,26 @@
 import org.cloudbus.cloudsim.vms.Vm;
 
 /**
- * Class used to maintain VM IDs even after removal of some VMs.
+ * Class used to maintain two thresholds for each location.
  */
 public class Pair {
-    Vm vm;
-    boolean isRemoved;
+    Double first; //Threshold for location
+    Double second; //Threshold for host
 
     Pair(){
 
     }
 
-    Pair(Vm vm, boolean isRemoved){
-        this.vm = vm;
-        this.isRemoved = isRemoved;
+    public Pair(Double first, Double second) {
+        this.first = first;
+        this.second = second;
     }
 
-    public Vm getVm() {
-        return vm;
+    public Double getFirst() {
+        return first;
     }
 
-    public boolean isRemoved() {
-        return isRemoved;
+    public Double getSecond() {
+        return second;
     }
 }
