@@ -1,6 +1,6 @@
 from ftm.server import run_main as server_main
 from ftm.websocket_client import run_main as client_main
-# from ftm.test_cloud import run_main as cloud_main
+from ftm.test_cloud import run_main as cloud_main
 
 import subprocess, shlex
 import multiprocessing
@@ -33,10 +33,10 @@ def procedure():
     # cmd3 = f"mvn exec:java -Dexec.mainClass={classname} -Dexec.args={arguments}"
     cmd4 = "python websocket_client.py"
     # p1 = multiprocessing.Process(target=subprocess_cmd, args=(cmd2, "../"))
-    p2 = multiprocessing.Process(target=subprocess_cmd, args=(cmd3,))
+    # p2 = multiprocessing.Process(target=subprocess_cmd, args=(cmd3,))
     # p3 = multiprocessing.Process(target=subprocess_cmd, args=(cmd4, "../"))
     p1 = multiprocessing.Process(target=server_main)
-    # p2 = multiprocessing.Process(target=cloud_main)
+    p2 = multiprocessing.Process(target=cloud_main)
     p3 = multiprocessing.Process(target=client_main, args=(queue,))
     
     p1.start()  #starting server
