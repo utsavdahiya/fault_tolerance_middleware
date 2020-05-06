@@ -57,6 +57,7 @@ def run_main():
     NUM_LOCATIONS = 10
     OUTPUT = "./results/default_output.pkl"
     SIMULATION_TIME = 38
+    ARCH = "new"    #can change to "original"
 
     THRESHOLD1 = 0.5
     THRESHOLD2 = 0.8
@@ -77,6 +78,7 @@ def run_main():
             settings['FAULT_RATE'] = fault_rate
             settings['EPOCH'] = epoch
             settings['SIMULATION_TIME'] = SIMULATION_TIME
+            settings['ARCH'] = ARCH
 
             with open("ftm.conf", 'w') as handle:
                 print(f"updating ftm.conf: {settings}")
