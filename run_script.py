@@ -47,6 +47,8 @@ def procedure():
     p1.join()
     queue.put("quit")
     print("p1 finished")
+    p2.join()
+    p3.join()
 
 def run_main():
     NUM_SIMULATION = 1
