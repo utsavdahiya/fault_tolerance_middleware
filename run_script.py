@@ -74,7 +74,7 @@ def run_main():
             fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * NUM_LOCATIONS
             settings['FAULT_RATE'] = fault_rate
             settings['EPOCH'] = epoch
-            with open("ftm.conf") as handle:
+            with open("ftm.conf", 'w') as handle:
                 print(f"updating ftm.conf: {settings}")
                 json.dump(settings, handle)
 
