@@ -6,6 +6,7 @@ FAULT_RATE = 5
 ITERATION = 1
 EPOCH = 1
 SIMULATION_TIME = 40
+ARCH = "new"
 OUTPUT = "./results/default_output.pkl"
 
 def initialize_globals(args):
@@ -37,3 +38,6 @@ def initialize_globals(args):
     if 'SIMULATION_TIME' in args:
         global SIMULATION_TIME
         SIMULATION_TIME = args['SIMULATION_TIME']
+    if 'ARCH' in args:
+        global ARCH
+        ARCH = args['ARCH']
