@@ -30,7 +30,8 @@ def print_all_durations(data):
     duration_max = np.array(duration_max)
     duration_min = np.array(duration_min)
 
-    plt.plot(duration_mean)
+    plt.plot(data.keys(), duration_mean, 'k-')
+    plt.fill_between(data.keys(), duration_min, duration_max, color='blue', alpha=0.2)
 
 def main():
     file_name = "default_output.pkl"
