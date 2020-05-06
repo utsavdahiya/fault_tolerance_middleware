@@ -31,10 +31,14 @@ def print_all_durations(data):
     duration_max = np.array(duration_max)
     duration_min = np.array(duration_min)
 
+    duration_mean.transpose
+
+    # print(f"len data: {len(data.keys())} | type: {type(data.keys())} | shape: {np.array(data.keys()).shape()}")
     print(f"data.keys(): {data.keys()}")
+    # print(f"len mean: {len(duration_mean)}| type: {type(duration_mean)} | shape: {duration_mean.shape()}")
     print(f"duration_mean: {duration_mean}")
-    plt.plot(data.keys(), duration_mean, 'k-')
-    plt.fill_between(data.keys(), duration_min, duration_max, color='blue', alpha=0.2)
+    plt.plot(list(data.keys()), duration_mean, 'k-')
+    plt.fill_between(list(data.keys()), duration_min, duration_max, color='blue', alpha=0.3)
     plt.xlabel("Fault rates")
     plt.ylabel("Availability")
     plt.show()
