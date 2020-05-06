@@ -14,7 +14,7 @@ def print_duration(fault_rate, List):
     ax.set(xlabel='Epochs', ylabel='Availability', title=str(fault_rate))
     ax.grid()
 
-    fig.savefig(f"fault_{fault_rate}_.png")
+    # fig.savefig(f"fault_{fault_rate}_.png")
     plt.show()
 
 def print_all_durations(data):
@@ -31,6 +31,8 @@ def print_all_durations(data):
     duration_max = np.array(duration_max)
     duration_min = np.array(duration_min)
 
+    print(f"data.keys(): {data.keys()}")
+    print(f"duration_mean: {duration_mean}")
     plt.plot(data.keys(), duration_mean, 'k-')
     plt.fill_between(data.keys(), duration_min, duration_max, color='blue', alpha=0.2)
     plt.xlabel("Fault rates")
