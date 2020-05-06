@@ -1,6 +1,6 @@
 from ftm.server import run_main as server_main
 from ftm.websocket_client import run_main as client_main
-from ftm.test_cloud import run_main as cloud_main
+# from ftm.test_cloud import run_main as cloud_main
 
 import subprocess, shlex
 import multiprocessing
