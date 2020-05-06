@@ -16,6 +16,22 @@ def print_duration(fault_rate, List):
     fig.savefig(f"fault_{fault_rate}_.png")
     plt.show()
 
+def print_all_durations(data):
+    duration_mean = []
+    duration_min = []
+    duration_max = []
+
+    for fault_rate, record in data:
+        duration_mean.append(np.mean(data[fault_rate]['duration']))
+        duration_max.append(np.max(data[fault_rate]['duration']))
+        duration_min.append(np.min(data[fault_rate]['duration']))
+
+    duration_mean = np.array(duration_mean)
+    duration_max = np.array(duration_max)
+    duration_min = np.array(duration_min)
+
+    plt.figure()
+
 def main():
     file_name = "default_ouput.pkl"
 

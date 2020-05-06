@@ -37,6 +37,7 @@ class VmPlacement(VmPlacementPolicy):
                             ...
                         ]
         '''
+        random.seed(SEED)
         
         logger.info(colored("placing the VMs", 'blue'))
         final_placement = []
@@ -77,6 +78,7 @@ class VmPlacement(VmPlacementPolicy):
                             ...
                         ]
         '''
+        random.seed(SEED)
         
         logger.info(colored("placing the VMs", 'blue'))
         final_placement = []
