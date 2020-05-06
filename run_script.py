@@ -76,7 +76,7 @@ def run_main():
             settings['EPOCH'] = epoch
             with open("ftm.conf") as handle:
                 print(f"updating ftm.conf: {settings}")
-                json.dump(settings)
+                json.dump(settings, handle)
 
             cloud_args = f"{THRESHOLD1} {THRESHOLD2} {SEED1} {SEED2} {SEED3}"
             with open("CloudSim_Conf", 'w+t') as handle:
