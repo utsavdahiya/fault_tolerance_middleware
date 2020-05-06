@@ -188,7 +188,7 @@ def parse_arguments(args):
         OUTPUT = args['OUTPUT']
 
 async def main():
-    parse_arguments(sys.argv)
+    # parse_arguments(sys.argv)
 
     tasks = []  #list of tasks to be run concurrently
 
