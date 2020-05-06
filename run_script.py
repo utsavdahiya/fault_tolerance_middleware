@@ -86,7 +86,7 @@ def run_main():
                 handle.write(cloud_args)
 
             procedure()
-            time.sleep(20)
+            time.sleep(4)
             SEED1 += 1
             SEED2 += 1
             SEED3 += 1
