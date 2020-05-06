@@ -8,6 +8,7 @@ from .fault_masking_mgr import FaultMasking
 
 # from ftm.server import CONFIG_NUMBER, FAULT_CONFIG, NUM_LOCATIONS, CONFIG_NUMBER, FAULT_CONFIG, ITERATION, EPOCH, OUTPUT
 
+import sys
 import pickle
 import numpy as np
 from bitarray import bitarray
@@ -204,6 +205,9 @@ class FTM:
         # failure_result[FAULT_CONFIG] = store
         with open(output, 'wb') as handle:
             pickle.dump(result, handle)
+
+        logger.info(colored("---------------EXITING SERVER---------------------", 'magenta'))
+        sys.exit()
 
 async def start_ftm(application, client_id, msg_monitor, data):
     '''To start initialise the ftm middleware: going from client requirments to

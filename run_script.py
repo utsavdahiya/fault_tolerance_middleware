@@ -86,6 +86,8 @@ def run_main():
                 handle.write(cloud_args)
 
             procedure()
+
+            print(f"\n\n\n\n--------------------------------------EPOCH COMPLETED-----------------------------------\n\n\n")
             time.sleep(4)
             SEED1 += 1
             SEED2 += 1
