@@ -116,7 +116,7 @@ class Application():
         await ftm_middleware.cont_ftm(ftm_instance, locations)
         
     async def on_status(self, data):
-        logger.debug(colored(f"on_status hit", 'blue', 'on_white'))
+        # logger.debug(colored(f"on_status hit", 'blue', 'on_white'))
         client_id = data.get('client_id', None)
         if client_id is None:
             raise Exception(colored(f"client_id was not present in status message", 'red'))
