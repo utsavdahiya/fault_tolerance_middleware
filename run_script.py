@@ -54,7 +54,7 @@ def run_main():
     NUM_SIMULATION = 1
     EPOCH = 1
     NUM_LOCATIONS = 10
-    output = "./results/default_output.pkl"
+    OUTPUT = "./results/default_output.pkl"
 
     THRESHOLD1 = 0.5
     THRESHOLD2 = 0.8

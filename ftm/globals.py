@@ -6,7 +6,7 @@ FAULT_RATE = 1
 ITERATION = 1
 EPOCH = 1
 SIMULATION_TIME = 40
-OUTPUT = "./default_output"
+OUTPUT = "./results/default_output.pkl"
 
 def initialize_globals(args):
     print(f"Arguements passed: {args}")

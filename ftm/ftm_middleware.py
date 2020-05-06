@@ -172,6 +172,7 @@ class FTM:
         try:
             with open(output, 'rb') as handle:
                 result = pickle.load(handle)
+                logger.info(colored(f"FILE OPENED", on_color='on_green'))
         except Exception as e:
             logger.info(colored(f"FILE OPENNING: {e}", 'red'))
             #file not present
