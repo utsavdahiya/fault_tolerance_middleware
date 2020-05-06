@@ -1,4 +1,5 @@
 '''FTM middleware that will perform the workings of FTM'''
+import ftm.globals
 from .ftm_kernel import service_dir, composition_engine, evaluation_unit
 from .replication_mgr import replica_invoker
 from .resource_mgr import ResouceManager
@@ -40,7 +41,7 @@ class FTM:
         self.all_VMs = {}   #a dict of all VMs <vm_id: vm_obj>
         self.VMs = []   #a list of VMs asked by client [{primary_vm_id: [list of replica VMs]}]
         self.availability = {}  #dict to calc availability <primary_vm_id: bitarray>
-        self.SIMULATION_TIME = 40
+        # self.SIMULATION_TIME = 40
 
         asyncio.create_task(self.setup())
 
@@ -170,7 +171,7 @@ class FTM:
         #processing failure_durations
         num_primary = self.ft_unit.replication_strat.num_of_primary
         mean_failure_duration = np.sum(failure_durations)/num_primary
-        availability = mean_failure_duration / self.SIMULATION_TIME
+        availability = mean_failure_duration / globals.SIMULATION_TIME
         print(colored(f"Availability: {availability}"))
         # with open('./results/failure_durations.pkl', 'rb') as handle:
         #     availability_result = pickle.load(handle)
@@ -184,7 +185,7 @@ class FTM:
         #     failure_result = pickle.load(handle)
         
         # store = failure_result[FAULT_CONFIG]
-        # for time in range(self.SIMULATION_TIME):
+        # for time in range(globals.SIMULATION_TIME):
         #     if time not in store[FAULT_CONFIG]:
         #         store[FAULT_CONFIG][time] = []
         #     arr = np.array(failure_times)

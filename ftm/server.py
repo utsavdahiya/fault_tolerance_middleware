@@ -1,3 +1,4 @@
+import ftm.globals
 from ftm import ftm_middleware
 from ftm import ft_units
 from .messaging_monitor import MessagingMonitor
@@ -15,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-NUM_LOCATIONS = 10
+# NUM_LOCATIONS = 10
 
 class Client:
     counter = 0
@@ -32,7 +33,7 @@ class Application():
         self.client_dict = {}   #dict: <client_websocket, client_obj>
         self.ftm_dict = {}   #dict: <client_id, ftm>
         self.ftm_list = []
-        self.locations = [i for i in range(NUM_LOCATIONS)]
+        self.locations = [i for i in range(globals.NUM_LOCATIONS)]
 
     async def on_connect_client(self, data: dict):
         """callback on establishing contact with client
@@ -156,36 +157,6 @@ class Application():
         ftm_instance = self.ftm_dict[client_id]
         await ftm_instance.finish()
 
-def parse_arguments(args):
-    '''
-    Args:
-        args: a list of args containing config file name
-    '''
-    logger.info(colored(f"Arguements passed: {args}"))
-    if len(args) < 2:
-        return
-    fname = f"../run/{args[1]}"
-    with open(fname) as handle:
-        args = json.load(handle)
-
-    if 'NUM_LOCATIONS' in args:
-        global NUM_LOCATIONS
-        NUM_LOCATIONS = args['NUM_LOCATIONS']
-    if 'FAULT_CONFIG' in args:
-        global FAULT_CONFIG
-        FAULT_CONFIG = args['FAULT_CONFIG']
-    if 'CONFIG_NUMBER' in args:
-        global CONFIG_NUMBER
-        CONFIG_NUMBER = args['CONFIG_NUMBER']
-    if 'ITERATION' in args:
-        global ITERATION
-        ITERATION = args['ITERATION']
-    if 'EPOCH' in args:
-        global EPOCH
-        EPOCH = args['EPOCH']
-    if 'OPUTPUT' in args:
-        global OUTPUT
-        OUTPUT = args['OUTPUT']
 
 async def main():
     # parse_arguments(sys.argv)
