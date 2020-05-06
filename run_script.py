@@ -32,7 +32,7 @@ def procedure():
     # cmd3 = f"mvn exec:java -Dexec.mainClass={classname} -Dexec.args={arguments}"
     cmd4 = "python websocket_client.py"
     # p1 = multiprocessing.Process(target=subprocess_cmd, args=(cmd2, "../"))
-    p2 = multiprocessing.Process(target=subprocess_cmd, args=(cmd3))
+    p2 = multiprocessing.Process(target=subprocess_cmd, args=(cmd3,))
     # p3 = multiprocessing.Process(target=subprocess_cmd, args=(cmd4, "../"))
     p1 = multiprocessing.Process(target=server_main)
     # p2 = multiprocessing.Process(target=cloud_main)
