@@ -36,10 +36,10 @@ def run_main():
     p2 = multiprocessing.Process(target=cloud_main)
     p3 = multiprocessing.Process(target=client_main, args=(queue,))
     p1.start()  #starting server
-    time.sleep(2)
-    p2.start()  #starting cloud
-    time.sleep(5)
-    p3.start()  #starting client
+    # time.sleep(2)
+    # p2.start()  #starting cloud
+    # time.sleep(5)
+    # p3.start()  #starting client
     p1.join()
     queue.put("quit")
     print("p1 finished")

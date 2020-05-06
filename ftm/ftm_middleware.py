@@ -1,5 +1,5 @@
 '''FTM middleware that will perform the workings of FTM'''
-import ftm.globals
+from ftm import globals
 from .ftm_kernel import service_dir, composition_engine, evaluation_unit
 from .replication_mgr import replica_invoker
 from .resource_mgr import ResouceManager

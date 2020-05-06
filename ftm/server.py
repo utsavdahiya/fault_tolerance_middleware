@@ -1,4 +1,4 @@
-import ftm.globals
+from ftm import globals
 from ftm import ftm_middleware
 from ftm import ft_units
 from .messaging_monitor import MessagingMonitor
