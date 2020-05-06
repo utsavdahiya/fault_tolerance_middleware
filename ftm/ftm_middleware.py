@@ -54,7 +54,7 @@ class FTM:
             action = item.get('action').upper()
             data = item.get('data', {})
             callaback = item.get('callback', None)
-            logger.info(colored(f"New action: {action}",'blue', 'on_white'))
+            # logger.info(colored(f"New action: {action}",'blue', 'on_white'))
 
             if action == 'STATUS':
                 asyncio.create_task(self.evaluate_status(data))

@@ -33,7 +33,7 @@ def print_all_durations(data):
     plt.figure()
 
 def main():
-    file_name = "default_ouput.pkl"
+    file_name = "default_output.pkl"
 
     with open(file_name, 'rb') as handle:
         result = pickle.load(handle)
