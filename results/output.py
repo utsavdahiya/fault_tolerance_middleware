@@ -38,6 +38,7 @@ def main():
     with open(file_name, 'rb') as handle:
         result = pickle.load(handle)
 
+    print(f"result: {result}")
     #printing one simulation durations
     for fault_rate, record in result:
         #displaying fault rate
