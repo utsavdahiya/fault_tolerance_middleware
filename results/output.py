@@ -43,7 +43,8 @@ def main():
     with open(file_name, 'rb') as handle:
         result = pickle.load(handle)
 
-    print(f"result: {json.dumps(result, indent=2)}")
+    # print(f"result: {json.dumps(result, indent=2)}")
+    print(f"result: {result}")
     #printing one simulation durations
     for fault_rate, record in result.items():
         #displaying fault rate
