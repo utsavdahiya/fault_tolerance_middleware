@@ -23,26 +23,30 @@ def subprocess_cmd(command, cwd=None, **kwargs):
 
 # subprocess_cmd(command)
 
-def run_main():
+def procedure():
     queue = multiprocessing.Queue()
-
     cmd2 = "python server.py arg1 arg2 arg 3"
-    cmd3 = "python test_cloud.py"
+    classname = "Client"
+    arguments = "/home/uday-vig/fault_tolerance_middleware/CloudSim_Conf"
+    cmd3 = f"mvn exec:java -Dexec.mainClass={classname} -Dexec.args={arguments}"
     cmd4 = "python websocket_client.py"
     # p1 = multiprocessing.Process(target=subprocess_cmd, args=(cmd2, "../"))
-    # p2 = multiprocessing.Process(target=subprocess_cmd, args=(cmd3, "../"))
+    p2 = multiprocessing.Process(target=subprocess_cmd, args=(cmd3, "../"))
     # p3 = multiprocessing.Process(target=subprocess_cmd, args=(cmd4, "../"))
     p1 = multiprocessing.Process(target=server_main)
-    p2 = multiprocessing.Process(target=cloud_main)
+    # p2 = multiprocessing.Process(target=cloud_main)
     p3 = multiprocessing.Process(target=client_main, args=(queue,))
     p1.start()  #starting server
     time.sleep(2)
     p2.start()  #starting cloud
-    time.sleep(5)
+    time.sleep(3)
     p3.start()  #starting client
     p1.join()
     queue.put("quit")
     print("p1 finished")
+
+def run_main():
+    procedure()
 
 if __name__ == '__main__':
     run_main()
