@@ -52,9 +52,10 @@ def procedure():
 
 def run_main():
     NUM_SIMULATION = 1
-    EPOCH = 30
+    EPOCH = 10
     NUM_LOCATIONS = 10
     OUTPUT = "./results/default_output.pkl"
+    SIMULATION_TIME = 38
 
     THRESHOLD1 = 0.5
     THRESHOLD2 = 0.8
@@ -74,6 +75,7 @@ def run_main():
             fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * NUM_LOCATIONS
             settings['FAULT_RATE'] = fault_rate
             settings['EPOCH'] = epoch
+            settings['SIMULATION_TIME'] = SIMULATION_TIME
             with open("ftm.conf", 'w') as handle:
                 print(f"updating ftm.conf: {settings}")
                 json.dump(settings, handle)
