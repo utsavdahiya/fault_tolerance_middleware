@@ -2,7 +2,7 @@ import json
 
 NUM_LOCATIONS = 10
 CONFIG_NUMBER = 1
-FAULT_CONFIG = 1
+FAULT_RATE = 1
 ITERATION = 1
 EPOCH = 1
 SIMULATION_TIME = 40
@@ -18,9 +18,9 @@ def initialize_globals(args):
     if 'NUM_LOCATIONS' in args:
         global NUM_LOCATIONS
         NUM_LOCATIONS = args['NUM_LOCATIONS']
-    if 'FAULT_CONFIG' in args:
-        global FAULT_CONFIG
-        FAULT_CONFIG = args['FAULT_CONFIG']
+    if 'FAULT_RATE' in args:
+        global FAULT_RATE
+        FAULT_RATE = args['FAULT_RATE']
     if 'CONFIG_NUMBER' in args:
         global CONFIG_NUMBER
         CONFIG_NUMBER = args['CONFIG_NUMBER']

@@ -146,54 +146,63 @@ class FTM:
         table.field_names = ["VM ID", "Failure Duration"]
         failure_times = []  #times of occurance of all failures
         failure_durations = []
-        try:
-            for primary_vm, stat in failures.items():
-                #primary_vm= primary_vm_d, stat= list of failures
-                if stat[0]["flag"] == True:
-                    #if recovery was pending
-                    stat[-1].end = default_timer()
-                for failure in stat[1:]:
-                    duration = failure.end - failure.start
-                    failure_durations.append(duration)
-                    failure_times.append(failure.start)
-                    table.add_row([primary_vm, duration])
-                    total_duration += duration
-        except Exception as e:
-            logger.error(colored(f"failure is of type: {type(failures)}"))
-            print("failures dict: ")
-            print(failures)
-            logger.error(colored(f"error: {e}"))
 
-        print(table)
-        print(colored(f"Total Failure Duration:\t {total_duration}", "green"))
+        for primary_vm, stat in failures.items():
+            #primary_vm= primary_vm_d, stat= list of failures
+            if stat[0]["flag"] == True:
+                #if recovery was pending
+                stat[-1].end = default_timer()
+            for failure in stat[1:]:
+                duration = failure.end - failure.start
+                failure_durations.append(duration)
+                failure_times.append(failure.start)
+                table.add_row([primary_vm, duration])
+                total_duration += duration
+
+        logger.info("\n", table)
+        logger.info(colored(f"Total Failure Duration:\t {total_duration}", "green"))
 
         #post processing of data for storage
+        output = globals.OUTPUT
         #processing failure_durations
         num_primary = self.ft_unit.replication_strat.num_of_primary
         mean_failure_duration = np.sum(failure_durations)/num_primary
-        availability = mean_failure_duration / globals.SIMULATION_TIME
+        availability = 1.0 - (float(mean_failure_duration) / float(globals.SIMULATION_TIME))
         print(colored(f"Availability: {availability}"))
-        # with open('./results/failure_durations.pkl', 'rb') as handle:
-        #     availability_result = pickle.load(handle)
+        try:
+            with open(output, 'rb') as handle:
+                result = pickle.load(handle)
+        except Exception as e:
+            logger.info(colored(f"FILE OPENNING: {e}", 'red'))
+            #file not present
+            with open(output, 'w+b') as handle:
+                result = {}
+                logger.info(colored(f"initailising file with dict", 'green'))
+                pickle.dump(result, handle)
 
-        # availability_result[CONFIG_NUMBER].append(availability)
-        # with open('./results/failure_durations.pkl', 'wb') as handle:
-        #     pickle.dump(availability_result, handle)
+        if globals.FAULT_RATE not in result:
+            result[globals.FAULT_RATE] = {}
+            result[globals.FAULT_RATE]['duration'] = []
+            result[globals.FAULT_RATE]['timing'] = {}
+
+        result[globals.FAULT_RATE]['duration'].append(availability)
+        # with open(output, 'wb') as handle:
+        #     pickle.dump(result, handle)
 
         # #processing the failure times
         # with open('/resutls/failure_times.pkl', 'rb') as handle:
-        #     failure_result = pickle.load(handle)
+            # failure_result = pickle.load(handle)
         
         # store = failure_result[FAULT_CONFIG]
-        # for time in range(globals.SIMULATION_TIME):
-        #     if time not in store[FAULT_CONFIG]:
-        #         store[FAULT_CONFIG][time] = []
-        #     arr = np.array(failure_times)
-        #     store[time] = (arr < time).sum()
+        for time in range(globals.SIMULATION_TIME):
+            if time not in result[globals.FAULT_RATE]['timing']:
+                result[globals.FAULT_CONFIG]['timing'][time] = []
+            arr = np.array(failure_times)
+            result[globals.FAULT_RATE]['timing'][time].append((arr < time).sum())
         
         # failure_result[FAULT_CONFIG] = store
-        # with open('./results/failure_times.pkl', 'wb') as handle:
-        #     pickle.dump(failure_result, handle)
+        with open(output, 'wb') as handle:
+            pickle.dump(result, handle)
 
 async def start_ftm(application, client_id, msg_monitor, data):
     '''To start initialise the ftm middleware: going from client requirments to
