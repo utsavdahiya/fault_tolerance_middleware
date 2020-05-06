@@ -110,6 +110,10 @@ public class Client {
     private static final BetaDistribution betaDistributionHost = new BetaDistribution(ALPHA, BETA);
     private static final BetaDistribution betaDistributionIndex = new BetaDistribution(ALPHA, BETA);
 
+    static StringBuilder debugRandoms = new StringBuilder();
+    static StringBuilder debugHosts = new StringBuilder();
+    static StringBuilder debugLocations = new StringBuilder();
+
     private static String finishClientID;
     private static/*final*/ CloudSim simulation;
     private static/*final*/ Session currSession;
@@ -172,9 +176,11 @@ public class Client {
             if((int)(eventInfo.getTime()) >= 15){
                 double randomGeneratedForLocation = LOWER_BOUND + (betaDistributionLocation.sample() * (UPPER_BOUND - LOWER_BOUND));
                 //System.out.println(randomGeneratedForLocation + " loc ");
+                debugRandoms.append(randomGeneratedForLocation).append(" ");
                 for(Map.Entry<Integer, Pair> entry : locationThresholdEntrySet){
                     if(randomGeneratedForLocation > entry.getValue().getFirst()){
                         double randomGeneratedForHost = LOWER_BOUND + (betaDistributionHost.sample() * (UPPER_BOUND - LOWER_BOUND));
+                        debugRandoms.append(randomGeneratedForHost).append(" ");
                         //System.out.println(randomGeneratedForHost + " host ");
                         if(randomGeneratedForHost > entry.getValue().getSecond()){
                             int factor = NUMBER_OF_HOSTS / TOTAL_LOCATIONS;
@@ -182,6 +188,7 @@ public class Client {
                             int startIdx = factor * id;
                             int randomHostIndex = (int)(Math.floor(startIdx + (betaDistributionIndex.sample() * factor)));
                             //System.out.println(randomHostIndex + " idx ");
+                            debugRandoms.append(randomHostIndex).append(" ");
                             if(hostList.get(randomHostIndex).getFailedPesNumber() != HOST_PES){
                                 fault.generateHostFault(hostList.get(randomHostIndex));
                             }
@@ -219,7 +226,8 @@ public class Client {
 
             if((int)eventInfo.getTime() == 15){
                 for(Host host : hostList){
-                    System.out.println(host.getVmList().size());
+                    //System.out.println(host.getVmList().size());
+                    debugHosts.append(host.getVmList().size()).append(" ");
                 }
             }
 
@@ -352,6 +360,10 @@ public class Client {
 
         final List<Cloudlet> finishedCloudlets = broker.getCloudletFinishedList();
         new CloudletsTableBuilder(finishedCloudlets).build();
+
+        System.out.println(debugRandoms.toString());
+        System.out.println(debugHosts.toString());
+        System.out.println(debugLocations.toString());
     }
 
     /**
@@ -442,6 +454,8 @@ public class Client {
             int bandwidth = Integer.parseInt(vmConfig.getString("bandwidth"));
             int size = Integer.parseInt(vmConfig.getString("size"));
             int location = vmConfig.getInt("location");
+
+            debugLocations.append(location).append(" ");
 
             Vm vm = new VmSimple(mips, pes)
                     .setRam(ram).setBw(bandwidth).setSize(size)
