@@ -7,7 +7,7 @@
     <output>
         >return
 '''
-from ft_units.ft_unit_base import FtUnit
+from ..ft_units.ft_unit_base import FtUnit
 from termcolor import colored
 
 import logging
