@@ -12,7 +12,7 @@ def initialize_globals(args):
     print("---INITTIALIZING GLOBAL VARS---")
     print(f"Arguements passed: {args}")
 
-    fname = f"../{args}"
+    fname = f"{args}"
     with open(fname) as handle:
         args = json.load(handle)
 
