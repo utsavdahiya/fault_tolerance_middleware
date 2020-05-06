@@ -1,7 +1,7 @@
 """it is an example ft_unit that implements active replication and is reliable"""
 
 from .ft_unit_base import ReplicationStratergy, FaultDetectionStratergy, VmPlacementPolicy ,FtUnit
-from replication_mgr import replica_invoker
+from ..replication_mgr import replica_invoker
 from termcolor import colored
 # from random import choices
 import random

@@ -7,8 +7,8 @@
     <output>
         it returns a list of eligible ft_units
 '''
-from ft_units.ft_unit_base import FtUnit
-from ft_units import reliable
+from ftm.ft_units.ft_unit_base import FtUnit
+from ftm.ft_units import reliable
 from termcolor import colored
 
 import logging

@@ -6,7 +6,7 @@ it performs two functions:
 	>an interface for communication bw all the composition
 	>it also acts as interface bw the ftm and cloudsim
 '''
-
+import sys
 import asyncio
 import aiohttp
 from aiohttp import web
@@ -173,6 +173,7 @@ class MessagingMonitor():
 							# logger.debug(colored(f"a status msg received", 'yellow', 'on_white'))
 							# logger.debug(colored(f"msg: {json.dumps(recvd_msg, indent=2)}"))
 							# data['status'] = recvd_msg
+							sys.exit("exiting ftm")
 							await self.callbacks['on_status'](recvd_msg)
 						elif recvd_msg['desc'] == 'host_allocation':
 							await self.callbacks['on_host_allocation'](recvd_msg)

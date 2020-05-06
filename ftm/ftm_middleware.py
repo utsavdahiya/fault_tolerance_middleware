@@ -1,11 +1,11 @@
 '''FTM middleware that will perform the workings of FTM'''
-from ftm_kernel import service_dir, composition_engine, evaluation_unit
-from replication_mgr import replica_invoker
-from resource_mgr import ResouceManager
-from ft_units import *
-from fault_masking_mgr import FaultMasking
+from .ftm_kernel import service_dir, composition_engine, evaluation_unit
+from .replication_mgr import replica_invoker
+from .resource_mgr import ResouceManager
+from .ft_units import *
+from .fault_masking_mgr import FaultMasking
 
-from server import CONFIG_NUMBER, FAULT_CONFIG
+from ftm.server import CONFIG_NUMBER, FAULT_CONFIG, NUM_LOCATIONS, CONFIG_NUMBER, FAULT_CONFIG, ITERATION, EPOCH, OUTPUT
 
 import pickle
 import numpy as np
@@ -239,7 +239,7 @@ async def start_ftm(application, client_id, msg_monitor, data):
     # example: chosen_unit.repllication_strat = my_stratergy | derived from replication_mgr
     locations = data['locations']
     logger.info(colored(f"chosing locations using vm placement policy", 'blue'))
-    vm_placement = await ftm.ft_unit.vm_placement.place_random(locations,
+    vm_placement = await ftm.ft_unit.vm_placement.place(locations,
                     ftm.ft_unit.replication_strat.num_of_primary,
                     ftm.ft_unit.replication_strat.replica_ratio)
 

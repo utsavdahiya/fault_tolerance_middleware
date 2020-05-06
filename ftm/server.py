@@ -1,11 +1,11 @@
-import ftm_kernel.service_dir
-import ftm_middleware
-import ft_units
-from messaging_monitor import MessagingMonitor
+from ftm import ftm_middleware
+from ftm import ft_units
+from .messaging_monitor import MessagingMonitor
+
 import json
 import asyncio
 from termcolor import colored
-
+import pickle
 import sys
 import nest_asyncio
 nest_asyncio.apply()
@@ -15,9 +15,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-NUM_LOCATIONS = 10
-CONFIG_NUMBER = 1
-FAULT_CONFIG = 1
+
 
 class Client:
     counter = 0
@@ -158,11 +156,40 @@ class Application():
         ftm_instance = self.ftm_dict[client_id]
         await ftm_instance.finish()
 
+def parse_arguments(args):
+    '''
+    Args:
+        args: a list of args containing config file name
+    '''
+    logger.info(colored(f"Arguements passed: {args}"))
+    if len(args) < 2:
+        return
+    fname = f"../run/{args[1]}"
+    with open(fname) as handle:
+        args = json.load(handle)
+
+    if 'NUM_LOCATIONS' in args:
+        global NUM_LOCATIONS
+        NUM_LOCATIONS = args['NUM_LOCATIONS']
+    if 'FAULT_CONFIG' in args:
+        global FAULT_CONFIG
+        FAULT_CONFIG = args['FAULT_CONFIG']
+    if 'CONFIG_NUMBER' in args:
+        global CONFIG_NUMBER
+        CONFIG_NUMBER = args['CONFIG_NUMBER']
+    if 'ITERATION' in args:
+        global ITERATION
+        ITERATION = args['ITERATION']
+    if 'EPOCH' in args:
+        global EPOCH
+        EPOCH = args['EPOCH']
+    if 'OPUTPUT' in args:
+        global OUTPUT
+        OUTPUT = args['OUTPUT']
+
 async def main():
-    print("starting application")
-    logger.info("starting app")
-    logger.info("number of args: ", len(sys.argv))
-    logger.info(colored(f"arguments: {sys.argv}", 'green'))
+    parse_arguments(sys.argv)
+
     tasks = []  #list of tasks to be run concurrently
 
     # unit = ft_units.base.FtUnit("007", "replication", "fault_tolerance")
@@ -204,5 +231,8 @@ async def main():
     # await asyncio.gather(task for task in tasks)
     await asyncio.gather(*tasks)
 
-if __name__=='__main__':
-   asyncio.run(main())
+# if __name__== '__main__':
+#    asyncio.run(main())
+
+def run_main():
+    asyncio.run(main())

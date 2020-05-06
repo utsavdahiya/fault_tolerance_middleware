@@ -2,6 +2,8 @@ import asyncio
 import aiohttp
 import json
 from termcolor import colored
+import multiprocessing
+import sys
 
 import logging
 
@@ -86,17 +88,22 @@ class FtmClient():
         for parameter in self.basic_config:
             self.basic_config[parameter] *= 1.5
 
-async def main():
+async def main(queue):
     client = FtmClient("Hachiko")
     asyncio.create_task(client.connect("http://0.0.0.0:8082/ws"))
     await asyncio.sleep(5)
     cont = input("start an application on the VM?")
 
-    logger.info(colored("starting a application on the VM", 'green'))
-    msg = messages['instantiate_cloudlet']
-    msg['cloudlet'] = [messages['cloudlet']]
-    await client.send_json(msg)
+    # logger.info(colored("starting a application on the VM", 'green'))
+    # msg = messages['instantiate_cloudlet']
+    # msg['cloudlet'] = [messages['cloudlet']]
+    # await client.send_json(msg)
 
-    cont = input("waiting for ftm")
-    
-asyncio.run(main())
+    # cont = input("waiting for ftm")
+    print("waiting for ftm")
+    resp = queue.get()
+    print(f"received: {resp} | Now quitting")
+    sys.exit()
+
+def run_main(queue):
+    asyncio.run(main(queue))
