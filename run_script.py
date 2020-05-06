@@ -97,7 +97,7 @@ def run_main():
             SEED3 += 1
 
         #updating the parameters
-        THRESHOLD2 -= 0.05
+        THRESHOLD2 -= 0.08
 
 if __name__ == '__main__':
     run_main()

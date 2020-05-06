@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle
+import json
 
 def print_duration(fault_rate, List):
     '''
@@ -42,11 +43,13 @@ def main():
     with open(file_name, 'rb') as handle:
         result = pickle.load(handle)
 
-    print(f"result: {result}")
+    print(f"result: {json.dumps(result, indent=2)}")
     #printing one simulation durations
     for fault_rate, record in result.items():
         #displaying fault rate
         print("displaying")
         print_duration(fault_rate, record['duration'])
+
+    print_all_durations(result)
 
 main()
