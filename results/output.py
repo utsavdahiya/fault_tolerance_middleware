@@ -32,6 +32,9 @@ def print_all_durations(data):
 
     plt.plot(data.keys(), duration_mean, 'k-')
     plt.fill_between(data.keys(), duration_min, duration_max, color='blue', alpha=0.2)
+    plt.xlabel("Fault rates")
+    plt.ylabel("Availability")
+    plt.show()
 
 def main():
     file_name = "default_output.pkl"
