@@ -22,7 +22,7 @@ def print_all_durations(data):
     duration_min = []
     duration_max = []
 
-    for fault_rate, record in data:
+    for fault_rate, record in data.items():
         duration_mean.append(np.mean(data[fault_rate]['duration']))
         duration_max.append(np.max(data[fault_rate]['duration']))
         duration_min.append(np.min(data[fault_rate]['duration']))
