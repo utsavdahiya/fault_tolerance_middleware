@@ -30,7 +30,7 @@ def print_all_durations(data):
     duration_max = np.array(duration_max)
     duration_min = np.array(duration_min)
 
-    plt.figure()
+    plt.plot(duration_mean)
 
 def main():
     file_name = "default_output.pkl"
