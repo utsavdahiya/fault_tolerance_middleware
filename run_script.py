@@ -70,6 +70,8 @@ def run_main():
 
     fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
 
+    first_run = True
+
     for iteration in range(NUM_SIMULATION):
         SEED2 = 42
         for epoch in range(EPOCH):
@@ -84,8 +86,10 @@ def run_main():
             settings['ARCH'] = ARCH
             settings['OUTPUT'] = OUTPUT
             settings['NUM_LOCATIONS'] = NUM_LOCATIONS
-            settings['PORT_CLOUD'] = PORT_CLOUD
-            settings['PORT_CLIENT'] = PORT_CLIENT
+            if first_run:
+                first_run = False
+                settings['PORT_CLOUD'] = PORT_CLOUD
+                settings['PORT_CLIENT'] = PORT_CLIENT
 
             with open("ftm.conf", 'w') as handle:
                 print(f"updating ftm.conf: {settings}")
