@@ -15,9 +15,9 @@ def initialize_globals(args):
     print("---INITTIALIZING GLOBAL VARS---")
     print(f"Arguements passed: {args}")
 
-    fname = f"{args}"
-    with open(fname) as handle:
-        args = json.load(handle)
+    # fname = f"{args}"
+    # with open(fname) as handle:
+    #     args = json.load(handle)
 
     if 'NUM_LOCATIONS' in args:
         global NUM_LOCATIONS

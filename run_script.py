@@ -61,6 +61,7 @@ def run_main():
     ARCH = "new"    #can change to "original"
     PORT_CLOUD = '8081'
     PORT_CLIENT = '8082'
+    # CONFIG_FILE = "config1.conf"
 
     THRESHOLD1 = 0.5
     THRESHOLD2 = 0.8
@@ -76,10 +77,12 @@ def run_main():
         SEED2 = 42
         for epoch in range(EPOCH):
             print(f"Iteration: {iteration} | epoch: {epoch}")
-            with open("ftm.conf") as handle:
-                settings = json.load(handle)
+            # with open("ftm.conf") as handle:
+            #     settings = json.load(handle)
             
             fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
+
+            settings = {}
             settings['FAULT_RATE'] = fault_rate
             settings['EPOCH'] = epoch
             settings['SIMULATION_TIME'] = SIMULATION_TIME
@@ -91,10 +94,11 @@ def run_main():
                 settings['PORT_CLOUD'] = PORT_CLOUD
                 settings['PORT_CLIENT'] = PORT_CLIENT
 
-            with open("ftm.conf", 'w') as handle:
-                print(f"updating ftm.conf: {settings}")
-                json.dump(settings, handle)
-            globals.initialize_globals("ftm.conf")            
+            # with open(CONFIG_FILE, '+w') as handle:
+            #     print(f"updating {CONFIG_FILE}: {settings}")
+            #     json.dump(settings, handle)
+            # globals.initialize_globals("ftm.conf")
+            globals.initialize_globals(settings)            
 
             cloud_args = {
                             "threshold1" : str(THRESHOLD1),
