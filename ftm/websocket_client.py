@@ -5,6 +5,8 @@ from termcolor import colored
 import multiprocessing
 import sys
 
+from . import globals
+
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -93,7 +95,8 @@ class FtmClient():
 
 async def main(queue):
     client = FtmClient("Hachiko")
-    asyncio.create_task(client.connect("http://0.0.0.0:8082/ws"))
+    port = globals.PORT_CLIENT
+    asyncio.create_task(client.connect(f"http://0.0.0.0:{port}/ws"))
     await asyncio.sleep(5)
     # cont = input("start an application on the VM?")
 
