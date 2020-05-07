@@ -1,0 +1,7 @@
+//All keys and values should be of String data type
+
+{
+	"desc": "status",
+	"id": "0",
+	"client_id": "id of client"
+}
