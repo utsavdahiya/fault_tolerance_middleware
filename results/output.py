@@ -75,7 +75,7 @@ def print_all_durations(data):
     plt.show()
 
 def main():
-    file_name = "default_output.pkl"
+    file_name = "8 10 0.5 0.5 0.03 New.pkl"
 
     with open(file_name, 'rb') as handle:
         result = pickle.load(handle)
