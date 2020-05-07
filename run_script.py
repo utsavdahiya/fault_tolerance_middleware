@@ -41,7 +41,7 @@ def procedure():
     p3 = multiprocessing.Process(target=client_main, args=(queue,))
     
     p1.start()  #starting server
-    time.sleep(2)
+    time.sleep(7)
     p2.start()  #starting cloud
     time.sleep(4)
     p3.start()  #starting client
@@ -79,6 +79,8 @@ def run_main():
             settings['EPOCH'] = epoch
             settings['SIMULATION_TIME'] = SIMULATION_TIME
             settings['ARCH'] = ARCH
+            settings['OUTPUT'] = OUTPUT
+            settings['NUM_LOCATIONS'] = NUM_LOCATIONS
 
             with open("ftm.conf", 'w') as handle:
                 print(f"updating ftm.conf: {settings}")
