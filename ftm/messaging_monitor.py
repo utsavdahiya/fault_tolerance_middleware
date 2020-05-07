@@ -196,9 +196,10 @@ class MessagingMonitor():
 	async def cloud_setup(self, port: int):
 		'''server for cloudsim'''
 		server_app = web.Application()
-		server_app.add_routes([web.get('/ws', self.cloud_websocket_handler),
-                    web.get('/', self.cloud_get_handler),
-                    web.post('/post', self.cloud_post_handler)])
+		# server_app.add_routes([web.get('/ws', self.cloud_websocket_handler),
+        #             web.get('/', self.cloud_get_handler),
+        #             web.post('/post', self.cloud_post_handler)])
+		server_app.add_routes([web.get('/ws', self.cloud_websocket_handler)])
 		logger.info(colored(f"cloud_server starting at {port}", 'yellow'))
 		web.run_app(server_app, port = port)
 		logger.info("-----------------does this line ever print??------------")
@@ -207,8 +208,7 @@ class MessagingMonitor():
 		'''server for the client to connect to'''
 		logger.info(f"req to start client server at {port}")
 		client_app = web.Application()
-		client_app.add_routes([web.get('/ws', self.client_websocket_handler),
-							web.get('/', self.client_get)])
+		client_app.add_routes([web.get('/ws', self.client_websocket_handler)])
 		logger.info(f"client_server starting at {port}")
 		web.run_app(client_app, port = port)
 
