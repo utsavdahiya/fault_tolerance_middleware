@@ -17,6 +17,37 @@ def print_duration(fault_rate, List):
     # fig.savefig(f"fault_{fault_rate}_.png")
     plt.show()
 
+def print_timing(fault_rate, record):
+    '''
+    Args:
+        record : {
+            0: [],
+            1: [],
+            .
+            .
+            SIMULATION_TIME: []
+        }
+    '''
+    timing_mean = []
+    timing_min = []
+    timing_max = []
+
+    for time, observations in record.items():
+        timing_mean.append(np.mean(observations))
+        timing_max.append(np.max(observations))
+        timing_min.append(np.min(observations))
+
+    timing_mean = np.array(timing_mean)
+    timing_max = np.array(timing_max)
+    timing_min = np.array(timing_min)
+
+    y = np.arange(1)
+    plt.plot(list(record.keys()), timing_mean, 'k-')
+    plt.fill_between(list(record.keys()), timing_min, timing_max, color='red', alpha=0.3)
+    plt.xlabel("Time (s)")
+    plt.ylabel("Num of Failures (cumulative)")
+    plt.show()
+
 def print_all_durations(data):
     duration_mean = []
     duration_min = []
@@ -31,7 +62,7 @@ def print_all_durations(data):
     duration_max = np.array(duration_max)
     duration_min = np.array(duration_min)
 
-    duration_mean.transpose
+    # duration_mean.transpose
 
     # print(f"len data: {len(data.keys())} | type: {type(data.keys())} | shape: {np.array(data.keys()).shape()}")
     print(f"data.keys(): {data.keys()}")
@@ -56,6 +87,8 @@ def main():
         #displaying fault rate
         print("displaying")
         print_duration(fault_rate, record['duration'])
+
+        print_timing(fault_rate, record['timing'])
 
     print_all_durations(result)
 
