@@ -41,9 +41,9 @@ def procedure():
     p3 = multiprocessing.Process(target=client_main, args=(queue,))
     
     p1.start()  #starting server
-    time.sleep(7)
-    p2.start()  #starting cloud
     time.sleep(4)
+    p2.start()  #starting cloud
+    time.sleep(7)
     p3.start()  #starting client
     p1.join()
     queue.put("quit")
