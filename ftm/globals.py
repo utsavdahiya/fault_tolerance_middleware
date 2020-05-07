@@ -7,6 +7,8 @@ ITERATION = 1
 EPOCH = 1
 SIMULATION_TIME = 40
 ARCH = "new"
+PORT_CLOUD = '80801'
+PORT_CLIENT = '8082'
 OUTPUT = "./results/default_output.pkl"
 
 def initialize_globals(args):
@@ -32,7 +34,7 @@ def initialize_globals(args):
     if 'EPOCH' in args:
         global EPOCH
         EPOCH = args['EPOCH']
-    if 'OPUTPUT' in args:
+    if 'OUTPUT' in args:
         global OUTPUT
         OUTPUT = args['OUTPUT']
     if 'SIMULATION_TIME' in args:
@@ -41,3 +43,9 @@ def initialize_globals(args):
     if 'ARCH' in args:
         global ARCH
         ARCH = args['ARCH']
+    if 'PORT_CLOUD' in args:
+        global PORT_CLOUD
+        PORT_CLOUD = args['PORT_CLOUD']
+    if 'PORT_CLIENT' in args:
+        global PORT_CLIENT
+        PORT_CLIENT = args['PORT_CLIENT']

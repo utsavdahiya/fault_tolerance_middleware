@@ -58,6 +58,8 @@ def run_main():
     OUTPUT = "./results/default_output.pkl"
     SIMULATION_TIME = 38
     ARCH = "new"    #can change to "original"
+    PORT_CLOUD = '8081'
+    PORT_CLIENT = '8082'
 
     THRESHOLD1 = 0.5
     THRESHOLD2 = 0.8
@@ -81,6 +83,8 @@ def run_main():
             settings['ARCH'] = ARCH
             settings['OUTPUT'] = OUTPUT
             settings['NUM_LOCATIONS'] = NUM_LOCATIONS
+            settings['PORT_CLOUD'] = PORT_CLOUD
+            settings['PORT_CLIENT'] = PORT_CLIENT
 
             with open("ftm.conf", 'w') as handle:
                 print(f"updating ftm.conf: {settings}")

@@ -179,7 +179,7 @@ async def main():
     app.msg_monitor.callbacks['on_finish'] = app.on_finish
 
     #initialising server where you can send requests
-    cloud_side_port = "8081"   #set port number to where you want to send requests
+    cloud_side_port = globals.PORT_CLOUD   #set port number to where you want to send requests
     tasks.append(asyncio.create_task(app.msg_monitor.cloud_setup(cloud_side_port)))
     '''my server is now running and can handle your requests at:
         get_req: /
@@ -194,7 +194,7 @@ async def main():
 
     #starting client websocket server
     # app['client_websockets'] = {}   #dict to store client sessions
-    client_side_port = '8082'   #port where clients would connect
+    client_side_port = globals.PORT_CLIENT   #port where clients would connect
     tasks.append(asyncio.create_task(app.msg_monitor.client_setup(client_side_port)))   #starting server where client can connect to
 
     # tasks.append(asyncio.create_task(app.msg_monitor.test_server()))
