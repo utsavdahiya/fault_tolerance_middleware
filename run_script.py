@@ -3,6 +3,7 @@ from ftm.websocket_client import run_main as client_main
 from ftm import globals
 # from ftm.test_cloud import run_main as cloud_main
 
+from termcolor import colored
 import subprocess, shlex
 import multiprocessing
 import time
@@ -47,10 +48,13 @@ def procedure():
     time.sleep(7)
     p3.start()  #starting client
     p1.join()
+    print("xxxxxxxxxxxxxx FTM finished xxxxxxxxxxxxxxxxx")
     queue.put("quit")
     print("p1 finished")
-    p2.join()
     p3.join()
+    print("xxxxxxxxxxxxxx Client finished xxxxxxxxxxxxx")
+    p2.join()
+    print("xxxxxxxxxxxxxx CloudSim finished xxxxxxxxxxxxxx")
 
 def run_main():
     NUM_SIMULATION = 4
@@ -114,7 +118,7 @@ def run_main():
 
             procedure()
 
-            print(f"\n\n\n\n--------------------------------------EPOCH COMPLETED-----------------------------------\n\n\n")
+            print(colored(f"\n\n\n\n-----------------------------EPOCH COMPLETED---------------------------\n\n\n", 'green'))
             time.sleep(4)
             SEED1 += 1
             SEED2 += 1
