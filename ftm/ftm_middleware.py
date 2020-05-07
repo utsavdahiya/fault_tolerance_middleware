@@ -208,7 +208,7 @@ class FTM:
         with open(output, 'wb') as handle:
             pickle.dump(result, handle)
 
-        logger.info(colored("---------------EXITING SERVER---------------------", 'magenta'))
+        logger.info(colored("\n\n\n\n---------------EXITING SERVER---------------------\n\n\n\n", 'magenta'))
         sys.exit()
 
 async def start_ftm(application, client_id, msg_monitor, data):
