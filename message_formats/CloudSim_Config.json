@@ -1,0 +1,10 @@
+//All keys and values should be of String data type
+
+{
+	"threshold1" : "0.5",
+	"threshold2" : "0.8",
+	"seed1" : "42",
+	"seed2" : "42",
+	"seed3" : "42",
+	"port" : "8081"
+}

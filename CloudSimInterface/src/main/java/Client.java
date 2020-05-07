@@ -31,6 +31,8 @@ import org.cloudsimplus.listeners.VmHostEventInfo;
 import org.glassfish.tyrus.client.ClientManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.websocket.*;
 import java.io.*;
@@ -53,7 +55,7 @@ import java.util.logging.Logger;
 /**
  * This class acts as the Client Endpoint for the websocket connection and handles all communication.
  * It also describes an interface which sends any data required by FTM such as the current parameters
- *     of the VMs and handles all requests such as creating another VM and allocating resources to it.
+ * of the VMs and handles all requests such as creating another VM and allocating resources to it.
  */
 @ClientEndpoint
 public class Client {
@@ -77,10 +79,17 @@ public class Client {
         //latch.countDown();
     }
 
+    /**
+     * Constants related to the websocket connection.
+     */
     private Logger logger = Logger.getLogger(this.getClass().getName());
     public static CountDownLatch latch;
     private static Queue<String> messageQueue = new LinkedList<>();
+    private static String port;
 
+    /**
+     * Constants related to Cloud Architecture configuration.
+     */
     private static final int HOST_PES = 10; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE.
     private static final int SCHEDULING_INTERVAL = 1; // Random number as of now, TODO: Discuss. DONE.
     private static final int NUMBER_OF_HOSTS = 50; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE
@@ -88,11 +97,17 @@ public class Client {
     private static final int TOTAL_LOCATIONS = 10; //Random number as of now.
     private static JSONArray locations;
 
+    /**
+     * Constants related to injection of faults (needed by CloudSim).
+     */
     private static HostFaultInjection fault;
     //private static int count = 0;
     private static PoissonDistr poisson;
     private static final double MEAN_FAILURE_NUMBER_PER_HOUR = 0;
 
+    /**
+     * Constants related to generation of faults (needed by our program).
+     */
     private static final double LOWER_BOUND = 0.0;
     private static final double UPPER_BOUND = 1.0;
     private static final HashMap<Integer, Pair> locationThreshold = new HashMap<>();
@@ -109,11 +124,22 @@ public class Client {
     private static final BetaDistribution betaDistributionLocation = new BetaDistribution(ALPHA, BETA);
     private static final BetaDistribution betaDistributionHost = new BetaDistribution(ALPHA, BETA);
     private static final BetaDistribution betaDistributionIndex = new BetaDistribution(ALPHA, BETA);
+    private static String threshold1FromCMD;
+    private static String threshold2FromCMD;
+    private static String seed1FromCMD;
+    private static String seed2FromCMD;
+    private static String seed3FromCMD;
 
+    /**
+     * Constants related to debugging.
+     */
     static StringBuilder debugRandoms = new StringBuilder();
     static StringBuilder debugHosts = new StringBuilder();
     static StringBuilder debugLocations = new StringBuilder();
 
+    /**
+     * Variables related to working of CloudSim.
+     */
     private static String finishClientID;
     private static/*final*/ CloudSim simulation;
     private static/*final*/ Session currSession;
@@ -130,8 +156,18 @@ public class Client {
     private static BiFunction<VmAllocationPolicy, Vm, Optional<Host>> findHostForVm;
     private static EventListener<VmHostEventInfo> hostAllocationListener;
 
+    /**
+     *  Variables related to parsing of argument file.
+     */
+    private static JSONParser jsonParser = new JSONParser();
+
     //vm.setID() -> For location
     //vm.setDescription() -> For Client ID
+
+    /**
+     * vm.setID() -> For location
+     * vm.setDescription() -> For Client ID
+     */
 
     public static void main(String[] args) {
         //latch = new CountDownLatch(1);
@@ -277,7 +313,19 @@ public class Client {
             }
         };
 
-        File file = new File(args[0]);
+        try{
+            org.json.simple.JSONObject obj = (org.json.simple.JSONObject) jsonParser.parse(new FileReader(args[0]));
+            threshold1FromCMD = (String) obj.get("threshold1");
+            threshold2FromCMD = (String) obj.get("threshold2");
+            seed1FromCMD = (String) obj.get("seed1");
+            seed2FromCMD = (String) obj.get("seed2");
+            seed3FromCMD = (String) obj.get("seed3");
+            port = (String) obj.get("port");
+        }catch (IOException | ParseException e){
+            e.printStackTrace();
+        }
+
+        /*File file = new File(args[0]);
         String arguments = "";
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -293,13 +341,14 @@ public class Client {
         String[] argsArray = arguments.split(" ");
         for(String str : argsArray){
             System.out.print(str + " ");
-        }
-        betaDistributionLocation.reseedRandomGenerator(Long.parseLong(argsArray[2]));
-        betaDistributionHost.reseedRandomGenerator(Long.parseLong(argsArray[3]));
-        betaDistributionIndex.reseedRandomGenerator(Long.parseLong(argsArray[4]));
+        }*/
+
+        betaDistributionLocation.reseedRandomGenerator(Long.parseLong(seed1FromCMD));
+        betaDistributionHost.reseedRandomGenerator(Long.parseLong(seed2FromCMD));
+        betaDistributionIndex.reseedRandomGenerator(Long.parseLong(seed3FromCMD));
 
         for(int i = 0; i < TOTAL_LOCATIONS; i++) {
-            locationThreshold.put(i, new Pair(Double.parseDouble(argsArray[0]), Double.parseDouble(argsArray[1])));
+            locationThreshold.put(i, new Pair(Double.parseDouble(threshold1FromCMD), Double.parseDouble(threshold2FromCMD)));
         }
 
         locationThresholdEntrySet = locationThreshold.entrySet();
@@ -307,7 +356,9 @@ public class Client {
         ClientManager client = ClientManager.createClient();
         try {
             //System.out.println("yolo1");
-            currSession = client.connectToServer(Client.class, new URI("ws://localhost:8081/ws"));
+            //currSession = client.connectToServer(Client.class, new URI("ws://localhost:8081/ws"));
+            String url = "ws://localhost:" + port + "/ws";
+            currSession = client.connectToServer(Client.class, new URI(url));
             System.out.println(currSession.getId());
             locations = new JSONArray();
             for(int i = 0; i < TOTAL_LOCATIONS; i++){
