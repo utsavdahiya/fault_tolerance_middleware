@@ -101,7 +101,7 @@ def run_main():
                             "port" : PORT_CLOUD
                         }
             with open("CloudSim_Config.json", 'w') as handle:
-                print(f"updating CloudSim_Conf: {json.dump(cloud_args, indent=2)}")
+                print(f"updating CloudSim_Conf: {json.dumps(cloud_args, indent=2)}")
                 json.dump(cloud_args, handle, indent=2)
 
             procedure()
