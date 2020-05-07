@@ -1,0 +1,7 @@
+//All keys and values should be of String data type
+
+{
+	"desc": "instantiate_vm",
+	"client_id": "0",
+	"VM": [],
+}

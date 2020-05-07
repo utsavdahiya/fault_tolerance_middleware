@@ -1,0 +1,21 @@
+//All keys and values are of String data type, condition can be working or failed.
+
+{
+    "desc": "status",
+    "client_id": "id of client",
+    "vm_id": "id of vm",
+	"allocated_bandwidth":"10000", 
+    "available_bandwidth":"10000",
+    "capacity_bandwidth":"20000",
+    "current_requested_bandwidth":"20000",
+    "cpu_percent_utilization":"80",
+    "current_requested_total_mips":"500",
+    "allocated_ram":"4096",
+    "available_ram":"8192",
+    "capacity_ram":"8192",
+    "current_requested_ram":"8192",
+    "allocated_storage":"12800",
+    "available_storage":"25600",
+    "capacity_storage":"25600",
+    "condition":"working"
+}
