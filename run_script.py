@@ -29,7 +29,8 @@ def procedure():
     queue = multiprocessing.Queue()
     cmd2 = "python server.py arg1 arg2 arg 3"
     classname = "Client"
-    arguments = "/home/uday-vig/fault_tolerance_middleware/CloudSim_Conf"
+    # arguments = "/home/uday-vig/fault_tolerance_middleware/CloudSim_Conf"
+    arguments = "/home/uday-vig/fault_tolerance_middleware/CloudSim_Config.json"
     cmd3 = f'mvn exec:java -f CloudSimInterface/ -Dexec.mainClass={classname} -Dexec.args="{arguments}"'
     # cmd3 = f"mvn exec:java -Dexec.mainClass={classname} -Dexec.args={arguments}"
     cmd4 = "python websocket_client.py"
@@ -91,10 +92,17 @@ def run_main():
                 json.dump(settings, handle)
             globals.initialize_globals("ftm.conf")            
 
-            cloud_args = f"{THRESHOLD1} {THRESHOLD2} {SEED1} {SEED2} {SEED3}"
-            with open("CloudSim_Conf", 'w+t') as handle:
-                print(f"updating CloudSim_Conf: {cloud_args}")
-                handle.write(cloud_args)
+            cloud_args = {
+                            "threshold1" : str(THRESHOLD1),
+                            "threshold2" : str(THRESHOLD2),
+                            "seed1" : str(SEED1),
+                            "seed2" : str(SEED2),
+                            "seed3" : str(SEED3),
+                            "port" : PORT_CLOUD
+                        }
+            with open("CloudSim_Config.json", 'w') as handle:
+                print(f"updating CloudSim_Conf: {json.dump(cloud_args, indent=2)}")
+                json.dump(cloud_args, handle, indent=2)
 
             procedure()
 
