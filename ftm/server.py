@@ -156,6 +156,7 @@ class Application():
         client_id = data['client_id']
         ftm_instance = self.ftm_dict[client_id]
         await ftm_instance.finish()
+        sys.exit()
 
 
 async def main():
