@@ -3,14 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="74182473-e4f4-4de9-bc2c-f046aec36f17" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Client.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../CloudSim_Conf" beforeDir="false" afterPath="$PROJECT_DIR$/../CloudSim_Conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ftm.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../ftm.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../message_formats/finish.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../results/default_output.pkl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../results/output.py" beforeDir="false" afterPath="$PROJECT_DIR$/../results/output.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

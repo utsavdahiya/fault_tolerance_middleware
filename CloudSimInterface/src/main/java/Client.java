@@ -238,9 +238,9 @@ public class Client {
                 fault.generateHostFault(hostList.get(randomHostIndex));
             }*/
 
-            while(!messageQueue.isEmpty()) {
+            while(messageQueue != null && !messageQueue.isEmpty()) {
                 String receivedMessage = getRecMessage();
-                if(receivedMessage.length() != 0){
+                if(receivedMessage != null && !receivedMessage.isEmpty()){
                     //System.out.println("yolo9");
                     JSONObject obj = new JSONObject(receivedMessage);
                     parseAndRoute(obj);
@@ -994,7 +994,7 @@ public class Client {
     public static String getRecMessage() {
         //System.out.println("yolo6");
         String send = "";
-        if(!messageQueue.isEmpty()){
+        if(messageQueue != null && !messageQueue.isEmpty()){
             send = messageQueue.poll();
         }
         return send;
