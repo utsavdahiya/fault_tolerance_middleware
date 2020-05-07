@@ -17,6 +17,7 @@ from prettytable import PrettyTable
 from termcolor import colored
 import asyncio
 import json
+from timeit import default_timer
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -42,6 +43,7 @@ class FTM:
         self.all_VMs = {}   #a dict of all VMs <vm_id: vm_obj>
         self.VMs = []   #a list of VMs asked by client [{primary_vm_id: [list of replica VMs]}]
         self.availability = {}  #dict to calc availability <primary_vm_id: bitarray>
+        self.simulation_start_time = default_timer() + 9
         # self.SIMULATION_TIME = 40
 
         asyncio.create_task(self.setup())
@@ -156,7 +158,7 @@ class FTM:
             for failure in stat[1:]:
                 duration = failure.end - failure.start
                 failure_durations.append(duration)
-                failure_times.append(failure.start)
+                failure_times.append(failure.start - self.simulation_start_time)
                 table.add_row([primary_vm, duration])
                 total_duration += duration
 
