@@ -13,7 +13,7 @@ command = "python test.py"
 def subprocess_cmd(command, cwd=None, **kwargs):
     if 'queue' in kwargs:
         queue = kwargs['queue']
-    process = subprocess.Popen(command.split(), cwd=cwd, stdout=subprocess.PIPE)
+    process = subprocess.Popen(command.split(), cwd=cwd, stdout=subprocess.PIPE, text=True)
     # output = process.stdout
     # error = process.stderr
     output, error = process.communicate()
