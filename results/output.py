@@ -77,7 +77,7 @@ def print_all_durations(data):
     plt.show()
 
 def main():
-    file_name = "8-10-0.5-0.9-0.03-Old-10.pkl"
+    file_name = "output-simulation-1.pkl"
 
     with open(file_name, 'rb') as handle:
         result = pickle.load(handle)
