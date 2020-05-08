@@ -60,18 +60,18 @@ def procedure():
     print("xxxxxxxxxxxxxx CloudSim finished xxxxxxxxxxxxxx")
 
 def run_main():
-    NUM_SIMULATION = 1
-    EPOCH = 3
-    NUM_LOCATIONS = 5
-    OUTPUT = "./results/def.pkl"
+    NUM_SIMULATION = 8
+    EPOCH = 10
+    NUM_LOCATIONS = 10
+    OUTPUT = "./results/OutputUday9.pkl"
     SIMULATION_TIME = 38
-    ARCH = "new"    #can change to "original"
+    ARCH = "original"    #can change to "original"
     PORT_CLOUD = '8083'
     PORT_CLIENT = '8084'
     # CONFIG_FILE = "config1.conf"
 
     THRESHOLD1 = 0.5
-    THRESHOLD2 = 0.7
+    THRESHOLD2 = 0.9
     SEED1 = 42
     SEED2 = 42
     SEED3 = 42
