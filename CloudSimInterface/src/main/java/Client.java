@@ -1,4 +1,5 @@
 import org.apache.commons.math3.distribution.BetaDistribution;
+import org.apache.commons.math3.distribution.UniformRealDistribution;
 import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicy;
 import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicySimple;
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
@@ -125,6 +126,8 @@ public class Client {
     private static final BetaDistribution betaDistributionHost = new BetaDistribution(ALPHA, BETA);
     private static final BetaDistribution betaDistributionIndex = new BetaDistribution(ALPHA, BETA);
     private static final BetaDistribution betaDistributionWholeLocation = new BetaDistribution(ALPHA, BETA);
+    private static final UniformRealDistribution uniformDistribution = new UniformRealDistribution();
+    private static final UniformRealDistribution uniformDistributionAllocation = new UniformRealDistribution();
     private static String threshold1FromCMD;
     private static String threshold2FromCMD;
     private static String seed1FromCMD;
@@ -214,7 +217,7 @@ public class Client {
             }
 
             if((int)(eventInfo.getTime()) >= 15){
-                double randomGeneratedForLocation = LOWER_BOUND + (betaDistributionLocation.sample() * (UPPER_BOUND - LOWER_BOUND));
+                /*double randomGeneratedForLocation = LOWER_BOUND + (betaDistributionLocation.sample() * (UPPER_BOUND - LOWER_BOUND));
                 //System.out.println(randomGeneratedForLocation + " loc ");
                 debugRandoms.append(randomGeneratedForLocation).append(" ");
                 for(Map.Entry<Integer, Pair> entry : locationThresholdEntrySet){
@@ -234,8 +237,14 @@ public class Client {
                             }
                         }
                     }
-                }
+                }*/
 
+                for(Host host : hostList) {
+                    double randomNumber = uniformDistribution.sample();
+                    if (randomNumber > Double.parseDouble(threshold1FromCMD)) {
+                        fault.generateHostFault(host);
+                    }
+                }
             }
 
             /*if(randomGenerated > THRESHOLD && (int)(eventInfo.getTime()) >= 15){
@@ -338,7 +347,7 @@ public class Client {
                 }
                 port = (String) params.get("port");
             }else if(run == 1){
-                org.json.simple.JSONObject params = (org.json.simple.JSONObject) arr.get(1);
+                org.json.simple.JSONObject params = (org.json.simple.JSONObject) arr.get(0);
                 numHosts = Integer.parseInt((String) params.get("num_hosts"));
                 threshold1FromCMD = (String) params.get("threshold1");
                 threshold2FromCMD = (String) params.get("threshold2");
@@ -375,16 +384,19 @@ public class Client {
             System.out.print(str + " ");
         }*/
 
-        betaDistributionLocation.reseedRandomGenerator(Long.parseLong(seed1FromCMD));
+        /*betaDistributionLocation.reseedRandomGenerator(Long.parseLong(seed1FromCMD));
         betaDistributionHost.reseedRandomGenerator(Long.parseLong(seed2FromCMD));
         betaDistributionIndex.reseedRandomGenerator(Long.parseLong(seed3FromCMD));
-        betaDistributionWholeLocation.reseedRandomGenerator(Long.parseLong(seed4FromCMD));
+        betaDistributionWholeLocation.reseedRandomGenerator(Long.parseLong(seed4FromCMD));*/
 
-        for(int i = 0; i < numLocations; i++) {
+        uniformDistribution.reseedRandomGenerator(Long.parseLong(seed1FromCMD));
+        uniformDistributionAllocation.reseedRandomGenerator(Long.parseLong(seed2FromCMD));
+
+        /*for(int i = 0; i < numLocations; i++) {
             locationThreshold.put(i, new Pair(Double.parseDouble(threshold1FromCMD), Double.parseDouble(threshold2FromCMD)));
-        }
+        }*/
 
-        if(numLocationsDown != 0){
+        /*if(numLocationsDown != 0){
             for(int i = 0; i < numLocationsDown; i++){
                 int locationDownIdx = (int)(Math.floor((betaDistributionWholeLocation.sample() * numLocations)));
                 if(locationDownIdx == numLocations){
@@ -394,9 +406,9 @@ public class Client {
                 pair.second = 0.1;
                 locationThreshold.put(locationDownIdx, pair);
             }
-        }
+        }*/
 
-        locationThresholdEntrySet = locationThreshold.entrySet();
+        //locationThresholdEntrySet = locationThreshold.entrySet();
 
         ClientManager client = ClientManager.createClient();
         try {
@@ -476,7 +488,7 @@ public class Client {
             int factor = numHosts / numLocations;
             int id = (int)(vm.getId());
             int startIdx = factor * id;
-            int min = Integer.MAX_VALUE;
+            /*int min = Integer.MAX_VALUE;
             Host rv = null;
             for(int i = startIdx; i < startIdx + factor; i++){
                 Host host = hostList.get(i);
@@ -486,7 +498,9 @@ public class Client {
                 }
             }
 
-            return rv != null ? Optional.of(rv) : Optional.empty();
+            return rv != null ? Optional.of(rv) : Optional.empty();*/
+            int randomHostIndex = (int)(Math.floor(startIdx + (uniformDistributionAllocation.sample() * factor)));
+            return Optional.of(hostList.get(randomHostIndex));
         };
 
         VmAllocationPolicySimple vmAllocationPolicy = new VmAllocationPolicySimple();
