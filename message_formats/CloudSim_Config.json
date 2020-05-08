@@ -6,5 +6,8 @@
 	"seed1" : "42",
 	"seed2" : "42",
 	"seed3" : "42",
+	"seed4" : "42",
+	"num_locations" : "10",
+	"num_locations_down" : "1",
 	"port" : "8081"
 }
