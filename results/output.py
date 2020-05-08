@@ -85,7 +85,8 @@ def print_timing(fault_rate, record, **kwargs):
         }
     '''
     ax = kwargs.get('ax', None)
-    label = kwargs.get('label', None)
+    label = kwargs.get('label', '')
+    color = kwargs.get('color', 'red')
     
     timing_mean = []
     timing_min = []
@@ -103,15 +104,21 @@ def print_timing(fault_rate, record, **kwargs):
     y = np.arange(1)
     if ax is None:
         fig, ax = plt.subplots()
-    ax.plot(list(record.keys()), timing_mean, 'k-')
-    ax.fill_between(list(record.keys()), timing_min, timing_max, color='red', alpha=0.3)
+    ax.plot(list(record.keys()), timing_mean, 'k-', label=label)
+    ax.fill_between(list(record.keys()), timing_min, timing_max, color=color, alpha=0.3)
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Num of Failures (cumulative)")
     ax.grid()
-    if label is None:
+    if label is '':
         plt.show()
+    else:
+        return ax
 
-def print_all_durations(data):
+def print_all_durations(data, **kwargs):
+    ax = kwargs.get('ax', None)
+    label = kwargs.get('label', '')
+    color = kwargs.get('color', 'blue')
+
     duration_mean = []
     duration_min = []
     duration_max = []
@@ -130,16 +137,21 @@ def print_all_durations(data):
     # duration_mean.transpose
 
     # print(f"len data: {len(data.keys())} | type: {type(data.keys())} | shape: {np.array(data.keys()).shape()}")
-    print(f"data.keys(): {data.keys()}")
+    # print(f"data.keys(): {data.keys()}")
     # print(f"len mean: {len(duration_mean)}| type: {type(duration_mean)} | shape: {duration_mean.shape()}")
-    print(f"duration_mean: {duration_mean}")
-    plt.plot(list(data.keys()), duration_mean, 'k-')
-    plt.fill_between(list(data.keys()), duration_min, duration_max, color='blue', alpha=0.3)
-    plt.xlabel("Fault rates")
-    plt.ylabel("Availability")
-    plt.title(f"Mean val: {mean_val}")
-    plt.grid()
-    plt.show()
+    # print(f"duration_mean: {duration_mean}")
+    if ax is None:
+        fig, ax = plt.subplots()
+    ax.plot(list(data.keys()), duration_mean, 'k-', label=label, color=color)
+    ax.fill_between(list(data.keys()), duration_min, duration_max, color=color, alpha=0.3)
+    ax.set_xlabel("Fault rates")
+    ax.set_ylabel("Availability")
+    ax.set_title(f"Mean val: {mean_val}")
+    ax.grid()
+    if label is '':
+        plt.show()
+    else:
+        return ax
 
 def print_comparision(file1, file2):
     with open(file1, 'rb') as handle:
@@ -151,21 +163,28 @@ def print_comparision(file1, file2):
     fig, axs = plt.subplots(len(result1.keys()), 2, figsize=(18, 40))
     
     i = 0
-    for fault_rate in result1.keys():
-        axs[i, 0] = print_duration(fault_rate, result1[fault_rate]['duration'], ax=axs[i, 0], label=f"new | mean:{np.array(result1[fault_rate]['duration']).mean()}")
-        axs[i, 0] = print_duration(fault_rate, result2[fault_rate]['duration'], ax=axs[i, 0], label=f"old | mean:{np.array(result2[fault_rate]['duration']).mean()}")
+    for fault_rate1, fault_rate2 in zip(result1.keys(), result2.keys()):
+        axs[i, 0] = print_duration(fault_rate1, result1[fault_rate1]['duration'], ax=axs[i, 0], label=f"new | mean:{np.array(result1[fault_rate1]['duration']).mean()}")
+        axs[i, 0] = print_duration(fault_rate2, result2[fault_rate2]['duration'], ax=axs[i, 0], label=f"old | mean:{np.array(result2[fault_rate2]['duration']).mean()}")
         axs[i, 0].legend()
 
-        axs[i, 1] = print_timing(fault_rate, result1[fault_rate]['timing'], ax=axs[i, 1], label=f"New")
-        axs[i, 1] = print_timing(fault_rate, result2[fault_rate]['timing'], ax=axs[i, 1], label=f"Old")
+        axs[i, 1] = print_timing(fault_rate1, result1[fault_rate1]['timing'], ax=axs[i, 1], label=f"New", color='green')
+        axs[i, 1] = print_timing(fault_rate2, result2[fault_rate2]['timing'], ax=axs[i, 1], label=f"Old", color ='red')
         axs[i, 1].legend()
         i += 1
 
-    a = ScrollableWindow(fig)
+    fig2, ax = plt.subplots(figsize=(18,40))
+    ax = print_all_durations(result1, ax=ax, label="New", color='green')
+    ax = print_all_durations(result2, ax=ax, label="Old", color='red')
+    ax.legend()
+    plt.show()
+    
+    # a = ScrollableWindow(fig)
+
 
 def main():
-    file1 = "output-simulation-1.pkl"   #new
-    file2 = "output-simulation-old-2.pkl"   #old
+    file1 = "output-simulation-4.pkl"   #new
+    file2 = "output-simulation-5.pkl"   #old
 
     # with open(file1, 'rb') as handle:
     #     result = pickle.load(handle)
