@@ -17,7 +17,7 @@ def subprocess_cmd(command, cwd=None, **kwargs):
     # output = process.stdout
     # error = process.stderr
     output, error = process.communicate()
-    # print(f"output: {output} \nerror: {error}")
+    print(f"output: {output} \nerror: {error}")
 
 # def subprocess_cmd(command):
 #     process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
