@@ -1,13 +1,28 @@
 //All keys and values should be of String data type
 
 {
-	"threshold1" : "0.5",
-	"threshold2" : "0.8",
-	"seed1" : "42",
-	"seed2" : "42",
-	"seed3" : "42",
-	"seed4" : "42",
-	"num_locations" : "10",
-	"num_locations_down" : "1",
-	"port" : "8081"
+	"run": "0",
+	"array": [{
+		"num_hosts": "70",
+		"threshold1": "0.5",
+		"threshold2": "0.8",
+		"seed1": "42",
+		"seed2": "42",
+		"seed3": "42",
+		"seed4": "42",
+		"num_locations": "10",
+		"num_locations_down": "1",
+		"port": "8081"
+	}, {
+		"num_hosts": "70",
+		"threshold1": "0.5",
+		"threshold2": "0.8",
+		"seed1": "42",
+		"seed2": "42",
+		"seed3": "42",
+		"seed4": "42",
+		"num_locations": "10",
+		"num_locations_down": "1",
+		"port": "8081"
+	}]
 }

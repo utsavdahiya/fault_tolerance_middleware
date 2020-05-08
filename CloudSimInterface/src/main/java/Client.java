@@ -92,9 +92,9 @@ public class Client {
      */
     private static final int HOST_PES = 10; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE.
     private static final int SCHEDULING_INTERVAL = 1; // Random number as of now, TODO: Discuss. DONE.
-    private static final int NUMBER_OF_HOSTS = 50; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE
+    private static int numHosts; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE
     private static final int TIME_TILL_TERMINATION = 40; // Random time as of now, very big time as discussed
-    private static final int TOTAL_LOCATIONS = 10; //Random number as of now.
+    private static int numLocations; //Random number as of now.
     private static JSONArray locations;
 
     /**
@@ -124,11 +124,15 @@ public class Client {
     private static final BetaDistribution betaDistributionLocation = new BetaDistribution(ALPHA, BETA);
     private static final BetaDistribution betaDistributionHost = new BetaDistribution(ALPHA, BETA);
     private static final BetaDistribution betaDistributionIndex = new BetaDistribution(ALPHA, BETA);
+    private static final BetaDistribution betaDistributionWholeLocation = new BetaDistribution(ALPHA, BETA);
     private static String threshold1FromCMD;
     private static String threshold2FromCMD;
     private static String seed1FromCMD;
     private static String seed2FromCMD;
     private static String seed3FromCMD;
+    private static String seed4FromCMD;
+    private static int numLocationsDown;
+    private static int run;
 
     /**
      * Constants related to debugging.
@@ -145,7 +149,7 @@ public class Client {
     private static/*final*/ Session currSession;
     private static/*final*/ DatacenterBroker broker;
     private static/*final*/ Datacenter datacenter;
-    static final List<Host> hostList = new ArrayList<>(NUMBER_OF_HOSTS);
+    static final List<Host> hostList = new ArrayList<>(numHosts);
     private static final List<Vm> vmList = new ArrayList<>();
     private static List<Vm> unchangedList = new ArrayList<>();
     private static HashMap<Integer, Integer> idMap = new HashMap<>();
@@ -219,7 +223,7 @@ public class Client {
                         debugRandoms.append(randomGeneratedForHost).append(" ");
                         //System.out.println(randomGeneratedForHost + " host ");
                         if(randomGeneratedForHost > entry.getValue().getSecond()){
-                            int factor = NUMBER_OF_HOSTS / TOTAL_LOCATIONS;
+                            int factor = numHosts / numLocations;
                             int id = entry.getKey();
                             int startIdx = factor * id;
                             int randomHostIndex = (int)(Math.floor(startIdx + (betaDistributionIndex.sample() * factor)));
@@ -231,6 +235,7 @@ public class Client {
                         }
                     }
                 }
+
             }
 
             /*if(randomGenerated > THRESHOLD && (int)(eventInfo.getTime()) >= 15){
@@ -315,12 +320,39 @@ public class Client {
 
         try{
             org.json.simple.JSONObject obj = (org.json.simple.JSONObject) jsonParser.parse(new FileReader(args[0]));
-            threshold1FromCMD = (String) obj.get("threshold1");
-            threshold2FromCMD = (String) obj.get("threshold2");
-            seed1FromCMD = (String) obj.get("seed1");
-            seed2FromCMD = (String) obj.get("seed2");
-            seed3FromCMD = (String) obj.get("seed3");
-            port = (String) obj.get("port");
+            run = Integer.parseInt((String) obj.get("run"));
+            org.json.simple.JSONArray arr = (org.json.simple.JSONArray) obj.get("array");
+            if(run == 0){
+                org.json.simple.JSONObject params = (org.json.simple.JSONObject) arr.get(0);
+                numHosts = Integer.parseInt((String) params.get("num_hosts"));
+                threshold1FromCMD = (String) params.get("threshold1");
+                threshold2FromCMD = (String) params.get("threshold2");
+                seed1FromCMD = (String) params.get("seed1");
+                seed2FromCMD = (String) params.get("seed2");
+                seed3FromCMD = (String) params.get("seed3");
+                seed4FromCMD = (String) params.get("seed4");
+                numLocations = Integer.parseInt((String) params.get("num_locations"));
+                numLocationsDown = Integer.parseInt((String) params.get("num_locations_down"));
+                if(numLocationsDown < 0){
+                    numLocationsDown = 0;
+                }
+                port = (String) params.get("port");
+            }else if(run == 1){
+                org.json.simple.JSONObject params = (org.json.simple.JSONObject) arr.get(1);
+                numHosts = Integer.parseInt((String) params.get("num_hosts"));
+                threshold1FromCMD = (String) params.get("threshold1");
+                threshold2FromCMD = (String) params.get("threshold2");
+                seed1FromCMD = (String) params.get("seed1");
+                seed2FromCMD = (String) params.get("seed2");
+                seed3FromCMD = (String) params.get("seed3");
+                seed4FromCMD = (String) params.get("seed4");
+                numLocations = Integer.parseInt((String) params.get("num_locations"));
+                numLocationsDown = Integer.parseInt((String) params.get("num_locations_down"));
+                if(numLocationsDown < 0){
+                    numLocationsDown = 0;
+                }
+                port = (String) params.get("port");
+            }
         }catch (IOException | ParseException e){
             e.printStackTrace();
         }
@@ -346,9 +378,22 @@ public class Client {
         betaDistributionLocation.reseedRandomGenerator(Long.parseLong(seed1FromCMD));
         betaDistributionHost.reseedRandomGenerator(Long.parseLong(seed2FromCMD));
         betaDistributionIndex.reseedRandomGenerator(Long.parseLong(seed3FromCMD));
+        betaDistributionWholeLocation.reseedRandomGenerator(Long.parseLong(seed4FromCMD));
 
-        for(int i = 0; i < TOTAL_LOCATIONS; i++) {
+        for(int i = 0; i < numLocations; i++) {
             locationThreshold.put(i, new Pair(Double.parseDouble(threshold1FromCMD), Double.parseDouble(threshold2FromCMD)));
+        }
+
+        if(numLocationsDown != 0){
+            for(int i = 0; i < numLocationsDown; i++){
+                int locationDownIdx = (int)(Math.floor((betaDistributionWholeLocation.sample() * numLocations)));
+                if(locationDownIdx == numLocations){
+                    locationDownIdx = numLocations - 1;
+                }
+                Pair pair = locationThreshold.get(locationDownIdx);
+                pair.second = 0.1;
+                locationThreshold.put(locationDownIdx, pair);
+            }
         }
 
         locationThresholdEntrySet = locationThreshold.entrySet();
@@ -361,7 +406,7 @@ public class Client {
             currSession = client.connectToServer(Client.class, new URI(url));
             System.out.println(currSession.getId());
             locations = new JSONArray();
-            for(int i = 0; i < TOTAL_LOCATIONS; i++){
+            for(int i = 0; i < numLocations; i++){
                 locations.put(i + "");
             }
 
@@ -422,13 +467,13 @@ public class Client {
      * @return Datacenter with the given hosts.
      */
     private static Datacenter createDatacenter() {
-        for(int i = 0; i < NUMBER_OF_HOSTS; i++) {
+        for(int i = 0; i < numHosts; i++) {
             Host host = createHost();
             hostList.add(host);
         }
 
         findHostForVm = (vmAllocationPolicy, vm) -> {
-            int factor = NUMBER_OF_HOSTS / TOTAL_LOCATIONS;
+            int factor = numHosts / numLocations;
             int id = (int)(vm.getId());
             int startIdx = factor * id;
             int min = Integer.MAX_VALUE;
