@@ -155,6 +155,10 @@ def print_comparision(file1, file2):
         axs[i, 0] = print_duration(fault_rate, result1[fault_rate]['duration'], ax=axs[i, 0], label=f"new | mean:{np.array(result1[fault_rate]['duration']).mean()}")
         axs[i, 0] = print_duration(fault_rate, result2[fault_rate]['duration'], ax=axs[i, 0], label=f"old | mean:{np.array(result2[fault_rate]['duration']).mean()}")
         axs[i, 0].legend()
+
+        axs[i, 1] = print_timing(fault_rate, result1[fault_rate]['timing'], ax=axs[i, 1], label=f"New")
+        axs[i, 1] = print_timing(fault_rate, result2[fault_rate]['timing'], ax=axs[i, 1], label=f"Old")
+        axs[i, 1].legend()
         i += 1
 
     a = ScrollableWindow(fig)
