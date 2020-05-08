@@ -464,7 +464,7 @@ public class Client {
         }
 
         final long ram = 131072; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE 128GB.
-        final long bw = 327680; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE 40 * 8Mbps.
+        final long bw = 16384; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE (40 * 8) / 20 Mbps.
         final long storage = 819200; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE 800GB.
         Host host = new HostSimple(ram, bw, storage, peList);
         host
