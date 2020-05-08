@@ -27,13 +27,14 @@ class Client:
         self.ftm_list = []
 
 class Application():
-    def __init__(self, msg_monitor):
+    def __init__(self, msg_monitor, queue):
         self.msg_monitor = msg_monitor
         self.clients = []
         self.client_dict = {}   #dict: <client_websocket, client_obj>
         self.ftm_dict = {}   #dict: <client_id, ftm>
         self.ftm_list = []
         self.locations = [i for i in range(globals.NUM_LOCATIONS)]
+        self.queue = queue
 
     async def on_connect_client(self, data: dict):
         """callback on establishing contact with client
@@ -147,8 +148,9 @@ class Application():
         #add task to ftm
         await ftm_instance._queue.put({'action': 'MIGRATION SUCCESSFUL', 'data': data})
         
-    async def on_connect_cloud(self, data):
-        pass
+    async def on_connect_cloud(self, data={}):
+        logger.info(colored("cloud connected!!"))
+        self.queue.put("start client!")
 
     async def on_finish(self, data):
         #wrapping up and printing results
@@ -159,7 +161,7 @@ class Application():
         sys.exit()
 
 
-async def main():
+async def main(queue):
     # parse_arguments(sys.argv)
 
     tasks = []  #list of tasks to be run concurrently
@@ -168,7 +170,7 @@ async def main():
     # unit.demo()
     cloudsim_url = 'http://0.0.0.0:8080/'   #set this to the url where your server is running
     msg_monitor = MessagingMonitor(cloudsim_url)
-    app = Application(msg_monitor)
+    app = Application(msg_monitor, queue)
     #registering callbaks with msg_monitor
     app.msg_monitor.callbacks['on_connect_cloud'] = app.on_connect_cloud
     app.msg_monitor.callbacks['on_connect_client'] = app.on_connect_client
@@ -206,5 +208,5 @@ async def main():
 # if __name__== '__main__':
 #    asyncio.run(main())
 
-def run_main():
-    asyncio.run(main())
+def run_main(queue):
+    asyncio.run(main(queue))

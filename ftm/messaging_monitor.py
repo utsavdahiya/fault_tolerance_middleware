@@ -149,6 +149,7 @@ class MessagingMonitor():
 		msg = {"desc": "welcome message"}
 		logger.debug(colored(f"sending msg: {msg} to cloud", 'white', 'on_yellow'))
 		await ws.send_json(msg)
+		await self.callbacks['on_connect_cloud']()
 		self.cloud_session = ws
 		data = {'websocket': ws}
 		# await self.callbacks['on_cloud_connect'](data)

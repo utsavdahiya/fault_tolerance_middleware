@@ -38,14 +38,16 @@ def procedure():
     # p1 = multiprocessing.Process(target=subprocess_cmd, args=(cmd2, "../"))
     p2 = multiprocessing.Process(target=subprocess_cmd, args=(cmd3,))
     # p3 = multiprocessing.Process(target=subprocess_cmd, args=(cmd4, "../"))
-    p1 = multiprocessing.Process(target=server_main)
+    p1 = multiprocessing.Process(target=server_main, args=(queue,))
     # p2 = multiprocessing.Process(target=cloud_main)
     p3 = multiprocessing.Process(target=client_main, args=(queue,))
     
     p1.start()  #starting server
     time.sleep(4)
     p2.start()  #starting cloud
-    time.sleep(7)
+    resp = queue.get()
+    print(colored(f"Server process says: {resp}", 'yellow'))
+    time.sleep(2)
     p3.start()  #starting client
     p1.join()
     print("xxxxxxxxxxxxxx FTM finished xxxxxxxxxxxxxxxxx")
