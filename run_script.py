@@ -71,16 +71,18 @@ def run_main():
     # CONFIG_FILE = "config1.conf"
 
     RUN = '0'
-    THRESHOLD1 = 0.5
+    THRESHOLD1 = 0.5    #used for host threshold over the dist by SEED1
     THRESHOLD2 = 0.7
-    SEED1 = 42
+    SEED1 = 42  #used for host fault injection porb uniform distribution
     SEED2 = 42
     SEED3 = 42
     SEED4 = 42
     LOCATIONS_DOWN = 0
     NUM_HOSTS = "70"
 
-    fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
+    FAULT_RATE = 0.8
+    THRESHOLD1 = 1.0 - float(FAULT_RATE)/0.5
+    # fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
 
     first_run = True
 
@@ -94,7 +96,7 @@ def run_main():
             fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
 
             settings = {}
-            settings['FAULT_RATE'] = fault_rate
+            settings['FAULT_RATE'] = FAULT_RATE
             settings['EPOCH'] = epoch
             settings['SIMULATION_TIME'] = SIMULATION_TIME
             settings['ARCH'] = ARCH
