@@ -129,7 +129,6 @@ def run_main():
                 params['array'][0] = cloud_args
             else:
                 params['array'][1] = cloud_args
-            json.dump(params, handle)
 
             with open("CloudSim_Config.json", 'w') as outfile:
                 json.dump(params, outfile)
