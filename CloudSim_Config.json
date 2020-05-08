@@ -1,8 +1,1 @@
-{
-  "threshold1": "0.5",
-  "threshold2": "0.48999999999999977",
-  "seed1": "121",
-  "seed2": "51",
-  "seed3": "121",
-  "port": "8081"
-}
+{"run": "0", "array": [{"threshold1": "0.9885714285714285", "threshold2": "0.7", "seed1": "42", "seed2": "42", "seed3": "42", "seed4": "42", "port": "8081", "num_locations": "10", "num_locations_down": "0", "num_hosts": "70"}, {"threshold1": "0.5", "threshold2": "0.99", "seed1": "42", "seed2": "42", "seed3": "42", "seed4": "42", "port": "8083", "num_locations": "10", "num_locations_down": "1", "num_hosts": "70"}]}
