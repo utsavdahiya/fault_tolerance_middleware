@@ -160,8 +160,8 @@ def print_comparision(file1, file2):
     a = ScrollableWindow(fig)
 
 def main():
-    file1 = "output-simulation-2.pkl"   #new
-    file2 = "output-simulation-1.pkl"   #old
+    file1 = "output-simulation-1.pkl"   #new
+    file2 = "output-simulation-old-2.pkl"   #old
 
     # with open(file1, 'rb') as handle:
     #     result = pickle.load(handle)
