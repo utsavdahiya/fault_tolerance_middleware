@@ -93,7 +93,8 @@ def run_main():
             # with open("ftm.conf") as handle:
             #     settings = json.load(handle)
             
-            fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
+            THRESHOLD1 = 1.0 - float(FAULT_RATE)/0.5
+            # fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
 
             settings = {}
             settings['FAULT_RATE'] = FAULT_RATE
