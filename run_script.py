@@ -31,7 +31,7 @@ def procedure(RUN):
     cmd2 = "python server.py arg1 arg2 arg 3"
     classname = "Client"
     # arguments = "/home/uday-vig/fault_tolerance_middleware/CloudSim_Conf"
-    arguments = f"/home/uday-vig/fault_tolerance_middleware/CloudSim_Config.json|{RUN}"
+    arguments = f"/home/uday-vig/fault_tolerance_middleware/CloudSim_Config.json&{RUN}"
     cmd3 = f'mvn exec:java -f CloudSimInterface/ -Dexec.mainClass={classname} -Dexec.args="{arguments}"'
     # cmd3 = f"mvn exec:java -Dexec.mainClass={classname} -Dexec.args={arguments}"
     cmd4 = "python websocket_client.py"
