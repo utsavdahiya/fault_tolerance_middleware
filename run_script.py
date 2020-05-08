@@ -78,6 +78,7 @@ def run_main():
     SEED3 = 42
     SEED4 = 42
     LOCATIONS_DOWN = 0
+    NUM_HOSTS = "70"
 
     fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
 
@@ -119,7 +120,8 @@ def run_main():
                             "seed4" : str(SEED4),
                             "port" : PORT_CLOUD,
                             "num_locations" : str(NUM_LOCATIONS),
-                            "num_locations_down" : str(LOCATIONS_DOWN)
+                            "num_locations_down" : str(LOCATIONS_DOWN),
+                            "num_hosts" : NUM_HOSTS
                         }
             with open("CloudSim_Config.json") as handle:
                 print(f"updating CloudSim_Conf: {json.dumps(cloud_args, indent=2)}")
