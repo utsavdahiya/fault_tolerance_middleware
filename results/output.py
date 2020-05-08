@@ -46,6 +46,7 @@ def print_timing(fault_rate, record):
     plt.fill_between(list(record.keys()), timing_min, timing_max, color='red', alpha=0.3)
     plt.xlabel("Time (s)")
     plt.ylabel("Num of Failures (cumulative)")
+    plt.grid()
     plt.show()
 
 def print_all_durations(data):
@@ -72,10 +73,11 @@ def print_all_durations(data):
     plt.fill_between(list(data.keys()), duration_min, duration_max, color='blue', alpha=0.3)
     plt.xlabel("Fault rates")
     plt.ylabel("Availability")
+    plt.grid()
     plt.show()
 
 def main():
-    file_name = "8 10 0.5 0.5 0.03 New.pkl"
+    file_name = "8-10-0.5-0.9-0.03-Old-10.pkl"
 
     with open(file_name, 'rb') as handle:
         result = pickle.load(handle)
