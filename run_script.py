@@ -48,6 +48,7 @@ def procedure():
     resp = queue.get()
     print(colored(f"Server process says: {resp}", 'yellow'))
     time.sleep(2)
+
     p3.start()  #starting client
     p1.join()
     print("xxxxxxxxxxxxxx FTM finished xxxxxxxxxxxxxxxxx")
@@ -59,10 +60,10 @@ def procedure():
     print("xxxxxxxxxxxxxx CloudSim finished xxxxxxxxxxxxxx")
 
 def run_main():
-    NUM_SIMULATION = 4
-    EPOCH = 3
-    NUM_LOCATIONS = 10
-    OUTPUT = "./results/default_output.pkl"
+    NUM_SIMULATION = 8
+    EPOCH = 10
+    NUM_LOCATIONS = 5
+    OUTPUT = "./results/8-10-0.5-0.7-0.03-New-5.pkl"
     SIMULATION_TIME = 38
     ARCH = "new"    #can change to "original"
     PORT_CLOUD = '8081'
@@ -70,7 +71,7 @@ def run_main():
     # CONFIG_FILE = "config1.conf"
 
     THRESHOLD1 = 0.5
-    THRESHOLD2 = 0.8
+    THRESHOLD2 = 0.7
     SEED1 = 42
     SEED2 = 42
     SEED3 = 42
@@ -127,7 +128,7 @@ def run_main():
             SEED3 += 1
 
         #updating the parameters
-        THRESHOLD2 -= 0.08
+        THRESHOLD2 -= 0.03
 
 if __name__ == '__main__':
     run_main()
