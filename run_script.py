@@ -26,12 +26,12 @@ def subprocess_cmd(command, cwd=None, **kwargs):
 
 # subprocess_cmd(command)
 
-def procedure():
+def procedure(RUN):
     queue = multiprocessing.Queue()
     cmd2 = "python server.py arg1 arg2 arg 3"
     classname = "Client"
     # arguments = "/home/uday-vig/fault_tolerance_middleware/CloudSim_Conf"
-    arguments = "/home/uday-vig/fault_tolerance_middleware/CloudSim_Config.json"
+    arguments = f"/home/uday-vig/fault_tolerance_middleware/CloudSim_Config.json {RUN}"
     cmd3 = f'mvn exec:java -f CloudSimInterface/ -Dexec.mainClass={classname} -Dexec.args="{arguments}"'
     # cmd3 = f"mvn exec:java -Dexec.mainClass={classname} -Dexec.args={arguments}"
     cmd4 = "python websocket_client.py"
@@ -112,7 +112,7 @@ def run_main():
             #     print(f"updating {CONFIG_FILE}: {settings}")
             #     json.dump(settings, handle)
             # globals.initialize_globals("ftm.conf")
-            globals.initialize_globals(settings)            
+            globals.initialize_globals(settings)
 
             cloud_args = {
                             "threshold1" : str(THRESHOLD1),
@@ -136,9 +136,9 @@ def run_main():
                 params['array'][1] = cloud_args
 
             with open("CloudSim_Config.json", 'w') as outfile:
-                json.dump(params, outfile)
+                json.dump(params, outfile, indent=2)
 
-            procedure()
+            procedure(RUN)
 
             print(colored(f"\n\n\n\n-----------------------------EPOCH COMPLETED---------------------------\n\n\n", 'green'))
             time.sleep(4)
