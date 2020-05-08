@@ -46,22 +46,34 @@ class ScrollableWindow(QtWidgets.QMainWindow):
 # pass the figure to the custom window
 # a = ScrollableWindow(fig)
 
-def print_duration(fault_rate, List):
+def print_duration(fault_rate, List, **kwargs):
     '''
     Args:
         fault_rate
     '''
-    mean_val = np.array(List).mean()
+    ax = kwargs.get('ax', None)
+    label = kwargs.get('label', None)
+
     y = np.arange(1, len(List)+1, 1)
-    fig, ax = plt.subplots()
-    ax.plot(y, List)
+    mean_val = 0
+    if ax is None:
+        mean_val = np.array(List).mean()
+        fig, ax = plt.subplots()
+    if label is None:
+        ax.plot(y, List)
+    else:
+        print("label passed")
+        ax.plot(y, List, label=label)
     ax.set(xlabel='Epochs', ylabel='Availability', title=str(f"Fault Rate:{fault_rate} | Mean: {mean_val}"))
     ax.grid()
 
     # fig.savefig(f"fault_{fault_rate}_.png")
-    plt.show()
+    if ax is label:
+        plt.show()
+    else:
+        return ax
 
-def print_timing(fault_rate, record):
+def print_timing(fault_rate, record, **kwargs):
     '''
     Args:
         record : {
@@ -72,6 +84,9 @@ def print_timing(fault_rate, record):
             SIMULATION_TIME: []
         }
     '''
+    ax = kwargs.get('ax', None)
+    label = kwargs.get('label', None)
+    
     timing_mean = []
     timing_min = []
     timing_max = []
@@ -86,12 +101,15 @@ def print_timing(fault_rate, record):
     timing_min = np.array(timing_min)
 
     y = np.arange(1)
-    plt.plot(list(record.keys()), timing_mean, 'k-')
-    plt.fill_between(list(record.keys()), timing_min, timing_max, color='red', alpha=0.3)
-    plt.xlabel("Time (s)")
-    plt.ylabel("Num of Failures (cumulative)")
-    plt.grid()
-    plt.show()
+    if ax is None:
+        fig, ax = plt.subplots()
+    ax.plot(list(record.keys()), timing_mean, 'k-')
+    ax.fill_between(list(record.keys()), timing_min, timing_max, color='red', alpha=0.3)
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Num of Failures (cumulative)")
+    ax.grid()
+    if label is None:
+        plt.show()
 
 def print_all_durations(data):
     duration_mean = []
@@ -130,27 +148,35 @@ def print_comparision(file1, file2):
     with open(file2, 'rb') as handle:
         result2 = pickle.load(handle)
     
-    fig, axs = plt.subplots(len(result1.keys()), 2, figsize=(16, 16))
+    fig, axs = plt.subplots(len(result1.keys()), 2, figsize=(18, 40))
     
+    i = 0
+    for fault_rate in result1.keys():
+        axs[i, 0] = print_duration(fault_rate, result1[fault_rate]['duration'], ax=axs[i, 0], label=f"new | mean:{np.array(result1[fault_rate]['duration']).mean()}")
+        axs[i, 0] = print_duration(fault_rate, result2[fault_rate]['duration'], ax=axs[i, 0], label=f"old | mean:{np.array(result2[fault_rate]['duration']).mean()}")
+        axs[i, 0].legend()
+        i += 1
+
+    a = ScrollableWindow(fig)
 
 def main():
     file1 = "output-simulation-2.pkl"
     file2 = "output-simulation-1.pkl"
 
-    with open(file1, 'rb') as handle:
-        result = pickle.load(handle)
+    # with open(file1, 'rb') as handle:
+    #     result = pickle.load(handle)
 
     # print(f"result: {json.dumps(result, indent=2)}")
-    print(f"result: {result}")
+    # print(f"result: {result}")
     #printing one simulation durations
-    for fault_rate, record in result.items():
-        #displaying fault rate
-        print("displaying")
-        print_duration(fault_rate, record['duration'])
+    # for fault_rate, record in result.items():
+    #     #displaying fault rate
+    #     print("displaying")
+    #     print_duration(fault_rate, record['duration'])
 
-        print_timing(fault_rate, record['timing'])
+    #     print_timing(fault_rate, record['timing'])
 
-    print_all_durations(result)
+    # print_all_durations(result)
 
     print_comparision(file1, file2)
 

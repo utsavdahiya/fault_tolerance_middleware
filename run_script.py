@@ -70,6 +70,7 @@ def run_main():
     PORT_CLIENT = '8082'
     # CONFIG_FILE = "config1.conf"
 
+    RUN = '0'
     THRESHOLD1 = 0.5
     THRESHOLD2 = 0.7
     SEED1 = 42
@@ -120,9 +121,18 @@ def run_main():
                             "num_locations" : str(NUM_LOCATIONS),
                             "num_locations_down" : str(LOCATIONS_DOWN)
                         }
-            with open("CloudSim_Config.json", 'w') as handle:
+            with open("CloudSim_Config.json") as handle:
                 print(f"updating CloudSim_Conf: {json.dumps(cloud_args, indent=2)}")
-                json.dump(cloud_args, handle, indent=2)
+                # json.dump(cloud_args, handle, indent=2)
+                params = json.load(handle)
+            if RUN == '0':
+                params['array'][0] = cloud_args
+            else:
+                params['array'][1] = cloud_args
+            json.dump(params, handle)
+
+            with open("CloudSim_Config.json", 'w') as outfile:
+                json.dump(params, outfile)
 
             procedure()
 
