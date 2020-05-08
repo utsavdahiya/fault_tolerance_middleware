@@ -116,7 +116,7 @@ def run_main():
                             "seed1" : str(SEED1),
                             "seed2" : str(SEED2),
                             "seed3" : str(SEED3),
-                            "seed" : str(SEED4),
+                            "seed4" : str(SEED4),
                             "port" : PORT_CLOUD,
                             "num_locations" : str(NUM_LOCATIONS),
                             "num_locations_down" : str(LOCATIONS_DOWN)
