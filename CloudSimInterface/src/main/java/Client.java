@@ -128,6 +128,7 @@ public class Client {
     private static final BetaDistribution betaDistributionWholeLocation = new BetaDistribution(ALPHA, BETA);
     private static final UniformRealDistribution uniformDistribution = new UniformRealDistribution();
     private static final UniformRealDistribution uniformDistributionAllocation = new UniformRealDistribution();
+    private static final UniformRealDistribution uniformDistributionMigration = new UniformRealDistribution();
     private static String threshold1FromCMD;
     private static String threshold2FromCMD;
     private static String seed1FromCMD;
@@ -143,6 +144,8 @@ public class Client {
     static StringBuilder debugRandoms = new StringBuilder();
     static StringBuilder debugHosts = new StringBuilder();
     static StringBuilder debugLocations = new StringBuilder();
+    static StringBuilder debugMigration = new StringBuilder();
+    static int migrationError = 0;
 
     /**
      * Variables related to working of CloudSim.
@@ -205,6 +208,8 @@ public class Client {
             }*/
 
             if((int)(eventInfo.getTime()) == TIME_TILL_TERMINATION - 2){
+                debugMigration.append(migrationError);
+                System.err.println(debugMigration.toString());
                 JSONObject finalMessage = new JSONObject();
                 finalMessage.put("desc", "finish");
                 finalMessage.put("client_id", finishClientID);
@@ -327,6 +332,7 @@ public class Client {
             }
         };
 
+        debugMigration.append("Migration error: ");
         try{
             String[] argsArray = args[0].split("&");
             org.json.simple.JSONObject obj = (org.json.simple.JSONObject) jsonParser.parse(new FileReader(argsArray[0]));
@@ -475,6 +481,8 @@ public class Client {
         System.out.println(debugRandoms.toString());
         System.out.println(debugHosts.toString());
         System.out.println(debugLocations.toString());
+        debugMigration.append(migrationError);
+        System.err.println(debugMigration.toString());
     }
 
     /**
@@ -837,7 +845,16 @@ public class Client {
     private static void migrateVm(JSONObject message){
         int vmID = Integer.parseInt(message.getString("id"));
         int mappedID = idMap.get(vmID);
-        String clientID = "";
+
+        Vm vm = unchangedList.get(mappedID);
+        if(vm.isInMigration()){
+            debugMigration.append("VM ID: ").append(vmID).append(" ").append(simulation.clock()).append("\n");
+            migrationError++;
+        }
+
+        int idx = (int)(Math.floor(uniformDistributionMigration.sample() * numHosts));
+        datacenter.requestVmMigration(vm, hostList.get(idx));
+        /*String clientID = "";
         if(message.has("client_id")){
             clientID = message.getString("client_id");
         }
@@ -874,9 +891,9 @@ public class Client {
             }
         }
 
-        /*if(temp == null){
+        *//*if(temp == null){
             return;
-        }*/
+        }*//*
 
         String delay = vm.getRam().getCapacity() / Conversion.bitesToBytes(temp.getBw().getCapacity() * datacenter.getBandwidthPercentForMigration()) + "";
         migrationStarted.put("delay", delay);
@@ -886,7 +903,7 @@ public class Client {
             e.printStackTrace();
         }
 
-        datacenter.requestVmMigration(vm, temp);
+        datacenter.requestVmMigration(vm, temp);*/
 
 
         /*if(!unchangedList.get(vmID).isRemoved){
