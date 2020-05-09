@@ -86,7 +86,7 @@ class ResouceManager:
                         #if all VMs are down and flag is also set for failure
                         pass
                     
-                logger.info(colored("checking status", 'blue'))
+                # logger.info(colored("checking status", 'blue'))
                 await self.msg_monitor.send_json(msg, 'cloud')
 
     async def instantiate(self, ftm, vm) -> (str, int):
