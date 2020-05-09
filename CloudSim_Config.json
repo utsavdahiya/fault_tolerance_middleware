@@ -1,1 +1,29 @@
-{"run": "0", "array": [{"threshold1": "0.9533333333333334", "threshold2": "0.7", "seed1": "72", "seed2": "42", "seed3": "72", "seed4": "42", "port": "8081", "num_locations": "10", "num_locations_down": "0", "num_hosts": "30"}, {"threshold1": "0.9733333333333334", "threshold2": "0.7", "seed1": "42", "seed2": "42", "seed3": "42", "seed4": "42", "port": "9081", "num_locations": "10", "num_locations_down": "0", "num_hosts": "30"}]}
+{
+  "run": "0",
+  "array": [
+    {
+      "threshold1": "0.956",
+      "threshold2": "0.7",
+      "seed1": "121",
+      "seed2": "51",
+      "seed3": "121",
+      "seed4": "42",
+      "port": "8081",
+      "num_locations": "10",
+      "num_locations_down": "0",
+      "num_hosts": "50"
+    },
+    {
+      "threshold1": "0.956",
+      "threshold2": "0.7",
+      "seed1": "121",
+      "seed2": "51",
+      "seed3": "121",
+      "seed4": "42",
+      "port": "9081",
+      "num_locations": "10",
+      "num_locations_down": "0",
+      "num_hosts": "50"
+    }
+  ]
+}
