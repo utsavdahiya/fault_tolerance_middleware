@@ -185,8 +185,8 @@ def print_comparision(file1, file2):
 
 
 def main():
-    file1 = "OutputUday22.pkl"   #new
-    file2 = "OutputUday23.pkl"   #old
+    file1 = "output-simulation-12.pkl"   #new
+    file2 = "output-simulation-13.pkl"   #old
 
     # with open(file1, 'rb') as handle:
     #     result = pickle.load(handle)

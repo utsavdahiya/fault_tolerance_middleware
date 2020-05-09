@@ -137,7 +137,7 @@ class FTM:
             #rest the failure counter once the VM is working
             self.all_VMs[data['vm_id']].fail_counter = 0
             #set the VM_status to be working
-            self.all_VMs[data['vm_id']].status = "inactive"
+            self.all_VMs[data['vm_id']].status = "active"
             #also set the bit True for the VM
             await self.activate_vm(data)
         # else:
