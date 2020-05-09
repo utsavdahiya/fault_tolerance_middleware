@@ -179,8 +179,9 @@ class MessagingMonitor():
 						elif recvd_msg['desc'] == 'host_allocation':
 							await self.callbacks['on_host_allocation'](recvd_msg)
 						elif recvd_msg['desc'] == 'migration_successful':
-							logger.debug(colored(f"migration message received", 'yellow', 'on_white'))
-							await self.callbacks['on_migration'](recvd_msg)
+							# logger.debug(colored(f"migration message received", 'yellow', 'on_white'))
+							# await self.callbacks['on_migration'](recvd_msg)
+							pass
 						elif recvd_msg['desc'] == "finish":
 							logger.info(colored(f"------------SIMULATION FINISHED---------", "magenta", "on_white"))
 							await self.callbacks["on_finish"](recvd_msg)

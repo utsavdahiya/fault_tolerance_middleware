@@ -179,14 +179,14 @@ def print_comparision(file1, file2):
     ax = print_all_durations(result1, ax=ax, label="New", color='blue')
     ax = print_all_durations(result2, ax=ax, label="Old", color='orange')
     ax.legend()
-    # plt.show()
+    plt.show()
     
-    a = ScrollableWindow(fig)
+    # a = ScrollableWindow(fig)
 
 
 def main():
-    file1 = "output-simulation-10.pkl"   #new
-    file2 = "output-simulation-11.pkl"   #old
+    file1 = "OutputUday18.pkl"   #new
+    file2 = "OutputUday19.pkl"   #old
 
     # with open(file1, 'rb') as handle:
     #     result = pickle.load(handle)
