@@ -113,7 +113,7 @@ class ActiveReplication(ReplicationStratergy):
 
         super().__init__("actve_replication", data)
 
-        self.replica_ratio = 2
+        self.replica_ratio = 3
 
     async def synchronizer(self, ftm , message):
         '''we are using active replication here'''
