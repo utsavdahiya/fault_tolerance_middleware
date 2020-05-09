@@ -400,6 +400,7 @@ public class Client {
 
         uniformDistribution.reseedRandomGenerator(Long.parseLong(seed1FromCMD));
         uniformDistributionAllocation.reseedRandomGenerator(Long.parseLong(seed2FromCMD));
+        uniformDistributionMigration.reseedRandomGenerator(Long.parseLong(seed3FromCMD));
 
         /*for(int i = 0; i < numLocations; i++) {
             locationThreshold.put(i, new Pair(Double.parseDouble(threshold1FromCMD), Double.parseDouble(threshold2FromCMD)));
