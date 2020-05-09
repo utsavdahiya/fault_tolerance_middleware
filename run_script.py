@@ -64,7 +64,7 @@ def run_main():
     NUM_SIMULATION = 5
     EPOCH = 10
     NUM_LOCATIONS = 10
-    OUTPUT = "./results/OutputUday23.pkl"
+    OUTPUT = "./results/OutputUday25.pkl"
     SIMULATION_TIME = 38
     ARCH = "original"    #can change to "original"
     PORT_CLOUD = '9081'
