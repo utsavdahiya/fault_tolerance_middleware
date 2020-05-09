@@ -136,6 +136,10 @@ class FTM:
             logger.info(colored(f"vm[{data['vm_id']}]STATUS OK", 'green', 'on_white'))
             #rest the failure counter once the VM is working
             self.all_VMs[data['vm_id']].fail_counter = 0
+            #set the VM_status to be working
+            self.all_VMs[data['vm_id']].status = "inactive"
+            #also set the bit True for the VM
+            await self.activate_vm(data)
         # else:
         #     logger.info(colored(f"no masking procedure specified", 'red'))
 
