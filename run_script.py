@@ -62,8 +62,8 @@ def procedure(RUN):
 def run_main():
     NUM_SIMULATION = 8
     EPOCH = 10
-    NUM_LOCATIONS = 10
-    OUTPUT = "./results/OutputUday15.pkl"
+    NUM_LOCATIONS = 5
+    OUTPUT = "./results/OutputUday17.pkl"
     SIMULATION_TIME = 38
     ARCH = "original"    #can change to "original"
     PORT_CLOUD = '9081'

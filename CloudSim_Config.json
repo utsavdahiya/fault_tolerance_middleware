@@ -9,7 +9,7 @@
       "seed3": "121",
       "seed4": "42",
       "port": "8081",
-      "num_locations": "10",
+      "num_locations": "5",
       "num_locations_down": "0",
       "num_hosts": "50"
     },
@@ -21,7 +21,7 @@
       "seed3": "121",
       "seed4": "42",
       "port": "9081",
-      "num_locations": "10",
+      "num_locations": "5",
       "num_locations_down": "0",
       "num_hosts": "50"
     }
