@@ -2,26 +2,26 @@
   "run": "0",
   "array": [
     {
-      "threshold1": "0.956",
+      "threshold1": "0.9279999999999999",
       "threshold2": "0.7",
       "seed1": "121",
       "seed2": "51",
       "seed3": "121",
       "seed4": "42",
       "port": "8081",
-      "num_locations": "5",
+      "num_locations": "10",
       "num_locations_down": "0",
       "num_hosts": "50"
     },
     {
-      "threshold1": "0.956",
+      "threshold1": "0.9279999999999999",
       "threshold2": "0.7",
       "seed1": "121",
       "seed2": "51",
       "seed3": "121",
       "seed4": "42",
       "port": "9081",
-      "num_locations": "5",
+      "num_locations": "10",
       "num_locations_down": "0",
       "num_hosts": "50"
     }
