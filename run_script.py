@@ -63,7 +63,7 @@ def run_main():
     NUM_SIMULATION = 8
     EPOCH = 10
     NUM_LOCATIONS = 10
-    OUTPUT = "./results/OutputUday13.pkl"
+    OUTPUT = "./results/OutputUday15.pkl"
     SIMULATION_TIME = 38
     ARCH = "original"    #can change to "original"
     PORT_CLOUD = '9081'
@@ -78,7 +78,7 @@ def run_main():
     SEED3 = 42
     SEED4 = 42
     LOCATIONS_DOWN = 0
-    NUM_HOSTS = 30
+    NUM_HOSTS = 50
 
     FAULT_RATE = 0.8
     THRESHOLD1 = 1.0 - float(FAULT_RATE)/NUM_HOSTS

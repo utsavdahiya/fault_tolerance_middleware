@@ -328,10 +328,11 @@ public class Client {
         };
 
         try{
-            org.json.simple.JSONObject obj = (org.json.simple.JSONObject) jsonParser.parse(new FileReader(args[0]));
+            String[] argsArray = args[0].split("&");
+            org.json.simple.JSONObject obj = (org.json.simple.JSONObject) jsonParser.parse(new FileReader(argsArray[0]));
             //run = Integer.parseInt((String) obj.get("run"));
             org.json.simple.JSONArray arr = (org.json.simple.JSONArray) obj.get("array");
-            if(Integer.parseInt(args[1]) == 0){
+            if(Integer.parseInt(argsArray[1]) == 0){
                 org.json.simple.JSONObject params = (org.json.simple.JSONObject) arr.get(0);
                 numHosts = Integer.parseInt((String) params.get("num_hosts"));
                 threshold1FromCMD = (String) params.get("threshold1");
@@ -347,7 +348,7 @@ public class Client {
                 }
                 port = (String) params.get("port");
                 System.out.println(port);
-            }else if(Integer.parseInt(args[1]) == 1){
+            }else if(Integer.parseInt(argsArray[1]) == 1){
                 org.json.simple.JSONObject params = (org.json.simple.JSONObject) arr.get(1);
                 numHosts = Integer.parseInt((String) params.get("num_hosts"));
                 threshold1FromCMD = (String) params.get("threshold1");
