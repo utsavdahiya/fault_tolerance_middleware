@@ -61,10 +61,10 @@ def procedure(RUN):
     print("xxxxxxxxxxxxxx CloudSim finished xxxxxxxxxxxxxx")
 
 def run_main():
-    NUM_SIMULATION = 10
+    NUM_SIMULATION = 5
     EPOCH = 10
-    NUM_LOCATIONS = 4
-    OUTPUT = "./results/OutputUday21.pkl"
+    NUM_LOCATIONS = 10
+    OUTPUT = "./results/OutputUday23.pkl"
     SIMULATION_TIME = 38
     ARCH = "original"    #can change to "original"
     PORT_CLOUD = '9081'
@@ -81,7 +81,7 @@ def run_main():
     LOCATIONS_DOWN = 0
     NUM_HOSTS = 50
 
-    FAULT_RATE = 0.8
+    FAULT_RATE = 2.2
     THRESHOLD1 = 1.0 - float(FAULT_RATE)/NUM_HOSTS
     # fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
 
