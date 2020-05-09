@@ -62,8 +62,8 @@ def procedure(RUN):
 def run_main():
     NUM_SIMULATION = 8
     EPOCH = 10
-    NUM_LOCATIONS = 5
-    OUTPUT = "./results/OutputUday17.pkl"
+    NUM_LOCATIONS = 10
+    OUTPUT = "./results/OutputUday19.pkl"
     SIMULATION_TIME = 38
     ARCH = "original"    #can change to "original"
     PORT_CLOUD = '9081'
@@ -80,7 +80,7 @@ def run_main():
     LOCATIONS_DOWN = 0
     NUM_HOSTS = 50
 
-    FAULT_RATE = 0.8
+    FAULT_RATE = 2.2
     THRESHOLD1 = 1.0 - float(FAULT_RATE)/NUM_HOSTS
     # fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
 
