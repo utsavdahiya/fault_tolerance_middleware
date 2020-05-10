@@ -89,7 +89,8 @@ class FTM:
         #setting the bit corressponding to vm_id
         bitset[pos] = True
         #add vm to monitoring list
-        self.resource_mgr.monitor_list.append(vm_id)
+        if vm_id not in self.resource_mgr.monitor_list:
+            self.resource_mgr.monitor_list.append(vm_id)
         logger.info(colored(f"vm[{vm_id}] has been activated"))
 
     async def evaluate_status(self, data, callaback=None):
