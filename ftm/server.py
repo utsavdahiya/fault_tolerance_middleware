@@ -8,8 +8,9 @@ import asyncio
 from termcolor import colored
 import pickle
 import sys
-import nest_asyncio
-nest_asyncio.apply()
+# import nest_asyncio
+from timeit import default_timer
+# nest_asyncio.apply()
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -83,6 +84,7 @@ class Application():
         info['client_req'] = data['client_req']
         info['locations'] = self.locations
         ftm_instance = await ftm_middleware.start_ftm(self, client_id, self.msg_monitor, info)
+        ftm_instance.simulation_start_time = default_timer()
         #register this ftm instance with the application
         self.ftm_dict[client_id] = ftm_instance
         self.ftm_list.append(ftm_instance)

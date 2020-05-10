@@ -137,10 +137,17 @@ class FTM:
             #rest the failure counter once the VM is working
             self.all_VMs[data['vm_id']].fail_counter = 0
             if self.all_VMs[data['vm_id']].status != "active":
-                #set the VM_status to be working
-                self.all_VMs[data['vm_id']].status = "active"
-                #also set the bit True for the VM
-                await self.activate_vm(data)
+                vm_id = data['vm_id']
+                self.all_VMs[vm_id].status = "active"   #acitvate the vm
+                primary_vm_id = self.all_VMs[vm_id].primary_vm_id
+                if primary_vm_id not in self.availability:
+                    #initailise the bitarray
+                    self.availability[primary_vm_id] = (self.ft_unit.replication_strat.replica_ratio + 1) * bitarray('0')
+                bitset = self.availability[primary_vm_id]
+                offset = int(primary_vm_id) % len(bitset)
+                pos = (int(vm_id) % len(bitset)) - offset
+                #setting the bit corressponding to vm_id
+                bitset[pos] = True
         # else:
         #     logger.info(colored(f"no masking procedure specified", 'red'))
 
