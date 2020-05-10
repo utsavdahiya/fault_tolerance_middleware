@@ -71,7 +71,7 @@ public class Client {
     public void onMessage(String message, Session session) {
         //System.out.println("yolo8");
         //System.err.println("Received ...." + message);
-        if(debugRequests != null) {
+        if(debugRequests != null && simulation != null) {
             debugRequests.append(message).append(" ").append(simulation.clock()).append("\n");
         }
         messageQueue.add(message);
@@ -149,6 +149,7 @@ public class Client {
     static StringBuilder debugLocations = new StringBuilder();
     static StringBuilder debugMigration = new StringBuilder();
     static StringBuilder debugRequests = new StringBuilder();
+    static StringBuilder debugHostsAllocation = new StringBuilder();
     static int migrationError = 0;
 
     /**
@@ -213,9 +214,10 @@ public class Client {
 
             if((int)(eventInfo.getTime()) == TIME_TILL_TERMINATION - 2){
                 debugMigration.append(migrationError);
-                System.err.println(debugMigration.toString());
+                //System.err.println(debugMigration.toString());
 
-                System.err.println(debugRequests.toString());
+                //System.err.println(debugRequests.toString());
+                System.err.println(debugHostsAllocation.toString());
                 JSONObject finalMessage = new JSONObject();
                 finalMessage.put("desc", "finish");
                 finalMessage.put("client_id", finishClientID);
@@ -330,6 +332,7 @@ public class Client {
 
             hostAllocationReply.put("vm_id", vmID + "");
 
+            debugHostsAllocation.append(hostAllocationReply).append(" ").append(simulation.clock()).append("\n");
             //System.out.println(hostAllocationReply);
             try {
                 currSession.getBasicRemote().sendObject(hostAllocationReply);
