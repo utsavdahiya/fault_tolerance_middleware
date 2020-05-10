@@ -54,7 +54,8 @@ class ResouceManager:
         #monitor the VMs to check if they are running smoothly
         logger.debug(colored(f"monitoring the VMs for status"))
         while self.monitor_flag:
-            await asyncio.sleep(self.timer)   #check every "timer" seconds
+            await asyncio.sleep(self.timer)   #check every "timer" seconds  
+            logger.debug(colored(f"----------MONITOR---------------"))
             for vm_id in self.monitor_list:
                 #check vm status with cloudsim
                 msg = {"desc": "status",
