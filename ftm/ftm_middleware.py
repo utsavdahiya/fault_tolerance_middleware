@@ -117,7 +117,7 @@ class FTM:
         vm_status = data
         vm_status['ftm'] = self
         if vm_status['condition'] != "working":
-            logger.info(colored(f"vm [{data['vm_id']}] condition is not working!!", 'red'))
+            logger.info(colored(f"vm[{data['vm_id']}] condition is not working!!", 'red'))
             if self.all_VMs[data['vm_id']].status == 'active':
                 #if the VM was active until now, then try to mask fault
                 await self._queue.put({'action': 'FAULT MASK', 'data': vm_status})
