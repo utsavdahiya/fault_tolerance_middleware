@@ -89,7 +89,10 @@ def run_main():
     first_cloud_run = True
 
     for iteration in range(NUM_SIMULATION):
+        SEED1 = 42  #used for host fault injection porb uniform distribution
         SEED2 = 42
+        SEED3 = 42
+        SEED4 = 42
         for epoch in range(EPOCH):
             print(f"Iteration: {iteration} | epoch: {epoch}")
             # with open("ftm.conf") as handle:
