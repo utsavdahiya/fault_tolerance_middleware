@@ -154,6 +154,7 @@ def run_main():
             SEED1 += 1
             SEED2 += 1
             SEED3 += 1
+            SEED4 += 1
 
         #updating the parameters
         # THRESHOLD2 -= 0.03
