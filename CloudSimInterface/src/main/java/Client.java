@@ -116,6 +116,7 @@ public class Client {
     private static final double UPPER_BOUND = 1.0;
     private static final HashMap<Integer, Pair> locationThreshold = new HashMap<>();
     private static Set<Map.Entry<Integer, Pair>> locationThresholdEntrySet;
+    //private static final HashMap<Integer, Double> hostThreshold = new HashMap<>();
     private static final double THRESHOLD_PERCENTAGE = 0.5;
     private static final double THRESHOLD_LOCATION = LOWER_BOUND + ((1 - LOWER_BOUND) * THRESHOLD_PERCENTAGE);
     private static final double THRESHOLD_HOST = LOWER_BOUND + ((1 - LOWER_BOUND) * THRESHOLD_PERCENTAGE);
@@ -132,6 +133,7 @@ public class Client {
     private static final UniformRealDistribution uniformDistribution = new UniformRealDistribution();
     private static final UniformRealDistribution uniformDistributionAllocation = new UniformRealDistribution();
     private static final UniformRealDistribution uniformDistributionMigration = new UniformRealDistribution();
+    private static final UniformRealDistribution uniformDistributionLocationDown = new UniformRealDistribution();
     private static String threshold1FromCMD;
     private static String threshold2FromCMD;
     private static String seed1FromCMD;
@@ -214,7 +216,7 @@ public class Client {
 
             if((int)(eventInfo.getTime()) == TIME_TILL_TERMINATION - 2){
                 debugMigration.append(migrationError);
-                //System.err.println(debugMigration.toString());
+                System.err.println(debugMigration.toString());
 
                 //System.err.println(debugRequests.toString());
                 System.err.println(debugHostsAllocation.toString());
@@ -256,6 +258,18 @@ public class Client {
                     double randomNumber = uniformDistribution.sample();
                     if (randomNumber > Double.parseDouble(threshold1FromCMD)) {
                         fault.generateHostFault(host);
+                    }
+                }
+
+            }
+
+            if((int)(eventInfo.getTime()) == 18){
+                for(int i = 0; i < numLocationsDown; i++){
+                    int factor = numHosts / numLocations;
+                    int id = (int)(Math.floor(uniformDistributionLocationDown.sample() * factor));
+                    int startIdx = factor * id;
+                    for(int j = startIdx; j < startIdx + factor; j++){
+                        fault.generateHostFault(hostList.get(j));
                     }
                 }
             }
@@ -410,19 +424,24 @@ public class Client {
         uniformDistribution.reseedRandomGenerator(Long.parseLong(seed1FromCMD));
         uniformDistributionAllocation.reseedRandomGenerator(Long.parseLong(seed2FromCMD));
         uniformDistributionMigration.reseedRandomGenerator(Long.parseLong(seed3FromCMD));
+        uniformDistributionLocationDown.reseedRandomGenerator(Long.parseLong(seed4FromCMD));
+
+        /*for(int i = 0; i < numHosts; i++){
+            hostThreshold.put(i, Double.parseDouble(threshold1FromCMD));
+        }*/
 
         /*for(int i = 0; i < numLocations; i++) {
             locationThreshold.put(i, new Pair(Double.parseDouble(threshold1FromCMD), Double.parseDouble(threshold2FromCMD)));
-        }*/
+        }
 
-        /*if(numLocationsDown != 0){
+        if(numLocationsDown != 0){
             for(int i = 0; i < numLocationsDown; i++){
-                int locationDownIdx = (int)(Math.floor((betaDistributionWholeLocation.sample() * numLocations)));
+                int locationDownIdx = (int)(Math.floor((uniformDistributionLocationDown.sample() * numLocations)));
                 if(locationDownIdx == numLocations){
                     locationDownIdx = numLocations - 1;
                 }
                 Pair pair = locationThreshold.get(locationDownIdx);
-                pair.second = 0.1;
+                pair.second = 0.01;
                 locationThreshold.put(locationDownIdx, pair);
             }
         }*/
@@ -858,13 +877,14 @@ public class Client {
         int mappedID = idMap.get(vmID);
 
         Vm vm = unchangedList.get(mappedID);
-        if(vm.isCreated()){
-            return;
-        }
 
         if(vm.isInMigration()){
             debugMigration.append("VM ID: ").append(vmID).append(" ").append(simulation.clock()).append("\n");
             migrationError++;
+        }
+
+        if(vm.isCreated()){
+            return;
         }
 
         int idx = (int)(Math.floor(uniformDistributionMigration.sample() * numHosts));
