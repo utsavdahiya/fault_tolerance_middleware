@@ -30,6 +30,6 @@ class FaultMasking:
                 "desc": "migration",
                 "id": vm_id
             }
-        logger.info(colored(f"migrating faulty VM [{vm_id}]", 'red'))
+        logger.info(colored(f"migrating faulty VM[{vm_id}]", 'red'))
         await ftm.msg_monitor.send_json(msg, 'cloud')
         # logger.info(colored(f"vm id[{vm_id}] has been successfully migrated to another host", on_color='on_green'))
