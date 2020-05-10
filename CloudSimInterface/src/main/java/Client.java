@@ -70,7 +70,10 @@ public class Client {
     @OnMessage
     public void onMessage(String message, Session session) {
         //System.out.println("yolo8");
-        //System.out.println("Received ...." + message);
+        //System.err.println("Received ...." + message);
+        if(debugRequests != null) {
+            debugRequests.append(message).append(" ").append(simulation.clock()).append("\n");
+        }
         messageQueue.add(message);
     }
 
@@ -145,6 +148,7 @@ public class Client {
     static StringBuilder debugHosts = new StringBuilder();
     static StringBuilder debugLocations = new StringBuilder();
     static StringBuilder debugMigration = new StringBuilder();
+    static StringBuilder debugRequests = new StringBuilder();
     static int migrationError = 0;
 
     /**
@@ -210,6 +214,8 @@ public class Client {
             if((int)(eventInfo.getTime()) == TIME_TILL_TERMINATION - 2){
                 debugMigration.append(migrationError);
                 System.err.println(debugMigration.toString());
+
+                System.err.println(debugRequests.toString());
                 JSONObject finalMessage = new JSONObject();
                 finalMessage.put("desc", "finish");
                 finalMessage.put("client_id", finishClientID);
@@ -844,10 +850,15 @@ public class Client {
      * @param message - Contains the ID of the VM to be migrated.
      */
     private static void migrateVm(JSONObject message){
+        System.err.println(message + "\n" + simulation.clock());
         int vmID = Integer.parseInt(message.getString("id"));
         int mappedID = idMap.get(vmID);
 
         Vm vm = unchangedList.get(mappedID);
+        if(vm.isCreated()){
+            return;
+        }
+
         if(vm.isInMigration()){
             debugMigration.append("VM ID: ").append(vmID).append(" ").append(simulation.clock()).append("\n");
             migrationError++;
