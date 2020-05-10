@@ -8,9 +8,9 @@ import asyncio
 from termcolor import colored
 import pickle
 import sys
-# import nest_asyncio
+import nest_asyncio
 from timeit import default_timer
-# nest_asyncio.apply()
+nest_asyncio.apply()
 
 import logging
 logging.basicConfig(level=logging.INFO)
