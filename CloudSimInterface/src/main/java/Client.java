@@ -266,7 +266,7 @@ public class Client {
             if((int)(eventInfo.getTime()) == 18){
                 for(int i = 0; i < numLocationsDown; i++){
                     int factor = numHosts / numLocations;
-                    int id = (int)(Math.floor(uniformDistributionLocationDown.sample() * factor));
+                    int id = (int)(Math.floor(uniformDistributionLocationDown.sample() * numLocations));
                     int startIdx = factor * id;
                     for(int j = startIdx; j < startIdx + factor; j++){
                         fault.generateHostFault(hostList.get(j));

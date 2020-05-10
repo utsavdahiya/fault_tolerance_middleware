@@ -61,27 +61,27 @@ def procedure(RUN):
     print("xxxxxxxxxxxxxx CloudSim finished xxxxxxxxxxxxxx")
 
 def run_main():
-    NUM_SIMULATION = 1
-    EPOCH = 1
-    NUM_LOCATIONS = 10
-    OUTPUT = "./results/test.pkl"
+    NUM_SIMULATION = 8
+    EPOCH = 10
+    NUM_LOCATIONS = 5
+    OUTPUT = "./results/OutputUday27.pkl"
     SIMULATION_TIME = 38
-    ARCH = "new"    #can change to "original"
-    PORT_CLOUD = '8081'
-    PORT_CLIENT = '8082'
+    ARCH = "original"    #can change to "original"
+    PORT_CLOUD = '9081'
+    PORT_CLIENT = '9082'
     # CONFIG_FILE = "config1.conf"
 
-    RUN = '0'
+    RUN = '1'
     THRESHOLD1 = 0.5    #used for host threshold over the dist by SEED1
     THRESHOLD2 = 0.7
     SEED1 = 42  #used for host fault injection porb uniform distribution
     SEED2 = 42
     SEED3 = 42
     SEED4 = 42
-    LOCATIONS_DOWN = 0
-    NUM_HOSTS = 50
+    LOCATIONS_DOWN = 1
+    NUM_HOSTS = 30
 
-    FAULT_RATE = 6.0
+    FAULT_RATE = 0.8
     THRESHOLD1 = 1.0 - float(FAULT_RATE)/NUM_HOSTS
     # fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
 
