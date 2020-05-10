@@ -81,7 +81,7 @@ def run_main():
     LOCATIONS_DOWN = 0
     NUM_HOSTS = 50
 
-    FAULT_RATE = 3.2
+    FAULT_RATE = 6.0
     THRESHOLD1 = 1.0 - float(FAULT_RATE)/NUM_HOSTS
     # fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
 
