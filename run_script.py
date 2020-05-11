@@ -1,7 +1,7 @@
 from ftm.server import run_main as server_main
 from ftm.websocket_client import run_main as client_main
 from ftm import globals
-# from ftm.test_cloud import run_main as cloud_main
+from ftm.test_cloud import run_main as cloud_main
 
 from termcolor import colored
 import subprocess, shlex
@@ -37,10 +37,10 @@ def procedure(RUN):
     # cmd3 = f"mvn exec:java -Dexec.mainClass={classname} -Dexec.args={arguments}"
     cmd4 = "python websocket_client.py"
     # p1 = multiprocessing.Process(target=subprocess_cmd, args=(cmd2, "../"))
-    p2 = multiprocessing.Process(target=subprocess_cmd, args=(cmd3,))
+    # p2 = multiprocessing.Process(target=subprocess_cmd, args=(cmd3,))
     # p3 = multiprocessing.Process(target=subprocess_cmd, args=(cmd4, "../"))
     p1 = multiprocessing.Process(target=server_main, args=(queue,))
-    # p2 = multiprocessing.Process(target=cloud_main)
+    p2 = multiprocessing.Process(target=cloud_main)
     p3 = multiprocessing.Process(target=client_main, args=(queue,))
     
     p1.start()  #starting server
@@ -67,8 +67,8 @@ def run_main():
     OUTPUT = "./results/OutputUday27.pkl"
     SIMULATION_TIME = 38
     ARCH = "original"    #can change to "original"
-    PORT_CLOUD = '9081'
-    PORT_CLIENT = '9082'
+    PORT_CLOUD = '8081'
+    PORT_CLIENT = '8082'
     # CONFIG_FILE = "config1.conf"
 
     RUN = '1'
