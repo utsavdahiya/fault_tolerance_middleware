@@ -2,7 +2,7 @@
 
 from .ft_unit_base import ReplicationStratergy, FaultDetectionStratergy, VmPlacementPolicy ,FtUnit
 from ..replication_mgr import replica_invoker
-from ftm.globals import LOCATIONS
+from ftm import globals
 from termcolor import colored
 # from random import choices
 import random
@@ -97,12 +97,12 @@ class VmPlacement(VmPlacementPolicy):
         random.seed(SEED)
         total_range = 1000
         mapping = []    #a list of tuples (start, end, location)
-        logger.info(f"locations: {LOCATIONS}")
-        if len(LOCATIONS.keys()) == 0:
+        logger.info(colored(f"locations: {globals.LOCATIONS}", on_color='on_red'))
+        if len(globals.LOCATIONS.keys()) == 0:
             remaining_range = total_range
             remaining_range_start = 0
         else:
-            for location, val in LOCATIONS.items():
+            for location, val in globals.LOCATIONS.items():
                 if len(mapping) == 0:
                     mapping.append((0,total_range * int(val)/100, int(location)))
                 else:
