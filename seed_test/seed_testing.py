@@ -5,7 +5,7 @@ import pickle
 
 START_SEED = 0
 NUM_LOCATIONS = 4
-NUM_VM_SET = 500
+NUM_VM_SET = 7
 SET_SIZE = 3
 NUM_ITERATIONS = 100
 OUTPUT_FILE = './default_output.pkl'
