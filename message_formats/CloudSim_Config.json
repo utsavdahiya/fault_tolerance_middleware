@@ -12,7 +12,9 @@
 		"seed4": "42",
 		"num_locations": "10",
 		"num_locations_down": "1",
-		"port": "8081"
+		"port": "8081",
+		"locations": {"loc_id": "percent_prob",
+						"loc_id2": "20"}
 	}, {
 		"num_hosts": "70",
 		"threshold1": "0.5",
@@ -23,6 +25,8 @@
 		"seed4": "42",
 		"num_locations": "10",
 		"num_locations_down": "1",
-		"port": "8081"
+		"port": "8081",
+		"locations": {"loc_id": "percent_prob",
+						"loc_id2": "20"}
 	}]
 }
