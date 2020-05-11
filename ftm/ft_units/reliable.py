@@ -2,6 +2,7 @@
 
 from .ft_unit_base import ReplicationStratergy, FaultDetectionStratergy, VmPlacementPolicy ,FtUnit
 from ..replication_mgr import replica_invoker
+from ftm.globals import LOCATIONS
 from termcolor import colored
 # from random import choices
 import random
@@ -14,6 +15,21 @@ logger.setLevel(logging.DEBUG)
 
 SEED = 42
 random.seed(SEED)
+
+def get_loc(mapping, range):
+    '''
+    Args:
+        mapping: a list of tuples
+    '''
+    num = random.randint(0,range)
+    loc = -1
+    for partition in mapping:
+        if (partition[0] <= num and num <= partition[1]):
+            loc = partition[2]
+            break
+    if loc == -1:
+        raise Exception("loc= -1, no mapping found!")
+    return [loc]
 
 class VmPlacement(VmPlacementPolicy):
     '''atleast one backup not on the same host as the primary'''
@@ -79,17 +95,40 @@ class VmPlacement(VmPlacementPolicy):
                         ]
         '''
         random.seed(SEED)
+        total_range = 1000
+        mapping = []    #a list of tuples (start, end, location)
+        if len(LOCATIONS.keys()) == 0:
+            remaining_range = total_range
+            remaining_range_start = 0
+        else:
+            for location, val in LOCATIONS.items():
+                if len(mapping) == 0:
+                    mapping.append(tuple(0,total_range * int(val)/100, int(location)))
+                else:
+                    prev_end = mapping[-1][2]
+                    mapping.append(tuple(prev_end+1, prev_end+1 + (total_range*int(val)/100), int(location)))
+                
+                #remove location from locations list
+                locations.remove(int(location))
+
+            remaining_range = total_range - mapping[-1][1]
+            remaining_range_start = mapping[-1][1]
         
+        partition = remaining_range / len(locations)
+        for location in locations:
+            mapping.append(tuple(mapping[-1][1] + 1, mapping[-1][1] + partition, location))
+        logger.info(colored(f"mapping: {mapping}", 'red'))
+
         logger.info(colored("placing the VMs", 'blue'))
         final_placement = []
         for primary_vm in range(num_primary):
             placement = {'primary': {}}
-            loc = random.choices(locations)
+            loc = get_loc(mapping, total_range)
             placement['primary']['loc'] = loc[0]   #this is a list of locations for pimary VMs
             backup_loc = {}
             num_backup = replica_ratio
             for i in range(num_backup):
-                loc = random.choices(locations)
+                loc = get_loc(mapping, total_range)
                 prev_val = backup_loc.get(loc[0], 0)
                 backup_loc[loc[0]] = prev_val + 1
 

@@ -9,6 +9,7 @@ SIMULATION_TIME = 40
 ARCH = "new"
 PORT_CLOUD = '80801'
 PORT_CLIENT = '8082'
+LOCATIONS = {}
 OUTPUT = "./results/default_output.pkl"
 
 def initialize_globals(args):
@@ -43,6 +44,8 @@ def initialize_globals(args):
     if 'ARCH' in args:
         global ARCH
         ARCH = args['ARCH']
+    if 'LOCATIONS' in args:
+        LOCATIONS = args['LOCATIONS']
     if 'PORT_CLOUD' in args:
         global PORT_CLOUD
         PORT_CLOUD = args['PORT_CLOUD']
