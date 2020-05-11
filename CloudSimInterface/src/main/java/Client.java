@@ -18,7 +18,6 @@ import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.resources.PeSimple;
 import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
-import org.cloudbus.cloudsim.util.Conversion;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelDynamic;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
@@ -117,20 +116,24 @@ public class Client {
     private static final HashMap<Integer, Pair> locationThreshold = new HashMap<>();
     private static Set<Map.Entry<Integer, Pair>> locationThresholdEntrySet;
     //private static final HashMap<Integer, Double> hostThreshold = new HashMap<>();
+    private static HashMap<Integer, Integer> locationFaultMap = new HashMap<>();
+    private static HashMap<Integer, ArrayList<Integer>> locationFaultBoundsMap = new HashMap<>();
+    private static Set<Map.Entry<Integer, ArrayList<Integer>>> locationFaultBoundsEntrySet;
     private static final double THRESHOLD_PERCENTAGE = 0.5;
     private static final double THRESHOLD_LOCATION = LOWER_BOUND + ((1 - LOWER_BOUND) * THRESHOLD_PERCENTAGE);
     private static final double THRESHOLD_HOST = LOWER_BOUND + ((1 - LOWER_BOUND) * THRESHOLD_PERCENTAGE);
     private static final long SEED_LOCATION = 123456L;
     private static final long SEED_HOST = 234567L;
     private static final long SEED_INDEX = 345678L;
-    private static final Random random = new Random(SEED_LOCATION);
+    private static final Random random = new Random();
     private static final double ALPHA = 1;
     private static final double BETA = 1;
     private static final BetaDistribution betaDistributionLocation = new BetaDistribution(ALPHA, BETA);
     private static final BetaDistribution betaDistributionHost = new BetaDistribution(ALPHA, BETA);
     private static final BetaDistribution betaDistributionIndex = new BetaDistribution(ALPHA, BETA);
     private static final BetaDistribution betaDistributionWholeLocation = new BetaDistribution(ALPHA, BETA);
-    private static final UniformRealDistribution uniformDistribution = new UniformRealDistribution();
+    private static final UniformRealDistribution uniformDistributionFaultLocation = new UniformRealDistribution();
+    private static final UniformRealDistribution uniformDistributionFaultHost = new UniformRealDistribution();
     private static final UniformRealDistribution uniformDistributionAllocation = new UniformRealDistribution();
     private static final UniformRealDistribution uniformDistributionMigration = new UniformRealDistribution();
     private static final UniformRealDistribution uniformDistributionLocationDown = new UniformRealDistribution();
@@ -226,6 +229,7 @@ public class Client {
                 try {
                     currSession.getBasicRemote().sendObject(finalMessage);
                     System.out.println(finalMessage);
+                    System.out.println(debugRandoms);
                 } catch (IOException | EncodeException e) {
                     e.printStackTrace();
                 }
@@ -254,16 +258,43 @@ public class Client {
                     }
                 }*/
 
-                for(Host host : hostList) {
-                    double randomNumber = uniformDistribution.sample();
-                    if (randomNumber > Double.parseDouble(threshold1FromCMD)) {
-                        fault.generateHostFault(host);
+                int randomNumber = random.nextInt(1000);
+                for(Map.Entry<Integer, ArrayList<Integer>> entry : locationFaultBoundsEntrySet){
+                    ArrayList<Integer> temp = entry.getValue();
+                    if(randomNumber >= temp.get(0) && randomNumber < temp.get(1)){
+                        int factor = numHosts / numLocations;
+                        int startIdx = factor * entry.getKey();
+                        for(int i = startIdx; i < startIdx + factor; i++){
+                            double randomNumberHost = uniformDistributionFaultHost.sample();
+                            debugRandoms.append(randomNumberHost).append("\n");
+                            if (randomNumberHost > Double.parseDouble(threshold1FromCMD)) {
+                                fault.generateHostFault(hostList.get(i));
+                            }
+                        }
+                        //break;
                     }
                 }
 
+                /*int locationIdx = (int)(Math.floor((uniformDistributionFaultLocation.sample() * numLocations)));
+                int factor = numHosts / numLocations;
+                int startIdx = factor * locationIdx;
+                for(int i = startIdx; i < startIdx + factor; i++){
+                    double randomNumber = uniformDistributionFaultHost.sample();
+                    if (randomNumber > Double.parseDouble(threshold1FromCMD)) {
+                        fault.generateHostFault(hostList.get(i));
+                    }
+                }*/
+
+                /*for(Host host : hostList) {
+                    double randomNumber = uniformDistributionFaultLocation.sample();
+                    if (randomNumber > Double.parseDouble(threshold1FromCMD)) {
+                        fault.generateHostFault(host);
+                    }
+                }*/
+
             }
 
-            if((int)(eventInfo.getTime()) == 18){
+            /*if((int)(eventInfo.getTime()) == 18){
                 for(int i = 0; i < numLocationsDown; i++){
                     int factor = numHosts / numLocations;
                     int id = (int)(Math.floor(uniformDistributionLocationDown.sample() * numLocations));
@@ -272,7 +303,7 @@ public class Client {
                         fault.generateHostFault(hostList.get(j));
                     }
                 }
-            }
+            }*/
 
             /*if(randomGenerated > THRESHOLD && (int)(eventInfo.getTime()) >= 15){
                 int randomHostIndex = ThreadLocalRandom.current().nextInt(0, hostList.size());
@@ -376,7 +407,13 @@ public class Client {
                     numLocationsDown = 0;
                 }
                 port = (String) params.get("port");
-                System.out.println(port);
+                //System.out.println(port);
+                org.json.simple.JSONObject locations = (org.json.simple.JSONObject) params.get("locations");
+                for(Iterator iterator = locations.keySet().iterator(); iterator.hasNext();) {
+                    int key = Integer.parseInt((String) iterator.next());
+                    int value = Integer.parseInt((String)locations.get(key + ""));
+                    locationFaultMap.put(key, value);
+                }
             }else if(Integer.parseInt(argsArray[1]) == 1){
                 org.json.simple.JSONObject params = (org.json.simple.JSONObject) arr.get(1);
                 numHosts = Integer.parseInt((String) params.get("num_hosts"));
@@ -392,7 +429,13 @@ public class Client {
                     numLocationsDown = 0;
                 }
                 port = (String) params.get("port");
-                System.out.println(port);
+                //System.out.println(port);
+                org.json.simple.JSONObject locations = (org.json.simple.JSONObject) params.get("locations");
+                for(Iterator iterator = locations.keySet().iterator(); iterator.hasNext();) {
+                    int key = Integer.parseInt((String) iterator.next());
+                    int value = Integer.parseInt((String)locations.get(key + ""));
+                    locationFaultMap.put(key, value);
+                }
             }
         }catch (IOException | ParseException e){
             e.printStackTrace();
@@ -421,11 +464,38 @@ public class Client {
         betaDistributionIndex.reseedRandomGenerator(Long.parseLong(seed3FromCMD));
         betaDistributionWholeLocation.reseedRandomGenerator(Long.parseLong(seed4FromCMD));*/
 
-        uniformDistribution.reseedRandomGenerator(Long.parseLong(seed1FromCMD));
+        //uniformDistributionFaultLocation.reseedRandomGenerator(Long.parseLong(seed1FromCMD));
         uniformDistributionAllocation.reseedRandomGenerator(Long.parseLong(seed2FromCMD));
         uniformDistributionMigration.reseedRandomGenerator(Long.parseLong(seed3FromCMD));
-        uniformDistributionLocationDown.reseedRandomGenerator(Long.parseLong(seed4FromCMD));
+        //uniformDistributionLocationDown.reseedRandomGenerator(Long.parseLong(seed4FromCMD));
+        uniformDistributionFaultHost.reseedRandomGenerator(Long.parseLong(seed4FromCMD));
+        random.setSeed(Long.parseLong(seed4FromCMD));
 
+        int lowerBound = 0;
+
+        for(Integer id : locationFaultMap.keySet()){
+            ArrayList<Integer> al = new ArrayList<>();
+            al.add(lowerBound);
+            al.add(lowerBound + (locationFaultMap.get(id) * 10));
+            locationFaultBoundsMap.put(id, al);
+            lowerBound += (locationFaultMap.get(id) * 10);
+        }
+
+        int commonProbabilityRemaining = (1000 - lowerBound) / (numLocations - locationFaultMap.size());
+        for(int i = 0; i < numLocations; i++){
+            if(!locationFaultMap.containsKey(i)) {
+                ArrayList<Integer> al = new ArrayList<>();
+                al.add(lowerBound);
+                al.add(lowerBound + commonProbabilityRemaining);
+                locationFaultBoundsMap.put(i, al);
+                lowerBound += commonProbabilityRemaining;
+            }
+        }
+
+        System.out.println(locationFaultBoundsMap);
+        System.out.println(locationFaultMap);
+
+        locationFaultBoundsEntrySet = locationFaultBoundsMap.entrySet();
         /*for(int i = 0; i < numHosts; i++){
             hostThreshold.put(i, Double.parseDouble(threshold1FromCMD));
         }*/
@@ -508,10 +578,10 @@ public class Client {
         new CloudletsTableBuilder(finishedCloudlets).build();
 
         System.out.println(debugRandoms.toString());
-        System.out.println(debugHosts.toString());
-        System.out.println(debugLocations.toString());
-        debugMigration.append(migrationError);
-        System.err.println(debugMigration.toString());
+        //System.out.println(debugHosts.toString());
+        //System.out.println(debugLocations.toString());
+        //debugMigration.append(migrationError);
+        //System.err.println(debugMigration.toString());
     }
 
     /**
@@ -887,8 +957,13 @@ public class Client {
             return;
         }
 
-        int idx = (int)(Math.floor(uniformDistributionMigration.sample() * numHosts));
+        int location = (int)(vm.getId());
+        int factor = numHosts / numLocations;
+        int startIdx = location * factor;
+        int idx = (int)(Math.floor(startIdx + (uniformDistributionMigration.sample() * factor)));
         datacenter.requestVmMigration(vm, hostList.get(idx));
+
+
         /*String clientID = "";
         if(message.has("client_id")){
             clientID = message.getString("client_id");
