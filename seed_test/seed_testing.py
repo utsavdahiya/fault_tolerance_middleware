@@ -5,9 +5,9 @@ import pickle
 
 START_SEED = 0
 NUM_LOCATIONS = 4
-NUM_VM_SET = 200
+NUM_VM_SET = 5
 SET_SIZE = 3
-NUM_ITERATIONS = 1
+NUM_ITERATIONS = 10
 OUTPUT_FILE = './default_output.pkl'
 
 def place_vm(seed_result, loc_result, togetherness_result):
