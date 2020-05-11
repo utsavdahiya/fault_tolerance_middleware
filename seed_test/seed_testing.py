@@ -47,7 +47,8 @@ def place_vm(seed_result, loc_result, togetherness_result):
             #updating the result
             loc_result = [sum(i) for i in zip(loc_result, placement)]
             togetherness_result = Counter(togetherness_result) + Counter(togetherness)
-            seed_val = {'score':score,
+            seed_val = {'seed': seed,
+                        'score':score,
                         'togetherness': togetherness,
                         'placement': placement}
 
