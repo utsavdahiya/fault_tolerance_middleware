@@ -81,6 +81,9 @@ def run_main():
     LOCATIONS_DOWN = 1
     NUM_HOSTS = 30
 
+    LOCATIONS = {"1" : "70",
+                "0" : "20"}
+
     FAULT_RATE = 0.8
     THRESHOLD1 = 1.0 - float(FAULT_RATE)/NUM_HOSTS
     # fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
@@ -108,6 +111,7 @@ def run_main():
             settings['ARCH'] = ARCH
             settings['OUTPUT'] = OUTPUT
             settings['NUM_LOCATIONS'] = NUM_LOCATIONS
+            settings['LOCATIONS'] = LOCATIONS
             if first_run:
                 first_run = False
                 settings['PORT_CLOUD'] = PORT_CLOUD
@@ -129,6 +133,7 @@ def run_main():
                             "port" : PORT_CLOUD,
                             "num_locations" : str(NUM_LOCATIONS),
                             "num_locations_down" : str(LOCATIONS_DOWN),
+                            "locations": LOCATIONS,
                             "num_hosts" : str(NUM_HOSTS)
                         }
             # if first_cloud_run:
