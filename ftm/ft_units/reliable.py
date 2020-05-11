@@ -97,16 +97,17 @@ class VmPlacement(VmPlacementPolicy):
         random.seed(SEED)
         total_range = 1000
         mapping = []    #a list of tuples (start, end, location)
+        logger.info(f"locations: {LOCATIONS}")
         if len(LOCATIONS.keys()) == 0:
             remaining_range = total_range
             remaining_range_start = 0
         else:
             for location, val in LOCATIONS.items():
                 if len(mapping) == 0:
-                    mapping.append(tuple(0,total_range * int(val)/100, int(location)))
+                    mapping.append((0,total_range * int(val)/100, int(location)))
                 else:
                     prev_end = mapping[-1][2]
-                    mapping.append(tuple(prev_end+1, prev_end+1 + (total_range*int(val)/100), int(location)))
+                    mapping.append((prev_end+1, prev_end+1 + (total_range*int(val)/100), int(location)))
                 
                 #remove location from locations list
                 locations.remove(int(location))
@@ -115,8 +116,10 @@ class VmPlacement(VmPlacementPolicy):
             remaining_range_start = mapping[-1][1]
         
         partition = remaining_range / len(locations)
+        if len(mapping) == 0:
+            mapping.append((-1, -1, -1))
         for location in locations:
-            mapping.append(tuple(mapping[-1][1] + 1, mapping[-1][1] + partition, location))
+            mapping.append((mapping[-1][1] + 1, mapping[-1][1] + partition, location))
         logger.info(colored(f"mapping: {mapping}", 'red'))
 
         logger.info(colored("placing the VMs", 'blue'))

@@ -45,6 +45,7 @@ def initialize_globals(args):
         global ARCH
         ARCH = args['ARCH']
     if 'LOCATIONS' in args:
+        # global LOCATIONS
         LOCATIONS = args['LOCATIONS']
     if 'PORT_CLOUD' in args:
         global PORT_CLOUD
