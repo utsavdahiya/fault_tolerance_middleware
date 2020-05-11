@@ -106,7 +106,7 @@ class VmPlacement(VmPlacementPolicy):
                 if len(mapping) == 0:
                     mapping.append((0,total_range * int(val)/100, int(location)))
                 else:
-                    prev_end = mapping[-1][2]
+                    prev_end = mapping[-1][1]
                     mapping.append((prev_end+1, prev_end+1 + (total_range*int(val)/100), int(location)))
                 
                 #remove location from locations list
