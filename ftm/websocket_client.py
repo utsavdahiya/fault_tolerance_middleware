@@ -12,6 +12,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("__name__")
 
+INPUT_FILE = "client_req.json"
+
 messages = {
     'instantiate_cloudlet': {
                     "desc":"instantiate_cloudlet",
@@ -53,7 +55,7 @@ class FtmClient():
                         if self.first_time: #this will run only once
                             self.first_time = False
                             try:
-                                with open("ftm/client_req.json") as f:
+                                with open("ftm/{INPUT_FILE}") as f:
                                     logger.info(colored("file loaded:", on_color='on_green'))
                                     # print(f)
                                     data = json.load(f)
