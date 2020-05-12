@@ -55,7 +55,7 @@ class FtmClient():
                         if self.first_time: #this will run only once
                             self.first_time = False
                             try:
-                                with open("ftm/{INPUT_FILE}") as f:
+                                with open(f"ftm/{INPUT_FILE}") as f:
                                     logger.info(colored("file loaded:", on_color='on_green'))
                                     # print(f)
                                     data = json.load(f)

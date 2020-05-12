@@ -146,7 +146,7 @@ def print_all_durations(data, **kwargs):
         fig, ax = plt.subplots()
     ax.plot(list(data.keys()), duration_mean, 'k-', label=label, color=color)
     ax.fill_between(list(data.keys()), duration_min, duration_max, color=color, alpha=0.3)
-    ax.set_xlabel("Fault rates")
+    ax.set_xlabel("Fault rates (per sec)")
     ax.set_ylabel("Availability")
     ax.set_title(f"Mean val: {mean_val}")
     ax.grid()
@@ -185,8 +185,8 @@ def print_comparision(file1, file2):
 
 
 def main():
-    file1 = "OutputUday29.pkl"   #new
-    file2 = "OutputUday30.pkl"   #old
+    file1 = "OutputUday31.pkl"   #new
+    file2 = "OutputUday32.pkl"   #old
 
     # with open(file1, 'rb') as handle:
     #     result = pickle.load(handle)
