@@ -64,7 +64,7 @@ def run_main():
     NUM_SIMULATION = 10
     EPOCH = 10
     NUM_LOCATIONS = 4
-    OUTPUT = "./results/OutputUday28.pkl"
+    OUTPUT = "./results/OutputUday30.pkl"
     SIMULATION_TIME = 38
     ARCH = "original"    #can change to "original"
     PORT_CLOUD = '9081'
@@ -81,10 +81,10 @@ def run_main():
     LOCATIONS_DOWN = 0
     NUM_HOSTS = 50
 
-    LOCATIONS_FAULT = {"1" : "70",
+    LOCATIONS_FAULT = {"1" : "60",
                 "0" : "20"}
     
-    LOCATIONS_PLACEMENT = {"1": "70",
+    LOCATIONS_PLACEMENT = {"1": "60",
                            "0": "20"}
 
     FAULT_RATE = 2.2
