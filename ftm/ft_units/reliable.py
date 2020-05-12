@@ -28,7 +28,7 @@ def get_loc(mapping, range):
             loc = partition[2]
             break
     if loc == -1:
-        raise Exception("loc= -1, no mapping found! for num: {num}")
+        raise Exception(f"loc= -1, no mapping found! for num: {num}")
     return [loc]
 
 class VmPlacement(VmPlacementPolicy):
