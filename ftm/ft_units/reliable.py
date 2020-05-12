@@ -119,7 +119,7 @@ class VmPlacement(VmPlacementPolicy):
         if len(mapping) == 0:
             mapping.append((-1, -1, -1))
         for location in locations:
-            mapping.append((mapping[-1][1] + 1, mapping[-1][1] + partition, location))
+            mapping.append((mapping[-1][1], mapping[-1][1] + partition, location))
         logger.info(colored(f"mapping: {mapping}", 'red'))
 
         logger.info(colored("placing the VMs", 'blue'))
