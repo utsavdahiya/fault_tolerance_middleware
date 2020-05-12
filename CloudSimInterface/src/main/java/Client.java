@@ -96,7 +96,7 @@ public class Client {
     private static final int HOST_PES = 10; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE.
     private static final int SCHEDULING_INTERVAL = 1; // Random number as of now, TODO: Discuss. DONE.
     private static int numHosts; // Random number as of now, TODO: Get this initially from FTM through a socket connection probably. DONE
-    private static final int TIME_TILL_TERMINATION = 40; // Random time as of now, very big time as discussed
+    private static final int TIME_TILL_TERMINATION = 80; // Random time as of now, very big time as discussed
     private static int numLocations; //Random number as of now.
     private static JSONArray locations;
 

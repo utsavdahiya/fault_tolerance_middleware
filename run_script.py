@@ -61,11 +61,11 @@ def procedure(RUN):
     print("xxxxxxxxxxxxxx CloudSim finished xxxxxxxxxxxxxx")
 
 def run_main():
-    NUM_SIMULATION = 10
+    NUM_SIMULATION = 5
     EPOCH = 10
     NUM_LOCATIONS = 5
-    OUTPUT = "./results/OutputUday38.pkl"
-    SIMULATION_TIME = 38
+    OUTPUT = "./results/OutputUday42.pkl"
+    SIMULATION_TIME = 78
     ARCH = "original"    #can change to "original"
     PORT_CLOUD = '9081'
     PORT_CLIENT = '9082'
@@ -164,7 +164,7 @@ def run_main():
 
         #updating the parameters
         # THRESHOLD2 -= 0.03
-        FAULT_RATE += 0.3
+        FAULT_RATE += 0.4
 
 if __name__ == '__main__':
     run_main()
