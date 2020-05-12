@@ -12,7 +12,7 @@
       "num_locations": "4",
       "num_locations_down": "0",
       "locations": {
-        "1": "70",
+        "1": "60",
         "0": "20"
       },
       "num_hosts": "50"
@@ -28,7 +28,7 @@
       "num_locations": "4",
       "num_locations_down": "0",
       "locations": {
-        "1": "70",
+        "1": "60",
         "0": "20"
       },
       "num_hosts": "50"
