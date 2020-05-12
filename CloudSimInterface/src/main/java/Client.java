@@ -145,6 +145,7 @@ public class Client {
     private static String seed4FromCMD;
     private static int numLocationsDown;
     private static int run;
+    private static int upperBoundRangeRandom = 10000;
 
     /**
      * Constants related to debugging.
@@ -258,7 +259,7 @@ public class Client {
                     }
                 }*/
 
-                int randomNumber = random.nextInt(1000);
+                int randomNumber = random.nextInt(upperBoundRangeRandom);
                 for(Map.Entry<Integer, ArrayList<Integer>> entry : locationFaultBoundsEntrySet){
                     ArrayList<Integer> temp = entry.getValue();
                     if(randomNumber >= temp.get(0) && randomNumber < temp.get(1)){
@@ -476,12 +477,12 @@ public class Client {
         for(Integer id : locationFaultMap.keySet()){
             ArrayList<Integer> al = new ArrayList<>();
             al.add(lowerBound);
-            al.add(lowerBound + (locationFaultMap.get(id) * 10));
+            al.add(lowerBound + (locationFaultMap.get(id) * (upperBoundRangeRandom / 100)));
             locationFaultBoundsMap.put(id, al);
-            lowerBound += (locationFaultMap.get(id) * 10);
+            lowerBound += (locationFaultMap.get(id) * (upperBoundRangeRandom / 100));
         }
 
-        int commonProbabilityRemaining = (1000 - lowerBound) / (numLocations - locationFaultMap.size());
+        int commonProbabilityRemaining = (upperBoundRangeRandom - lowerBound) / (numLocations - locationFaultMap.size());
         for(int i = 0; i < numLocations; i++){
             if(!locationFaultMap.containsKey(i)) {
                 ArrayList<Integer> al = new ArrayList<>();
