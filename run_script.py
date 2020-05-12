@@ -63,15 +63,15 @@ def procedure(RUN):
 def run_main():
     NUM_SIMULATION = 10
     EPOCH = 10
-    NUM_LOCATIONS = 4
-    OUTPUT = "./results/OutputUday32.pkl"
+    NUM_LOCATIONS = 5
+    OUTPUT = "./results/OutputUday34.pkl"
     SIMULATION_TIME = 38
     ARCH = "original"    #can change to "original"
     PORT_CLOUD = '9081'
     PORT_CLIENT = '9082'
     # CONFIG_FILE = "config1.conf"
 
-    RUN = '1'
+    RUN = '0'
     THRESHOLD1 = 0.5    #used for host threshold over the dist by SEED1
     THRESHOLD2 = 0.7
     SEED1 = 42  #used for host fault injection porb uniform distribution
@@ -79,14 +79,15 @@ def run_main():
     SEED3 = 42
     SEED4 = 42
     LOCATIONS_DOWN = 0
-    NUM_HOSTS = 50
+    NUM_HOSTS = 90
 
-    LOCATIONS_FAULT = {"1" : "50"}
+    LOCATIONS_FAULT = {"1" : "50",
+    				   "2" : "20"}
     
-    LOCATIONS_PLACEMENT = {"1": "60",
-                           "0": "20"}
+    LOCATIONS_PLACEMENT = {"1": "50",
+                           "2": "20"}
 
-    FAULT_RATE = 2.2
+    FAULT_RATE = 0.8
     THRESHOLD1 = 1.0 - float(FAULT_RATE)/NUM_HOSTS
     # fault_rate = (1 - THRESHOLD1) * (1 - THRESHOLD2) * float(NUM_LOCATIONS)
 
@@ -165,7 +166,7 @@ def run_main():
 
         #updating the parameters
         # THRESHOLD2 -= 0.03
-        FAULT_RATE += 0.2
+        FAULT_RATE += 0.4
 
 if __name__ == '__main__':
     run_main()
