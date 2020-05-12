@@ -236,7 +236,7 @@ public class Client {
                 }
             }
 
-            if((int)(eventInfo.getTime()) >= 15){
+            if((int)(eventInfo.getTime()) >= 10){
                 /*double randomGeneratedForLocation = LOWER_BOUND + (betaDistributionLocation.sample() * (UPPER_BOUND - LOWER_BOUND));
                 //System.out.println(randomGeneratedForLocation + " loc ");
                 debugRandoms.append(randomGeneratedForLocation).append(" ");
@@ -333,7 +333,7 @@ public class Client {
                 fault.generateHostFault(hostList.get(10));
             }*/
 
-            if((int)eventInfo.getTime() == 15){
+            if((int)eventInfo.getTime() == 10){
                 for(Host host : hostList){
                     //System.out.println(host.getVmList().size());
                     debugHosts.append(host.getVmList().size()).append(" ");
