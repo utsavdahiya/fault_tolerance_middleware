@@ -1,7 +1,7 @@
 {
 	"desc": "requirements",
 	"vms": [{
-		"num_of_instances": 333,
+		"num_of_instances": 170,
 		"config": {
 			"mips": "1000",
 			"pes": "1",

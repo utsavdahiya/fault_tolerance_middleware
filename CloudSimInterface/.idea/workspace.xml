@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="74182473-e4f4-4de9-bc2c-f046aec36f17" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ftm/client_req.json" beforeDir="false" afterPath="$PROJECT_DIR$/../ftm/client_req.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../run_script.py" beforeDir="false" afterPath="$PROJECT_DIR$/../run_script.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
