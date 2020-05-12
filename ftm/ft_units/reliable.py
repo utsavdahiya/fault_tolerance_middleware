@@ -28,7 +28,7 @@ def get_loc(mapping, range):
             loc = partition[2]
             break
     if loc == -1:
-        raise Exception("loc= -1, no mapping found!")
+        raise Exception("loc= -1, no mapping found! for num: {num}")
     return [loc]
 
 class VmPlacement(VmPlacementPolicy):
@@ -95,7 +95,7 @@ class VmPlacement(VmPlacementPolicy):
                         ]
         '''
         random.seed(SEED)
-        total_range = 1000
+        total_range = 10000
         mapping = []    #a list of tuples (start, end, location)
         logger.info(colored(f"locations: {globals.LOCATIONS}", on_color='on_red'))
         if len(globals.LOCATIONS.keys()) == 0:
