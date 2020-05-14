@@ -8,7 +8,7 @@
       "seed2": "51",
       "seed3": "51",
       "seed4": "51",
-      "port": "8081",
+      "port": "9081",
       "num_locations": "5",
       "num_locations_down": "0",
       "locations": {
@@ -17,7 +17,7 @@
       "num_hosts": "100"
     },
     {
-      "threshold1": "0.78",
+      "threshold1": "0.8",
       "threshold2": "0.7",
       "seed1": "51",
       "seed2": "51",
