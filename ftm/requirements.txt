@@ -26,6 +26,8 @@ pycodestyle==2.5.0
 pycparser==2.20
 pylint==2.4.4
 pyparsing==2.4.7
+PyQt5==5.14.2
+PyQt5-sip==12.7.2
 python-dateutil==2.8.1
 pytz==2020.1
 six==1.14.0
