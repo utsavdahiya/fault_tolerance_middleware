@@ -13,6 +13,9 @@ import numpy as np
 import pickle
 import json
 
+SIZE = 22
+matplotlib.rcParams.update({'font.size': SIZE})
+
 class ScrollableWindow(QtWidgets.QMainWindow):
     def __init__(self, fig):
         self.qapp = QtWidgets.QApplication([])
@@ -55,7 +58,7 @@ def print_duration(fault_rate, List, **kwargs):
     label = kwargs.get('label', None)
 
     y = np.arange(1, len(List)+1, 1)
-    mean_val = 0
+    mean_val = ''
     if ax is None:
         mean_val = np.array(List).mean()
         fig, ax = plt.subplots()
@@ -185,8 +188,8 @@ def print_comparision(file1, file2):
 
 
 def main():
-    file1 = "OutputUday31.pkl"   #new
-    file2 = "OutputUday32.pkl"   #old
+    file1 = "OutputUday45.pkl"   #new
+    file2 = "OutputUday46.pkl"   #old
 
     # with open(file1, 'rb') as handle:
     #     result = pickle.load(handle)
