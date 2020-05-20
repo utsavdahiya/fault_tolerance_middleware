@@ -13,7 +13,7 @@ import numpy as np
 import pickle
 import json
 
-SIZE = 22
+SIZE = 14
 matplotlib.rcParams.update({'font.size': SIZE})
 
 class ScrollableWindow(QtWidgets.QMainWindow):
@@ -175,16 +175,17 @@ def print_comparision(file1, file2):
 
         axs[i, 1] = print_timing(fault_rate1, result1[fault_rate1]['timing'], ax=axs[i, 1], label=f"New", color='blue')
         axs[i, 1] = print_timing(fault_rate2, result2[fault_rate2]['timing'], ax=axs[i, 1], label=f"Old", color ='orange')
-        axs[i, 1].legend()
+        axs[i, 1].legend(loc='upper left')
         i += 1
 
     fig2, ax = plt.subplots(figsize=(18,40))
     ax = print_all_durations(result1, ax=ax, label="New", color='blue')
     ax = print_all_durations(result2, ax=ax, label="Old", color='orange')
-    ax.legend(loc='upper left')
-    plt.show()
+    # ax.legend(loc='upper left', bbox_to_anchor=(0, 1.0))
+    ax.legend()
+    # plt.show()
     
-    # a = ScrollableWindow(fig)
+    a = ScrollableWindow(fig)
 
 
 def main():
