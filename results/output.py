@@ -181,7 +181,7 @@ def print_comparision(file1, file2):
     fig2, ax = plt.subplots(figsize=(18,40))
     ax = print_all_durations(result1, ax=ax, label="New", color='blue')
     ax = print_all_durations(result2, ax=ax, label="Old", color='orange')
-    ax.legend()
+    ax.legend(loc='upper left')
     plt.show()
     
     # a = ScrollableWindow(fig)
