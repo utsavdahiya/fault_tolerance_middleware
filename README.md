@@ -1,3 +1,5 @@
+For citation and detailed reference: ![FTM PLus](http://sersc.org/journals/index.php/IJAST/article/view/25197)
+
 # fault_tolerance_middleware
 An architecture for fault tolerance middleware that provides fault tolerance as a service for user applications on the top of cloud infrastructure
 
