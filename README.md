@@ -1,4 +1,4 @@
-### For citation and detailed reference: ![FTM Plus](http://sersc.org/journals/index.php/IJAST/article/view/25197)
+### For citation and detailed reference checkout our paper: [FTM Plus](http://sersc.org/journals/index.php/IJAST/article/view/25197)
 
 ---
 
