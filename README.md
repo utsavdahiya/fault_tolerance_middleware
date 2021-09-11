@@ -7,11 +7,15 @@ An architecture for fault tolerance middleware that provides fault tolerance as 
 
 ## Architecture:
 
-![FTM architecture](https://github.com/utsavdahiya/fault_tolerance_middleware/blob/develop/images/ftm_arch.png)
+![FTM architecture](./images/overview.png)
 
-Overview:
+Instantiation:
 
-![overview](https://github.com/utsavdahiya/fault_tolerance_middleware/blob/develop/images/overview.png)
+![Instantiation](./images/init-process.PNG)
+
+Workflow:
+
+![workflow](./images/workflow.PNG)
 
 ## Replication Manager
 * __replica group__: a set of VM instances that are controlled by a single implementaion of a replication mechanism(ft_unit).
